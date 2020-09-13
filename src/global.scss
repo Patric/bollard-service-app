@@ -24,3 +24,24 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+/* Theme varriables */
+@import "./theme/variables.scss";
+
+.under-text
+{   
+    padding-top: 4%;
+    display: flex;
+    justify-content: center;
+ 
+}
+
+.small-text:link{
+    text-align: center;
+    text-decoration: none;
+}
+
+.small-text:hover{
+    color: var(--ion-color-danger);
+}
+

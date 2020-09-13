@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sign in</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+
+<ion-content>
+
+  <form>
+    <ion-item lines = "full">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input #email placeholder = "E-mail address" type="text" required></ion-input>
+    </ion-item>
+
+    <ion-item lines="full">
+      <ion-label position="floating">Password</ion-label>
+      <ion-input #pass placeholder = "Password" type = "password" required></ion-input>
+    </ion-item>
+
+    <ion-row>
+      <ion-col>
+        <ion-button type ="submit" color="danger" expand = "block" (click)="login(email.value, pass.value)"> Sign In </ion-button>
+        <div class = under-text>
+          <a [routerLink]="['/forgot-password']" class = "small-text">Forgot Password?</a>
+        </div>
+       
+      </ion-col>
+    </ion-row>
+
+  </form>
+
+</ion-content>
