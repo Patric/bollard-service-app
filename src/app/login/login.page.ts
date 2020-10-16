@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { LoginService } from '../login.service';
+import { LoginService } from '../_services/login.service';
 
-import { User } from '../user';
+import { User } from '../_models/user';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +11,7 @@ import { User } from '../user';
 })
 export class LoginPage implements OnInit {
 
-  @Input() user: User;
+  user: User;
   users: User[];
 
   constructor
@@ -20,22 +20,25 @@ export class LoginPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    //this. user = new User;
-    this.getUsers();
-    console.log(`Users fetched`);
+    this.user = new User;
   }
 
-  getUsers(): void{
-    this.loginService.getUsers().subscribe(users => this.users = users);
-  }
 
-  login(email: string, password: string)
+  login($email: string, $pass: string)
   { 
-    //this.user.email = "CHECK";
-   // console.log(`User ${email} \n password ${password}`);
+    //this.loginService.fakeBackendTest();
+    this.loginService.validate($email, $pass);
+    // console.log(`User: ${email} \n password: ${password} ${this.user}`);
     
-    this.loginService.getUser(1).subscribe(user => this.user = user);
-   // console.log(`Fetched credentials from user ${this.user.email}`);
+    // if(this.user.email != undefined)
+    // {
+    //   console.log(`Fetched credentials from user ${this.user.email}`);
+    // }
+    // else
+    // {
+    //   console.log(this.loginService.validate(email, password).subscribe(user => this.user = user));
+    // }
+
   }
 
 }
