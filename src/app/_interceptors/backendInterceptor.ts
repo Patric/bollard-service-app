@@ -5,24 +5,34 @@ import { delay, mergeMap, materialize, dematerialize } from 'rxjs/operators';
 const usersData = {
     "users": [
     {
+      "id": "1",
       "email": "user_1",
-      "pass": "test"
+      "pass": "test",
+      "token": null
     },
     {
+      "id": "2",
       "email": "user_2",
-      "pass": "test"
+      "pass": "test",
+      "token": null
     },
     {
+      "id": "3",
       "email": "user_3",
-      "pass": "test"
+      "pass": "test",
+      "token": null
     },
     {
+      "id": "4",
       "email": "user_4",
-      "pass": "test"
+      "pass": "test",
+      "token": null
     },
     {
+      "id": "5",
       "email": "user_5",
-      "pass": "test"
+      "pass": "test",
+      "token": null
     },
     ]
    }
@@ -36,9 +46,9 @@ export class BackendInterceptor implements HttpInterceptor {
     
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>>
     {
-      console.log(request);
+
       const { url, method, headers, body } = request;
-      console.log("Method intercept called");
+      //console.log("Method intercept called");
       //we return an observable of null since we want to decide in handleRoute what we want to do instead of returning anything in the first place
  
       return of(null)
@@ -72,17 +82,17 @@ export class BackendInterceptor implements HttpInterceptor {
         function authenticate(){
           //console.log(headers, body);
           const {email, pass} = body;
-          console.log("found: ", usersData.users.find(x => x.email === email && x.pass === pass ));
+         // console.log("found: ", usersData.users.find(x => x.email === email && x.pass === pass ));
           const user = usersData.users.find(x => x.email === email && x.pass === pass );
           if(!user){
             return error("Email or password is incorrect");
           }
           // TO DO
           // generate token
+          // Hash user id
           return ok({
-            message: "Credentials authenticated",
-            email: user.email,
-            token: "fake-jwt-token"
+            id: user.id,//hashed user id
+            token: "generated-jwt-token"
           });
 
         }
@@ -108,7 +118,7 @@ export class BackendInterceptor implements HttpInterceptor {
 
         function isLoggedIn(){
           //return true of false based on given condition
-          return headers.get('Authorization') === 'fake-jwt-token';
+          return headers.get('Authorization') === 'generated-jwt-token';
         };
 
 

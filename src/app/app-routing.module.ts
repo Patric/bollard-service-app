@@ -1,6 +1,12 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './_guards/auth.guard';
+import { AuthService } from './_services/auth.service';
+
+var route = 'home';
+if(localStorage.getItem("currentUser")){
+  route = 'profile';
+}
 
 
 const routes: Routes = [
@@ -39,5 +45,6 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { 
+ 
 }
 export { RouterModule };

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -8,7 +8,8 @@ import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { map } from 'rxjs/operators';
 
-import { environment } from '../constants';
+import { environment } from '../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -22,10 +23,11 @@ export class AuthService {
 
   private url = environment.apiUrl;
   httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json', 'Authorization' : 'no-token'})
+    headers: new HttpHeaders({'Content-Type': 'application/json', Authorization: 'token'}),
+    withCredentials: true
   };
   users: Array<any>;
-
+  private cookieExpMin: number;
 
   constructor
   (
@@ -34,54 +36,79 @@ export class AuthService {
     private cookieService: CookieService
   ) 
   { 
-    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('currentUser')));
+    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['id', 'token'])));
     this.currentUser = this.currentUserSubject.asObservable();
+    this.cookieExpMin = 15;
+    //console.log("Value: ", this.currentUserValue);
+  }
+
+  getCookies(cookies: string[]){
+  var stringified = '{';
+  for(let i = 0; i < cookies.length; i++)
+  {
+    // any missing cookie leads to logout
+    if(this.cookieService.check(cookies[i]) == false){return null;}
+
+    stringified += `${JSON.stringify(cookies[i])}:${JSON.stringify(this.cookieService.get(cookies[i]))},`
+  }
+  stringified = stringified.slice(0, -1);
+  stringified += '}';
+  return stringified;
   }
 
   public get currentUserValue(): User {
     return this.currentUserSubject.value;
   }
 
-
   authenticate(email$: string, pass$: string)
   {
-    // this.http.post
-    // (
-    //   `${this.url}/authenticate`, 
-    //   {email: email$, pass: pass$},
-    //   this.httpOptions
-    // ).subscribe((x: any) => 
-    // {
-    //   this.httpOptions.headers.set('Authorization', x.token);
-    //   this.cookieService.set('jwt-token', x.token);
-    //   localStorage.setItem("token", x.token);
-    // });
-
     return this.http.post
     (
-      `${this.url}/authenticate`, 
+      `${this.url}/authenticate`,
       {email: email$, pass: pass$},
       this.httpOptions
       // map emits a new transformed observable, pipe used to combine functions
       // store user details and jwt token in local storage to keep user logged in between page refreshes
-    ).pipe(map((res: any) => {
-      localStorage.setItem('currentUser', JSON.stringify(res.user));
-      this.currentUserSubject.next(res.user);
-          return res;
+    ).pipe(map((user: any) => {
+   
+      /// DELETE
+     // localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      const expDate = new Date();
+      expDate.setMinutes(expDate.getMinutes() + this.cookieExpMin);
+      this.cookieService.set(
+        'id', // name 
+        (decodeURIComponent(user.id)), // value
+        expDate, // cookie expiration in addition to session expiration 
+        null, // path
+        null, //domain
+        null, // secure SET TO TRUE
+      );
+      this.cookieService.set(
+        'token', // name 
+        (decodeURIComponent(user.token)), // value
+        expDate, // cookie expiration in addition to session expiration 
+        null, // path
+        null, //domain
+        null, // secure
+      );
+      
+   
+
+      this.currentUserSubject.next(user);
+          return user;
     }));
+    
+  }
 
 
 
-      //console.log("type: ", typeof(x));
-      //TO DO
-      //ADD VALIDATION
-      //this.router.navigateByUrl("/profile");
+  logout(){
+    //localStorage.removeItem('currentUser');
 
+    this.cookieService.deleteAll();
 
-    //const url = `${this.userUrl}?email=^${email}`;
-    //console.log(`Getting user ${url}`)
-    //console.log(this.http.get<User>(url));
-    //return this.http.get<User>(url);  
+    this.currentUserSubject.next(null);
   }
     
 

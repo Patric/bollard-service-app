@@ -18,6 +18,8 @@ import { FormsModule } from '@angular/forms';
 
 import { BackendInterceptor } from './_interceptors/backendInterceptor';
 import { CookieService } from 'ngx-cookie-service';
+import { ErrorInterceptor } from './_interceptors/errorInterceptor';
+import { JwtInterceptor } from './_interceptors/jwtInterceptor';
 
 
 
@@ -36,11 +38,10 @@ import { CookieService } from 'ngx-cookie-service';
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: BackendInterceptor,
-      multi: true
-    },
+    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: BackendInterceptor, multi: true},
+
     CookieService
 
     // provider used to create fake backend

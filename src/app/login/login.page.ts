@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
-
-import { LoginService } from '../_services/login.service';
-
 import { User } from '../_models/user';
+import { AuthService } from '../_services/auth.service';
+import { Observable } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-login',
@@ -11,23 +12,37 @@ import { User } from '../_models/user';
 })
 export class LoginPage implements OnInit {
 
-  user: User;
-  users: User[];
+  private user: Observable<User>;
+
 
   constructor
   (
-    private loginService: LoginService
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    this.user = new User;
+ 
   }
 
 
   login($email: string, $pass: string)
   { 
     //this.loginService.fakeBackendTest();
-    this.loginService.validate($email, $pass);
+
+    //this.loginService.validate($email, $pass); ------------------------------<--
+    //returns user
+    this.authService.authenticate($email, $pass).subscribe((user) => 
+    {
+      this.user = user;
+      if(user.token){
+        this.router.navigate([`/profile`]);
+      }
+      
+    }
+    );
+    
     // console.log(`User: ${email} \n password: ${password} ${this.user}`);
     
     // if(this.user.email != undefined)
