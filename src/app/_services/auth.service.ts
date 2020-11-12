@@ -23,10 +23,13 @@ export class AuthService {
 
   private url = environment.apiUrl;
   httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json', Authorization: 'token'}),
+    headers: new HttpHeaders({'Content-Type': 'application/json'}),
     withCredentials: true
   };
-  users: Array<any>;
+
+  //users: Array<any>;
+
+
   private cookieExpMin: number;
 
   constructor
@@ -42,23 +45,12 @@ export class AuthService {
     //console.log("Value: ", this.currentUserValue);
   }
 
-  getCookies(cookies: string[]){
-  var stringified = '{';
-  for(let i = 0; i < cookies.length; i++)
-  {
-    // any missing cookie leads to logout
-    if(this.cookieService.check(cookies[i]) == false){return null;}
 
-    stringified += `${JSON.stringify(cookies[i])}:${JSON.stringify(this.cookieService.get(cookies[i]))},`
-  }
-  stringified = stringified.slice(0, -1);
-  stringified += '}';
-  return stringified;
-  }
 
   public get currentUserValue(): User {
     return this.currentUserSubject.value;
   }
+
 
   authenticate(email$: string, pass$: string)
   {
@@ -111,6 +103,21 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
     
+  // helper functions
+
+  getCookies(cookies: string[]){
+    var stringified = '{';
+    for(let i = 0; i < cookies.length; i++)
+    {
+      // any missing cookie leads to logout
+      if(this.cookieService.check(cookies[i]) == false){return null;}
+  
+      stringified += `${JSON.stringify(cookies[i])}:${JSON.stringify(this.cookieService.get(cookies[i]))},`
+    }
+    stringified = stringified.slice(0, -1);
+    stringified += '}';
+    return stringified;
+    }
 
 
 

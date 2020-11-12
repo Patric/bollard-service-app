@@ -72,6 +72,8 @@ export class BackendInterceptor implements HttpInterceptor {
               return testFunc();
             case url.endsWith('authenticate') && method === 'POST':
               return authenticate();
+            case url.endsWith('someInfo') && method === 'GET':
+              return testFunc();
             default:
               return next.handle(request)
           }
@@ -84,22 +86,43 @@ export class BackendInterceptor implements HttpInterceptor {
           const {email, pass} = body;
          // console.log("found: ", usersData.users.find(x => x.email === email && x.pass === pass ));
           const user = usersData.users.find(x => x.email === email && x.pass === pass );
+          const userID = usersData.users.findIndex(x => x.email === email && x.pass === pass );
+          
+
+
           if(!user){
             return error("Email or password is incorrect");
           }
           // TO DO
           // generate token
           // Hash user id
+          const generatedToken = getRandomString(121);
+          usersData.users[userID].token = generatedToken;
+          console.log(usersData.users[userID]);
           return ok({
             id: user.id,//hashed user id
-            token: "generated-jwt-token"
+            token: generatedToken
           });
 
         }
 
         function testFunc(){
-          return ok(usersData)
+
+          
+          if(isLoggedIn())
+          {
+            return ok(usersData)
+          }
+          else{
+            return error("You are not permitted to get this data");
+   
+          }
+
+          
         }
+
+
+
 
 
         //helper functions
@@ -118,9 +141,20 @@ export class BackendInterceptor implements HttpInterceptor {
 
         function isLoggedIn(){
           //return true of false based on given condition
-          return headers.get('Authorization') === 'generated-jwt-token';
+          return headers.get('Authorization') === usersData.users.find(x => x.id === headers.get('id')).token;
         };
 
+        function getRandomString(length: number){
+          var result = "";
+
+          var randomChars = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890';
+          
+          for(let i = 0; i <length; i++){
+            result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+          };
+          
+          return result;
+        }
 
     }
 
