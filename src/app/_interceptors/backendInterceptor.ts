@@ -114,7 +114,7 @@ export class BackendInterceptor implements HttpInterceptor {
             return ok(usersData)
           }
           else{
-            return error("You are not permitted to get this data");
+            return unauthorised();
    
           }
 
@@ -159,41 +159,6 @@ export class BackendInterceptor implements HttpInterceptor {
     }
 
 
-    
-  // authenticate() {
-  //   const { username, password } = body;
-  //   const user = this.users.find(x => x.username === username && x.password === password);
-  //   if (!user) return error('Username or password is incorrect');
-  //   return ok({
-  //       id: user.id,
-  //       username: user.username,
-  //       firstName: user.firstName,
-  //       lastName: user.lastName,
-  //       token: 'fake-jwt-token'
-  //   })
-  // }
-/*
- function handleRoute() {
-            switch (true) {
-                case url.endsWith('/users/authenticate') && method === 'POST':
-                    return authenticate();
-                case url.endsWith('/register') && method === 'POST':
-                    return register();
-                case url.endsWith('/users') && method === 'GET':
-                    return getUsers();
-                case url.match(/\/users\/\d+$/) && method === 'GET':
-                    return getUserById();
-                case url.match(/\/users\/\d+$/) && method === 'PUT':
-                    return updateUser();
-                case url.match(/\/users\/\d+$/) && method === 'DELETE':
-                    return deleteUser();
-                default:
-                    // pass through any requests not handled above
-                    return next.handle(request);
-            }    
-        }
-
-*/
 
 
 }

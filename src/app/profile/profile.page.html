@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar>
+    
     <ion-title>User's profile</ion-title>
   </ion-toolbar>
 </ion-header>
+
+
 
 
 
@@ -15,8 +18,19 @@
     <ion-row class="ion-align-items-center">
       <ion-button expand = "round" color ="primary" (click) = "logEvent()">Action</ion-button>
     </ion-row>
+    <ion-row>
+      <ion-list>
+          <ion-item lines="full" color="success" *ngFor="let element of response">
+              <ion-badge color = "primary">{{element.id}}</ion-badge><ion-label class="ion-text-wrap"> {{element.email}}  </ion-label>
+          </ion-item>
+          
+         
+      </ion-list>
+    </ion-row>
     
 
   </ion-grid>
+  
 </ion-content>
+<ion-button class = "logout" color="danger" expand = "round" (click) = "logout()">Logout</ion-button>
 

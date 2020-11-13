@@ -6,6 +6,7 @@ import { AuthService } from '../_services/auth.service';
 
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 
 
@@ -26,25 +27,34 @@ export class ProfilePage implements OnInit {
     private authService: AuthService
   ) {}
 
+  private response: Observable<Array<any>>;
+
   ngOnInit() {
   }
 
 
   logEvent(){
-    console.log("request to",  `${environment.apiUrl}/someInfo`);
     this.http.get
     (
       `${environment.apiUrl}/someInfo`,
       this.authService.httpOptions
       // map emits a new transformed observable, pipe used to combine functions
       // store user details and jwt token in local storage to keep user logged in between page refreshes
-    ).pipe(map((res: any) => {
+    ).subscribe((res: any) =>{
+      if(res.status == "401"){
+        this.router.navigateByUrl(this.router.getCurrentNavigation.toString());
+      }
+
       console.log(res);
-    }
-    )).subscribe();
+      this.response = res.users;
+      
+    } );
+  
+  }
+
+  logout(){
+    this.authService.logout();
     
-
-
   }
 
 }

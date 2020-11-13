@@ -96,11 +96,12 @@ export class AuthService {
 
 
   logout(){
+    //T O DO 
+    //send request to logout
     //localStorage.removeItem('currentUser');
-
     this.cookieService.deleteAll();
-
     this.currentUserSubject.next(null);
+    this.router.navigateByUrl("/");
   }
     
   // helper functions
