@@ -18,7 +18,25 @@
     <ion-row class="ion-align-items-center">
       <ion-button expand = "round" color ="primary" (click) = "logEvent()">Action</ion-button>
     </ion-row>
+
+
+    <ion-row class="ion-align-items-center">
+      <ion-button expand = "round" color ="primary" (click) = "check()">Check status</ion-button>
+    </ion-row>
+
+
     <ion-row>
+
+
+      <ion-row class="ion-align-items-center">
+        <ion-button expand = "round" color ="primary" (click) = "startScan()">Start scan</ion-button>
+      </ion-row>
+
+
+      <ion-row class="ion-align-items-center">
+        <ion-button expand = "round" color ="primary" (click) = "stopScan()">Stop scan</ion-button>
+      </ion-row>
+
       <ion-list>
           <ion-item lines="full" color="success" *ngFor="let element of response">
               <ion-badge color = "primary">{{element.id}}</ion-badge><ion-label class="ion-text-wrap"> {{element.email}}  </ion-label>
@@ -27,7 +45,15 @@
          
       </ion-list>
     </ion-row>
-    
+  <ion-row>
+    <ion-list>
+      <ion-item lines="full" color="danger" *ngFor="let element of devices">
+          <ion-badge color = "primary">{{element.name}}</ion-badge><ion-label class="ion-text-wrap"> {{element.address}}  </ion-label>
+      </ion-item>
+  </ion-list>
+  </ion-row>
+     
+ 
 
   </ion-grid>
   

@@ -20,6 +20,7 @@ import { BackendInterceptor } from './_interceptors/backendInterceptor';
 import { CookieService } from 'ngx-cookie-service';
 import { ErrorInterceptor } from './_interceptors/errorInterceptor';
 import { JwtInterceptor } from './_interceptors/jwtInterceptor';
+import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
 
 
 
@@ -41,8 +42,8 @@ import { JwtInterceptor } from './_interceptors/jwtInterceptor';
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: BackendInterceptor, multi: true},
-
-    CookieService
+    CookieService,
+    BluetoothLE
 
     // provider used to create fake backend
     //fakeBackendProvider

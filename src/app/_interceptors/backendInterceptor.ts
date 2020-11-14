@@ -94,7 +94,6 @@ export class BackendInterceptor implements HttpInterceptor {
             return error("Email or password is incorrect");
           }
           // TO DO
-          // generate token
           // Hash user id
           const generatedToken = getRandomString(121);
           usersData.users[userID].token = generatedToken;
