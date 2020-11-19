@@ -1,8 +1,8 @@
-import { DatePipe, formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { BluetoothLE, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
-import { BehaviorSubject, Observable, Observer, of } from 'rxjs';
+import { BehaviorSubject, Observable, Observer, of, throwError } from 'rxjs';
+
 
 
 @Injectable({
@@ -12,14 +12,21 @@ export class BluetoothService {
 
   scanStatus: ScanStatus;
   devicesFound: Array<any>;
-  devicesFoundObs: Observable<Array<any>>;
+  devicesFound$: BehaviorSubject<Array<any>>;
+  deviceInfo$: BehaviorSubject<any>;
+
 
 constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
 
-  
 
   this.devicesFound = new Array();
-
+  this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
+  this.deviceInfo$ = new BehaviorSubject<any>(null);
+  // this.bluetoothle.retrieveConnected().then((retrieved) => {
+  //   this.deviceInfo$ = new BehaviorSubject(retrieved.devices[1]);
+  // });
+  
+  
 
   console.log("Initiating bluetooth");
   this.plt.ready().then((readySource) => {
@@ -28,15 +35,10 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
     console.log('Platform ready from', readySource);
     
     this.bluetoothle.hasPermission().then((response) => {
-      //console.log(response);
       if(response.hasPermission == false){
 
         this.bluetoothle.requestPermission().then(status => console.log(status));
-
       }
-        
-
-
     });
 
     bluetoothle.isLocationEnabled().then((isLocationEnabled) => {
@@ -56,64 +58,211 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
       this.bluetoothle.enable();
       this.bluetoothle.getAdapterInfo().then(info => console.log(info));
     });
-
-
-    
    });
  }
 
 
   checkStatus(){
-    console.log('FOUND DEVICES: ', this.devicesFound);
+    this.bluetoothle.retrieveConnected().then(status => console.log(status.devices));
+
   }
-  startScan(){
+
+
+  startScanning(){
+    //this.closeConnection(this.deviceInfo$.getValue().dvc_address);
+    // Add all connected devices to scanning list
+ 
+    this.bluetoothle.retrieveConnected().then((connected) => 
+    {
+      
+      console.log("Devices connected:", connected.devices);
+      connected.devices.forEach((device: any) => 
+      {
+      this.devicesFound$.next(device);
+      console.log("Devices connected:", device);
+    
+    })});
+ 
+
+
+    this.bluetoothle.isScanning().then((status) => {
+      console.log(status.isScanning);
+
+    if(!status.isScanning){
     this.devicesFound = [];
     console.log(this.devicesFound);
     const stop_scan = new Date();
-    stop_scan.setSeconds(stop_scan.getSeconds() + 2);
+    stop_scan.setSeconds(stop_scan.getSeconds() + 3);
+    //this.stopScanning();
 
     
     this.bluetoothle.startScan({
-     // "services": ["1101"],
+      //"services": ["1101"], // error when connecting to different devices
       "allowDuplicates": true,  
       "scanMode": this.bluetoothle.SCAN_MODE_LOW_LATENCY,
       "matchMode": this.bluetoothle.MATCH_MODE_AGGRESSIVE,
       "matchNum": this.bluetoothle.MATCH_NUM_MAX_ADVERTISEMENT,
       "callbackType": this.bluetoothle.CALLBACK_TYPE_ALL_MATCHES,
-    }).subscribe((status) => {
-      
-
-      const myDate = new Date();
-      if(myDate.toString().substring(11, 30) == stop_scan.toString().substring(11,30)){
-        this.stopScan();
-      }
-
-      //console.log("New status: ", status);
-      if(status.status == "scanResult"){
-        if(this.devicesFound.find(x => x.address == status.address && x.name == status.name)){}
+    }).subscribe((deviceInfo) => {
+      if(deviceInfo.status == "scanResult"){
+        if(this.devicesFound.find(x => x.address == deviceInfo.address && x.name == deviceInfo.name)){}
         else{
-          this.devicesFound.push(status);
-          
+          this.devicesFound.push(deviceInfo);
         };
       }
-      else{
-        
+      const myDate = new Date();
+      if(myDate.toString().substring(11, 30) == stop_scan.toString().substring(11,30)){
+        this.stopScanning();
       }
-      //return of(this.devicesFound);
+    
+      this.devicesFound$.next(this.devicesFound);
+    });
+   }});
+
+
+  }
+
+  stopScanning(){
+   
+    this.bluetoothle.isScanning().then((status) => {
+      if(status.isScanning){
+        this.bluetoothle.stopScan().then(m => console.log(m));
+      };
+
+      
+      // if(status.isScanning && !this.isStopPlanned)
+      // {
+        
+      //   setTimeout(()=>{
+      //     console.log("clicked");
+      //     this.bluetoothle.stopScan().then(m => console.log(m));
+      //     this.isStopPlanned = false;
+      //   }, 600);
+      // this.isStopPlanned = true;
+      // }
+    });
+  }
+
+  getDevicesFound(): BehaviorSubject<Array<any>>{
+    return this.devicesFound$;
+  }
+  getConnectedDevices(): BehaviorSubject<any>{
+    return this.deviceInfo$;
+  }
+
+
+  connect(dvc_address: string)
+  {
+    // this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
+
+    // {  this.deviceInfo$.next(deviceInfo);
+    //   //console.log("IS connected?",deviceInfo.isConnected);
+    //   if(deviceInfo.isConnected){
+    //     //this.closeConnection(dvc_address);
+    //     console.log("Already connected");
+    //   }
+    // });
+
+    console.log("Connecting initiated");
+    this.bluetoothle.connect(
+      {
+        address: dvc_address,
+        autoConnect: false
+      }
+    ).subscribe((deviceInfo) =>  {
+    
+    //console.log("NEW CONNECTION STATUS: ", deviceInfo.status)
+    
+    
+    if(deviceInfo.status == "connected"){
+      
+      this.bluetoothle.discover({
+        "address": deviceInfo.address,
+        "clearCache": true
+      }).then((onfulfilled) => {
+        this.deviceInfo$.next(deviceInfo);
+        console.log("Services: ", onfulfilled.services);
+        
+    });
+      
+    };
+    
+    }, (err) => 
+    {
+      if(err.message == "Device previously connected, reconnect or close for new device"){
+      
+        this.bluetoothle.close({
+          address: err.address
+          }).then((onfullfilled) => {
+            console.log(onfullfilled);
+            if(onfullfilled.status == "closed"){
+              this.connect(dvc_address);
+            }
+          }
+          );;
+
+      console.log("Function connect() failed: ", err);
+          
+
+    }
     }
     );
+    
+    
+    // if(this.cntnStatus$.getValue() != ""){
+    //   return of(this.error(this.cntnStatus$.getValue()));
+    // }
+
+    console.log("RETURNING: ", this.deviceInfo$.getValue());
+    return this.deviceInfo$;
+    
   }
 
-  stopScan(){
-    this.bluetoothle.stopScan().then(m => console.log(m));
-    // this.bluetoothle.connect(
-    //   {address: "3C:71:BF:CB:3B:EE"}).subscribe(deviceInfo => console.log(deviceInfo));
+  read(){
+    console.log("reading...", this.deviceInfo$.getValue());
+
+    // this.bluetoothle.retrieveConnected().then((retrieved) => {
+    //   this.deviceInfo$.next(retrieved.devices[1]);
+
+    // });
+   
+    this.bluetoothle.read(
+      {
+        "address": this.deviceInfo$.getValue().address,
+        "service": "1101",
+        "characteristic": "2101"
+      }
+    ).then(res => console.log(this.bluetoothle.encodedStringToBytes(res.value)));
+  }
+  
+  closeConnection(dvc_address: string)
+  {
+    console.log("closing");
+    this.bluetoothle.close(
+      {
+        address: dvc_address
+      }
+    ).then((deviceInfo) =>  {
+     this.deviceInfo$.next(deviceInfo.status);
+     }
+     );
+   
+    //  if(this.cntnStatus$.getValue() != ""){
+    //    return of(this.error(this.cntnStatus$.getValue()));
+    //  }
+     return this.deviceInfo$;
   }
 
-  getDevicesFound(): Observable<Array<any>>{
-    return of(this.devicesFound);
+  
+
+
+  //helper functions
+
+  error(message: string){
+    return throwError ({error: { message }})
   }
- 
+
+ // bollard sending to device it's data. Device making request to serwer to get data for this bollard
   
 
 }

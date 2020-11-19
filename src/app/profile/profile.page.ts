@@ -1,12 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, defineInjectable, OnInit } from '@angular/core';
+import { Component, defineInjectable, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../_services/auth.service';
 
 import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 import { BluetoothService } from '../_services/bluetooth.service';
 
@@ -17,24 +17,33 @@ import { BluetoothService } from '../_services/bluetooth.service';
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })
-export class ProfilePage implements OnInit {
+export class ProfilePage implements OnInit, OnDestroy {
+
+  private response: Observable<Array<any>>;
+  private devicesFound$: BehaviorSubject<Array<any>>;
+
+  private connectedDeviceAdr$: BehaviorSubject<any>;
 
   constructor
   (
     private http: HttpClient,
     private router: Router,
     private bluetoothService: BluetoothService,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private ngZone: NgZone
+  ) {
+  }
 
-  private response: Observable<Array<any>>;
-  private devices;
 
   ngOnInit() {
-    this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {
-      console.log("PROPERTY CHANGEEED", devicesFound);
-      this.devices = devicesFound;
-    });
+    this.devicesFound$ = new BehaviorSubject<Array<any>>(null);
+    this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
+ 
+
+  }
+
+  ngOnDestroy(){
+    
   }
 
 
@@ -58,22 +67,67 @@ export class ProfilePage implements OnInit {
   }
 
   check(){
-    this.bluetoothService.checkStatus();
+    this.bluetoothService.read();
   }
   startScan(){
-    this.bluetoothService.startScan();
+    this.bluetoothService.startScanning();
+    this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {
+      this.ngZone.run( () => {this.devicesFound$.next(devicesFound); });
+    });
+
   }
   stopScan(){
-    this.bluetoothService.stopScan();
-    this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {
-      console.log("PROPERTY CHANGEEED", devicesFound);
-      this.devices = devicesFound;
-    });
+    this.bluetoothService.stopScanning();
+  }
+
+  connect(dvc_address: string){
+      this.bluetoothService.connect(dvc_address).subscribe((deviceInfo) => {
+        console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
+        this.ngZone.run( () => {
+          this.connectedDeviceAdr$.next(deviceInfo.address);
+         
+        });
+      });;;
+
+     
+      //this.updateConnected();
+
+  }
+
+
+
+
+
+
+  closeConnection(){
+   // console.log(this.connectedDeviceAdr$.getValue());
+    
+    this.bluetoothService.closeConnection(this.connectedDeviceAdr$.getValue()).subscribe((deviceInfo) => {
+      console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
+      this.ngZone.run( () => {
+        this.connectedDeviceAdr$.next(deviceInfo.address);
+       
+      });
+    });;;
+    //this.updateConnected();
   }
 
   logout(){
     this.authService.logout();
   
+  }
+
+  // helper functions
+
+  updateConnected(){
+    this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
+      console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
+      this.ngZone.run( () => {
+        this.connectedDeviceAdr$.next(deviceInfo.address);
+       
+      });
+    });;
+
   }
 
 }
