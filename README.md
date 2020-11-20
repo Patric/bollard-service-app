@@ -1,7 +1,7 @@
 # ionic-form-ui
 
 Część webowa rozwijana w Visual Studio Code z dodatkiem Angular Snippets (Version 9)
-
+Aktualnie sprawdzone na Android. W przypadku iOS prawdopodobnie będzie trzeba dokonać małych poprawek jeśli chodzi o plugin bluetooth. Na windows plugin bluetooth nie działa.
 
 Zainstalowane pakiety npm:
 + +-- @angular/cli@10.0.1
@@ -42,4 +42,17 @@ Kod programu Arduinio w katalogu arduino/sketch_oct26a.ino
 
 Do debugowania połączenia bluetooth asysta nRF Connect ze sklepu Play na Android(Weryfikowanie zgodności z pluginem cordovy)
 
+
+W celu uruchomienia w przeglądarce
+
+ionic serve --lab w katalogu projektu
+
+Aby zbudować aplikację natywną:
+
+Aby wyświetlać logi w Visual Studio Code: (aplikacja nei działa po odłącczeniu od komputera)
+ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tą samą komendę)
+
+Aby uruchomić aplikację na urządzeniu bez logów(działa po odłączeniu od komputera)
+
+ionic cordova run android
 
