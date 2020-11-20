@@ -37,6 +37,9 @@ Kod arduino kompilowany i wgrywany przy pomocy:
 Arduino IDE 1.8.13
 https://www.arduino.cc/en/software
 
+Kod programu Arduinio w folderze arduino pod nazwą "sketch_oct26a.ino"
+
+
 Do debugowania połączenia bluetooth asysta nRF Connect ze sklepu Play na Android(Weryfikowanie zgodności z pluginem cordovy)
 
-Kod Arduino w folderze arduino pod nazwą "sketch_oct26a.ino"
+
