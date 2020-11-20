@@ -14,13 +14,13 @@ oraz pakiety z package.json
 
 Potem pluginy cordova:
 
-cordova-plugin-bluetoothle 6.1.0 "Bluetooth LE"
-cordova-plugin-device 2.0.2 "Device"
-cordova-plugin-ionic-keyboard 2.2.0 "cordova-plugin-ionic-keyboard"
-cordova-plugin-ionic-webview 4.2.1 "cordova-plugin-ionic-webview"
-cordova-plugin-splashscreen 5.0.2 "Splashscreen"
-cordova-plugin-statusbar 2.4.2 "StatusBar"
-cordova-plugin-whitelist 1.3.3 "Whitelist"
++ cordova-plugin-bluetoothle 6.1.0 "Bluetooth LE"
++ cordova-plugin-device 2.0.2 "Device"
++ cordova-plugin-ionic-keyboard 2.2.0 "cordova-plugin-ionic-keyboard"
++ cordova-plugin-ionic-webview 4.2.1 "cordova-plugin-ionic-webview"
++ cordova-plugin-splashscreen 5.0.2 "Splashscreen"
++ cordova-plugin-statusbar 2.4.2 "StatusBar"
++ cordova-plugin-whitelist 1.3.3 "Whitelist"
 
 Plugin odpowiedzialny za bluetooth, wymagania do pluginu:
 
