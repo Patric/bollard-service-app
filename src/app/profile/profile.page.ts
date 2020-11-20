@@ -12,6 +12,7 @@ import { BluetoothService } from '../_services/bluetooth.service';
 
 
 
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -21,8 +22,9 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   private response: Observable<Array<any>>;
   private devicesFound$: BehaviorSubject<Array<any>>;
-
+  private connectedDevice$: BehaviorSubject<any>;
   private connectedDeviceAdr$: BehaviorSubject<any>;
+  private message$: BehaviorSubject<any>;
 
   constructor
   (
@@ -37,9 +39,42 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.devicesFound$ = new BehaviorSubject<Array<any>>(null);
+    this.connectedDevice$ = new BehaviorSubject<any>(null);
     this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
- 
+    this.message$ = new BehaviorSubject<any>(null);
+//tre
+    this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {
+      this.ngZone.run( () => {this.devicesFound$.next(devicesFound); });
+    });
 
+    this.bluetoothService.getMessage().subscribe((message) => {
+      this.ngZone.run( () => {
+       
+        this.message$.next(message); 
+  
+      });
+    });
+
+    this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
+        this.connectedDevice$.next(deviceInfo);
+
+        console.log("devieInfo in page", `${deviceInfo}`);
+        try{
+          if(deviceInfo.address != undefined){
+            this.ngZone.run( () => {
+              this.connectedDeviceAdr$.next(deviceInfo.address.toString());
+            });
+          }
+          else{
+            this.connectedDeviceAdr$.next(null);
+          }
+
+        }
+        catch(error){
+          console.log(error);
+        }      
+      
+    });
   }
 
   ngOnDestroy(){
@@ -68,12 +103,17 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   check(){
     this.bluetoothService.read();
+    // this.bluetoothService.getMessage().subscribe((response) => {
+    //   this.ngZone.run( () => {
+    //     console.log("new value");
+    //     this.message$.next(response.value); 
+      
+    //   });
+    // });
   }
   startScan(){
     this.bluetoothService.startScanning();
-    this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {
-      this.ngZone.run( () => {this.devicesFound$.next(devicesFound); });
-    });
+    
 
   }
   stopScan(){
@@ -81,13 +121,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
 
   connect(dvc_address: string){
-      this.bluetoothService.connect(dvc_address).subscribe((deviceInfo) => {
-        console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
-        this.ngZone.run( () => {
-          this.connectedDeviceAdr$.next(deviceInfo.address);
-         
-        });
-      });;;
+      this.bluetoothService.connect(dvc_address);
 
      
       //this.updateConnected();
@@ -102,13 +136,8 @@ export class ProfilePage implements OnInit, OnDestroy {
   closeConnection(){
    // console.log(this.connectedDeviceAdr$.getValue());
     
-    this.bluetoothService.closeConnection(this.connectedDeviceAdr$.getValue()).subscribe((deviceInfo) => {
-      console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
-      this.ngZone.run( () => {
-        this.connectedDeviceAdr$.next(deviceInfo.address);
-       
-      });
-    });;;
+    this.bluetoothService.closeConnection(this.connectedDevice$.value.address);
+    console.log("AFER CLOSING: ", this.connectedDevice$.value, this.connectedDeviceAdr$.value);
     //this.updateConnected();
   }
 
@@ -119,15 +148,15 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   // helper functions
 
-  updateConnected(){
-    this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
-      console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
-      this.ngZone.run( () => {
-        this.connectedDeviceAdr$.next(deviceInfo.address);
+  // updateConnected(){
+  //   this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
+  //     console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
+  //     this.ngZone.run( () => {
+  //       this.connectedDevice$.next(deviceInfo.address);
        
-      });
-    });;
+  //     });
+  //   });;
 
-  }
+  // }
 
 }

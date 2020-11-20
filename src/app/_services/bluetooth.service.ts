@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BluetoothLE, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
+import { BluetoothLE, DeviceInfo, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Observer, of, throwError } from 'rxjs';
 
@@ -14,7 +14,7 @@ export class BluetoothService {
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
   deviceInfo$: BehaviorSubject<any>;
-
+  message$: BehaviorSubject<any>;
 
 constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
 
@@ -22,6 +22,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
   this.deviceInfo$ = new BehaviorSubject<any>(null);
+  this.message$ = new BehaviorSubject<any>(null);
   // this.bluetoothle.retrieveConnected().then((retrieved) => {
   //   this.deviceInfo$ = new BehaviorSubject(retrieved.devices[1]);
   // });
@@ -149,19 +150,26 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
   getConnectedDevices(): BehaviorSubject<any>{
     return this.deviceInfo$;
   }
+  getMessage(): BehaviorSubject<any>{
+    return this.message$;
+  }
 
 
   connect(dvc_address: string)
   {
-    // this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
 
-    // {  this.deviceInfo$.next(deviceInfo);
-    //   //console.log("IS connected?",deviceInfo.isConnected);
-    //   if(deviceInfo.isConnected){
-    //     //this.closeConnection(dvc_address);
-    //     console.log("Already connected");
-    //   }
-    // });
+    //this.deviceInfo$.next("connecting");
+    this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
+
+    {  this.deviceInfo$.next(deviceInfo);
+      //console.log("IS connected?",deviceInfo.isConnected);
+      if(deviceInfo.isConnected){
+        //this.closeConnection(dvc_address);
+        console.log("Already connected");
+
+     //   return this.deviceInfo$;
+      }
+    });
 
     console.log("Connecting initiated");
     this.bluetoothle.connect(
@@ -180,7 +188,11 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
         "address": deviceInfo.address,
         "clearCache": true
       }).then((onfulfilled) => {
+        
         this.deviceInfo$.next(deviceInfo);
+        
+        console.log("New value: ", this.deviceInfo$.value);
+        this.read();
         console.log("Services: ", onfulfilled.services);
         
     });
@@ -213,8 +225,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
     //   return of(this.error(this.cntnStatus$.getValue()));
     // }
 
-    console.log("RETURNING: ", this.deviceInfo$.getValue());
-    return this.deviceInfo$;
+   // return this.deviceInfo$;
     
   }
 
@@ -226,13 +237,40 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
 
     // });
    
-    this.bluetoothle.read(
-      {
-        "address": this.deviceInfo$.getValue().address,
-        "service": "1101",
-        "characteristic": "2101"
+    // this.bluetoothle.read(
+    //   {
+    //     "address": this.deviceInfo$.getValue().address,
+    //     "service": "1101",
+    //     "characteristic": "2101"
+    //   }
+    // ).then((res) => {
+      
+    //   console.log(this.bluetoothle.encodedStringToBytes(res.value));
+    //   this.message$.next(this.bluetoothle.encodedStringToBytes(res.value));
+    // });
+
+    this.bluetoothle.subscribe({
+      "address": this.deviceInfo$.getValue().address,
+      "service": "1101",
+      "characteristic": "2101",
+    }).subscribe((onfulfilled) => 
+    {
+   
+      let value = onfulfilled.value;
+      //let base64 new Base64();
+     // console.log(base64.decode(String(decoded)));
+     // console.log(this.bluetoothle.encodedStringToBytes("Kg=="));
+     // console.log(`This is decoded ${decoded}`);
+      //decoded = base64.decode(String(decoded));
+    
+      if(value != undefined){
+        //onsole.log(this.bluetoothle.encodedStringToBytes(`${value}`));
+        this.message$.next(this.bluetoothle.encodedStringToBytes(`${value}`));
       }
-    ).then(res => console.log(this.bluetoothle.encodedStringToBytes(res.value)));
+      
+    });
+
+    
   }
   
   closeConnection(dvc_address: string)

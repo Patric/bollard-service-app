@@ -47,20 +47,32 @@
     </ion-row>
   <ion-row>
     <ion-list>
+      
       <ion-item lines="full" color="danger" *ngFor="let element of (devicesFound$ | async)">
           <ion-label class="ion-text-wrap"> {{element.address}} </ion-label><ion-badge color = "primary">{{element.name}}</ion-badge>
-          <div *ngIf="(connectedDeviceAdr$ | async) != 'null' && element.address !=(connectedDeviceAdr$ | async)">
+          <div *ngIf="element.address != (connectedDeviceAdr$ | async)">
           <ion-button color="medium" (click) = "connect(element.address)">Connect</ion-button>
         </div>
-        <div *ngIf="(connectedDeviceAdr$ | async) && element.address == (connectedDeviceAdr$ | async)">
+        <div *ngIf="element.address == (connectedDeviceAdr$ | async)">
           <ion-button color="medium" (click) = "closeConnection()">Disconnect</ion-button>
         </div>
         
       </ion-item>
   </ion-list>
   <ion-button color="medium" (click) = "closeConnection()">Disconnect</ion-button>
+  
   </ion-row>
-     
+  <ion-row>
+    <ion-toolbar>
+    <ion-title>
+      <ion-list-header lines="inset">
+      <ion-content class ="battery">Bollard battery level: {{message$.value}}%</ion-content>
+    </ion-list-header>
+  </ion-title>
+    </ion-toolbar>
+      
+  </ion-row>
+ 
  
 
   </ion-grid>
