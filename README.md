@@ -28,7 +28,8 @@ Pluginy cordova
 
 W celu uruchomienia w przeglądarce
 
-ionic serve --lab w katalogu projektu
+`ionic serve --lab`
+w katalogu projektu
 
 # Arduino
 
@@ -61,13 +62,14 @@ https://github.com/randdusing/cordova-plugin-bluetoothle
 
 #  Aby zbudować aplikację natywną:
 
-Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłączeniu od komputera)
-ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tę samą komendę)
+Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłączeniu od komputera):
+`ionic cordova run android --livereload --consolelogs --serverlogs`
+(może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tę samą komendę)
 
 
 Aby uruchomić aplikację na urządzeniu bez logów(aplikacja działa po odłączeniu od komputera) 
 
-ionic cordova run android --device
+`ionic cordova run android --device`
 
 Urządzenie musi być oczywiście w trybie deweloperskim.
 
