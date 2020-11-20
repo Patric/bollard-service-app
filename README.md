@@ -12,7 +12,9 @@ Zainstalowane pakiety npm:
 
 + pakiety z package.json
 
-Potem pluginy cordova:
+Aby zainstalować wymagane plugin npm install
+
+Pluginy cordova
 
 + cordova-plugin-bluetoothle 6.1.0 "Bluetooth LE"
 + cordova-plugin-device 2.0.2 "Device"
