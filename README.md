@@ -4,13 +4,13 @@ Część webowa rozwijana w Visual Studio Code z dodatkiem Angular Snippets (Ver
 
 
 Zainstalowane pakiety npm:
-+-- @angular/cli@10.0.1
-+-- cordova@9.0.0
-+-- cordova-res@0.15.2
-+-- ionic@5.4.16
-`-- native-run@1.2.2
++ +-- @angular/cli@10.0.1
++ +-- cordova@9.0.0
++ +-- cordova-res@0.15.2
++ +-- ionic@5.4.16
++ `-- native-run@1.2.2
 
-+ pakiety z package.json
+oraz pakiety z package.json
 
 Potem pluginy cordova:
 
