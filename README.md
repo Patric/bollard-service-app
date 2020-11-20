@@ -3,6 +3,8 @@
 Część webowa rozwijana w Visual Studio Code z dodatkiem Angular Snippets (Version 9)
 Aktualnie sprawdzone na Android. W przypadku iOS prawdopodobnie będzie trzeba dokonać małych poprawek jeśli chodzi o plugin bluetooth. Na windows plugin bluetooth nie działa.
 
+# Zainstalowane dodatki
+
 Zainstalowane pakiety npm:
 + +-- @angular/cli@10.0.1
 + +-- cordova@9.0.0
@@ -43,7 +45,7 @@ W celu uruchomienia w przeglądarce
 
 ionic serve --lab w katalogu projektu
 
-WYMAGANIA:
+#Wymagania:
 Należy spełniać pełne wymagania, aby zbudować aplikację na urządzeniu fizycznym:
 
 Cordova:
@@ -53,7 +55,8 @@ bluetoothle:
 https://github.com/randdusing/cordova-plugin-bluetoothle
 
 
-Aby zbudować aplikację natywną:
+
+#Aby zbudować aplikację natywną:
 
 Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłączeniu od komputera)
 ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tę samą komendę)
@@ -67,7 +70,7 @@ Urządzenie musi być oczywiście w trybie deweloperskim.
 
 
 
-Testowanie aplikacji.
+#Testowanie aplikacji.
 
 Zalogować się testowymi danymi:
 
