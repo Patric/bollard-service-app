@@ -55,13 +55,37 @@ https://github.com/randdusing/cordova-plugin-bluetoothle
 
 Aby zbudować aplikację natywną:
 
-Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłącczeniu od komputera)
+Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłączeniu od komputera)
 ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tę samą komendę)
 
 
-Aby uruchomić aplikację na urządzeniu bez logów(działa po odłączeniu od komputera) 
+Aby uruchomić aplikację na urządzeniu bez logów(aplikacja działa po odłączeniu od komputera) 
 
 ionic cordova run android --device
 
 Urządzenie musi być oczywiście w trybie deweloperskim.
 
+
+
+Testowanie aplikacji.
+
+Zalogować się testowymi danymi:
+
+username: user_1 
+password: test
+
+Następnie nastąpi przekierowanie do "profilu".
+
+Przycisk Action odpowiada za przykładowe pobranie danych z backendu(aktualnie pobierana lista użytkowników) Służy do tego aby sprawdzić, czy użytkownik jest zalogowany(przy logowaniu backend przydziela użytkownikowi token, który jest przesyłany w nagłówkach authorization i id(//TO DO wprowadzić zmiany, aby id i token był przekazywany w jednym nagłówku authorization) i weryfikowany po stronie backendu. Jeśli użytkownik nie będzie upoważniony do pobrania zawartości, bądź jego sesja wygaśnie to dane nie zostaną mu wysłane z serwera i nastąpi automatyczne przekierowanie do strony logowania.(//TO DO upewnić się, że aplikacja nie zachowuje tokenu oraz id w BehaviorSubject w authService). 
+
+Przycisk Check status głównie pomaga przy debugowaniu(aktualnie odpowaida za funkcję czytania danych z charakterystyki serwisu bluetooth)
+
+Przycisk Start scan rozpoczyna 3 sekundowe skanowanie urządzeń w pobliżu, które powinny być wyświetlane niżej na liście(name oraz address).
+
+W tym momencie powinniśmy mieć uruchomione Arduino z załadowanym przez nas programem, które będzie widoczne na liście zeskanowanych urządzeń pod nazwą "Rising Bollard#001". Należy wcisnąć przycisk "Connect" obok pozycji tego urządzenia oraz poczekać aż zostanie nawiązane połączenie. W przypadku problemów należy włączyć i wyłączyć bluetooth i ponowić próbę. Próba łączenia z innymi urządzenia powoduje zbugowanie aplikacji.(Aktualnie wykomentowany jest filtr, który odrzuca wszystkie inne serwisy niż ten z arduino. W normalnym wypadku wyświetlać się powinny tylko urządzenia, które oferują serwis o przyznanym przez nas UID i tak się dzieje, bo odkomentowaniu filtra)
+
+Po nawiązaniu połączenia przycisk "Connect" zamieni się w przycisk "Disconnect", a pooniżej zostaje wyświetlony stan naładowania, który będzie się zmieniał w czasie rzeczywistym. W celu rozłączenia urządzeń należy wcisnąć "Disconnect". Wówczas znów otrzymamy przycisk "Connect" obok danej pozycji.
+
+Przycisk Reset domyślnie służyć ma zerowaniu wszystkich ustawień i rozłączaniu urządzeń, jednak na tę chwilę powoduje tylko problemy.
+
+Przycisk logout powoduje wylogowanie i przeniesienie do root directory
