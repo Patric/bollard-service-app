@@ -24,10 +24,6 @@ Pluginy cordova
 + cordova-plugin-statusbar 2.4.2 "StatusBar"
 + cordova-plugin-whitelist 1.3.3 "Whitelist"
 
-Plugin odpowiedzialny za bluetooth, wymagania do pluginu:
-
-https://github.com/randdusing/cordova-plugin-bluetoothle
-
 
 Zainstalowane biblioteki Arduino:
 + ArduinoBLE
@@ -47,12 +43,25 @@ W celu uruchomienia w przeglądarce
 
 ionic serve --lab w katalogu projektu
 
+WYMAGANIA:
+Należy spełniać pełne wymagania, aby zbudować aplikację na urządzeniu fizycznym:
+
+Cordova:
+https://cordova.apache.org/docs/en/latest/guide/platforms/android/ 
+
+bluetoothle:
+https://github.com/randdusing/cordova-plugin-bluetoothle
+
+
 Aby zbudować aplikację natywną:
 
-Aby wyświetlać logi w Visual Studio Code: (aplikacja nei działa po odłącczeniu od komputera)
-ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tą samą komendę)
+Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłącczeniu od komputera)
+ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tę samą komendę)
 
-Aby uruchomić aplikację na urządzeniu bez logów(działa po odłączeniu od komputera)
 
-ionic cordova run android
+Aby uruchomić aplikację na urządzeniu bez logów(działa po odłączeniu od komputera) 
+
+ionic cordova run android --device
+
+Urządzenie musi być oczywiście w trybie deweloperskim.
 
