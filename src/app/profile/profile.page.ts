@@ -80,7 +80,10 @@ export class ProfilePage implements OnInit, OnDestroy {
   ngOnDestroy(){
     
   }
-
+  reset(){
+ 
+    this.bluetoothService.closeConnection(this.connectedDeviceAdr$.value);
+  }
 
   logEvent(){
     this.http.get

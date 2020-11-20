@@ -9,6 +9,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
+import { NavController } from '@ionic/angular';
 
 
 @Injectable({
@@ -36,7 +37,9 @@ export class AuthService {
   (
     private http: HttpClient,
     private router: Router,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private navCtrl: NavController
+
   ) 
   { 
     this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['id', 'token'])));
@@ -101,7 +104,8 @@ export class AuthService {
     //localStorage.removeItem('currentUser');
     this.cookieService.deleteAll();
     this.currentUserSubject.next(null);
-    this.router.navigateByUrl("/");
+    //this.router.navigateByUrl("/");
+    this.navCtrl.navigateRoot("/");
   }
     
   // helper functions

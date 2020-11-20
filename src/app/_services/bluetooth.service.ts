@@ -72,7 +72,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
   startScanning(){
     //this.closeConnection(this.deviceInfo$.getValue().dvc_address);
     // Add all connected devices to scanning list
- 
+    
     this.bluetoothle.retrieveConnected().then((connected) => 
     {
       
@@ -158,7 +158,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
   connect(dvc_address: string)
   {
 
-    //this.deviceInfo$.next("connecting");
+    this.deviceInfo$.next("connecting");
     this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
 
     {  this.deviceInfo$.next(deviceInfo);
