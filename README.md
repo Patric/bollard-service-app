@@ -26,6 +26,11 @@ Pluginy cordova
 + cordova-plugin-statusbar 2.4.2 "StatusBar"
 + cordova-plugin-whitelist 1.3.3 "Whitelist"
 
+W celu uruchomienia w przeglądarce
+
+ionic serve --lab w katalogu projektu
+
+# Arduino
 
 Zainstalowane biblioteki Arduino:
 + ArduinoBLE
@@ -41,11 +46,9 @@ Kod programu Arduinio w katalogu arduino/sketch_oct26a.ino
 Do debugowania połączenia bluetooth asysta nRF Connect ze sklepu Play na Android(Weryfikowanie zgodności z pluginem cordovy)
 
 
-W celu uruchomienia w przeglądarce
 
-ionic serve --lab w katalogu projektu
 
-#Wymagania:
+# Wymagania:
 Należy spełniać pełne wymagania, aby zbudować aplikację na urządzeniu fizycznym:
 
 Cordova:
@@ -56,7 +59,7 @@ https://github.com/randdusing/cordova-plugin-bluetoothle
 
 
 
-#Aby zbudować aplikację natywną:
+#  Aby zbudować aplikację natywną:
 
 Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłączeniu od komputera)
 ionic cordova run android --livereload --consolelogs --serverlogs (może wystąpić błąd net:: Należy wówczas spróbować odłączyć urządzenie, bądź zamknąć terminal i w nowym terminalu spróbować wywołać tę samą komendę)
@@ -70,18 +73,17 @@ Urządzenie musi być oczywiście w trybie deweloperskim.
 
 
 
-#Testowanie aplikacji.
+# Testowanie aplikacji.
 
 Zalogować się testowymi danymi:
-
 username: user_1 
 password: test
 
 Następnie nastąpi przekierowanie do "profilu".
 
-Przycisk Action odpowiada za przykładowe pobranie danych z backendu(aktualnie pobierana lista użytkowników) Służy do tego aby sprawdzić, czy użytkownik jest zalogowany(przy logowaniu backend przydziela użytkownikowi token, który jest przesyłany w nagłówkach authorization i id(//TO DO wprowadzić zmiany, aby id i token był przekazywany w jednym nagłówku authorization) i weryfikowany po stronie backendu. Jeśli użytkownik nie będzie upoważniony do pobrania zawartości, bądź jego sesja wygaśnie to dane nie zostaną mu wysłane z serwera i nastąpi automatyczne przekierowanie do strony logowania.(//TO DO upewnić się, że aplikacja nie zachowuje tokenu oraz id w BehaviorSubject w authService). 
+Przycisk Action odpowiada za przykładowe pobranie danych z backendu(aktualnie pobierana lista użytkowników) Służy do tego aby sprawdzić, czy użytkownik jest zalogowany(przy logowaniu backend przydziela użytkownikowi token, który jest przesyłany w nagłówkach authorization i id(//TO DO wprowadzić zmiany, aby id i token był przekazywany w jednym nagłówku authorization) i weryfikowany po stronie backendu. Jeśli użytkownik nie będzie upoważniony do pobrania zawartości, bądź jego sesja wygaśnie to dane nie zostaną mu wysłane z serwera i nastąpi automatyczne przekierowanie do strony logowania.(//TO DO upewnić się, że aplikacja nie zachowuje tokenu oraz id w BehaviorSubject w authService po wylogowaniu. Sprawdzić, czy w przypadku budowania aplikacji natywnych jest w ogóle sens wykorzystywania localStorage, cookeis i sessionStorage). 
 
-Przycisk Check status głównie pomaga przy debugowaniu(aktualnie odpowaida za funkcję czytania danych z charakterystyki serwisu bluetooth)
+Przycisk Check status głównie pomaga przy debugowaniu(aktualnie odpowiada za funkcję czytania danych z charakterystyki serwisu bluetooth)
 
 Przycisk Start scan rozpoczyna 3 sekundowe skanowanie urządzeń w pobliżu, które powinny być wyświetlane niżej na liście(name oraz address).
 
