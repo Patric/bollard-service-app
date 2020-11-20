@@ -1,0 +1,82 @@
+<ion-header>
+  <ion-toolbar>
+    
+    <ion-title>User's profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+
+
+
+
+<ion-content class = "info">
+  <ion-grid>
+    <ion-row class="ion-align-items-center">
+       <ion-title class = "info">Some profile info</ion-title>
+    </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-button expand = "round" color ="primary" (click) = "logEvent()">Action</ion-button>
+    </ion-row>
+
+
+    <ion-row class="ion-align-items-center">
+      <ion-button expand = "round" color ="primary" (click) = "check()">Check status</ion-button>
+    </ion-row>
+
+
+    <ion-row>
+
+
+      <ion-row class="ion-align-items-center">
+        <ion-button expand = "round" color ="primary" (click) = "startScan()">Start scan</ion-button>
+      </ion-row>
+
+
+      <ion-row class="ion-align-items-center">
+        <ion-button expand = "round" color ="primary" (click) = "stopScan()">Stop scan</ion-button>
+      </ion-row>
+
+      <ion-list>
+          <ion-item lines="full" color="success" *ngFor="let element of response">
+              <ion-badge color = "primary">{{element.id}}</ion-badge><ion-label class="ion-text-wrap"> {{element.email}}  </ion-label>
+          </ion-item>
+          
+         
+      </ion-list>
+    </ion-row>
+  <ion-row>
+    <ion-list>
+      
+      <ion-item lines="full" color="danger" *ngFor="let element of (devicesFound$ | async)">
+          <ion-label class="ion-text-wrap"> {{element.address}} </ion-label><ion-badge color = "primary">{{element.name}}</ion-badge>
+          <div *ngIf="element.address != (connectedDeviceAdr$ | async)">
+          <ion-button color="medium" (click) = "connect(element.address)">Connect</ion-button>
+        </div>
+        <div *ngIf="element.address == (connectedDeviceAdr$ | async)">
+          <ion-button color="medium" (click) = "closeConnection()">Disconnect</ion-button>
+        </div>
+        
+      </ion-item>
+  </ion-list>
+  <ion-button color="medium" (click) = "closeConnection()">Disconnect</ion-button>
+  
+  </ion-row>
+  <ion-row>
+    <ion-toolbar>
+    <ion-title>
+      <ion-list-header lines="inset">
+      <ion-content class ="battery">Bollard battery level: {{message$.value}}%</ion-content>
+    </ion-list-header>
+  </ion-title>
+    </ion-toolbar>
+      
+  </ion-row>
+ 
+ 
+
+  </ion-grid>
+  
+</ion-content>
+<ion-button class = "logout" color="danger" expand = "round" (click) = "logout()">Logout</ion-button>
+

@@ -1,8 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { User } from '../_models/user';
+import { AuthService } from '../_services/auth.service';
+import { Observable } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { LoginService } from '../login.service';
-
-import { User } from '../user';
 
 @Component({
   selector: 'app-login',
@@ -11,31 +12,48 @@ import { User } from '../user';
 })
 export class LoginPage implements OnInit {
 
-  @Input() user: User;
-  users: User[];
+  private user: Observable<User>;
+
 
   constructor
   (
-    private loginService: LoginService
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit() {
-    //this. user = new User;
-    this.getUsers();
-    console.log(`Users fetched`);
+ 
   }
 
-  getUsers(): void{
-    this.loginService.getUsers().subscribe(users => this.users = users);
-  }
 
-  login(email: string, password: string)
+  login($email: string, $pass: string)
   { 
-    //this.user.email = "CHECK";
-   // console.log(`User ${email} \n password ${password}`);
+    //this.loginService.fakeBackendTest();
+
+    //this.loginService.validate($email, $pass); ------------------------------<--
+    //returns user
+    this.authService.authenticate($email, $pass).subscribe((user) => 
+    {
+      this.user = user;
+      if(user.token){
+        this.router.navigate([`/profile`]);
+      }
+      
+    }
+    );
     
-    this.loginService.getUser(1).subscribe(user => this.user = user);
-   // console.log(`Fetched credentials from user ${this.user.email}`);
+    // console.log(`User: ${email} \n password: ${password} ${this.user}`);
+    
+    // if(this.user.email != undefined)
+    // {
+    //   console.log(`Fetched credentials from user ${this.user.email}`);
+    // }
+    // else
+    // {
+    //   console.log(this.loginService.validate(email, password).subscribe(user => this.user = user));
+    // }
+
   }
 
 }
