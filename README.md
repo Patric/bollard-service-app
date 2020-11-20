@@ -10,7 +10,7 @@ Zainstalowane pakiety npm:
 + +-- ionic@5.4.16
 + `-- native-run@1.2.2
 
-oraz pakiety z package.json
++ pakiety z package.json
 
 Potem pluginy cordova:
 
@@ -28,7 +28,7 @@ https://github.com/randdusing/cordova-plugin-bluetoothle
 
 
 Zainstalowane biblioteki Arduino:
-ArduinoBLE
++ ArduinoBLE
 
 Kod arduino kompilowany i wgrywany przy pomocy:
 
