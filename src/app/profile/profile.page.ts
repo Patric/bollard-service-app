@@ -105,7 +105,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
 
   check(){
-    this.bluetoothService.read();
+    this.bluetoothService.checkStatus();
     // this.bluetoothService.getMessage().subscribe((response) => {
     //   this.ngZone.run( () => {
     //     console.log("new value");

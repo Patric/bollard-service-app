@@ -42,6 +42,7 @@ export class AuthService {
 
   ) 
   { 
+    //update with cookie observable
     this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['id', 'token'])));
     this.currentUser = this.currentUserSubject.asObservable();
     this.cookieExpMin = 15;

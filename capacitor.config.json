@@ -1,0 +1,28 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "ionic-form-ui",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "windowsAndroidStudioPath": "D:\\Android Studio\\bin\\studio64.exe",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {
+    "preferences": {
+      "ScrollEnabled": "false",
+      "BackupWebStorage": "none",
+      "SplashMaintainAspectRatio": "true",
+      "FadeSplashScreenDuration": "300",
+      "SplashShowOnlyFirstTime": "false",
+      "SplashScreen": "screen",
+      "SplashScreenDelay": "3000"
+    }
+  },
+  "server": {
+    "url": "http://192.168.0.103:8100",
+    "originalUrl": "http://localhost:8100"
+  }
+}

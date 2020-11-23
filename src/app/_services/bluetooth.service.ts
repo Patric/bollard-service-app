@@ -64,7 +64,8 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
 
 
   checkStatus(){
-    this.bluetoothle.retrieveConnected().then(status => console.log(status.devices));
+    console.log("CHECK");
+   // this.bluetoothle.retrieveConnected().then(status => console.log(status.devices));
 
   }
 
