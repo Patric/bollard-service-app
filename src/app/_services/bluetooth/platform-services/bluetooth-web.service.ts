@@ -13,9 +13,6 @@ export class BluetoothWebService {
 
   private PRIMARY_SERVICE_UID = Number(peripheral.service.UUID);
   private PRIMARY_CHARACTERISTIC_UID = Number(peripheral.characteristic.UUID);
-
-  private remoteGATTServer: BluetoothRemoteGATTServer;
-  private remoteGATTCharacteristic: BluetoothRemoteGATTCharacteristic;
   
   private message$: BehaviorSubject<any>;
 

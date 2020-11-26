@@ -26,8 +26,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   private connectedDevice$: BehaviorSubject<any>;
   private connectedDeviceAdr$: BehaviorSubject<any>;
 
-  
-
+  // Bonding with html
   private devicesFound;
   private message;
 
@@ -36,7 +35,6 @@ export class ProfilePage implements OnInit, OnDestroy {
   ( private bluetoothService: BluetoothService,
     private http: HttpClient,
     private router: Router,
-  //  private bluetoothNativeService: bluetoothService,
     private authService: AuthService,
     private ngZone: NgZone,
   ) {
@@ -50,6 +48,7 @@ export class ProfilePage implements OnInit, OnDestroy {
       this.connectedDevice$ = new BehaviorSubject<any>(null);
       this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
 
+      // ngZone forces instant update on html side
       this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {this.ngZone.run( () => {
           this.devicesFound = devicesFound;
         });
@@ -68,12 +67,14 @@ export class ProfilePage implements OnInit, OnDestroy {
       }, 
       (err) => console.error("this.bluetoothService.getMessage() error", err));
 
- 
-
       this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
           this.connectedDevice$.next(deviceInfo);
-
-          //console.log("devieInfo in page", `${deviceInfo}`);
+          // troublesome part. deviceInfo can either be returned as one value(e.g "closed") or in json format e.g:
+          //("status: connected",
+          // "address: 00:00:00:000",                                                                
+          // "service": "1101")
+          // that is due to bluetoothLE plugin imperfection
+          // try and catch is necessary to catch deviceInfo.address error in case when the response in "closed", "connecting" format.
           try{
             if(deviceInfo.address != undefined){
               this.ngZone.run( () => {
@@ -100,8 +101,6 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
   reset(){
     this.bluetoothService.disconnect();
-    //this.bluetoothWebService.disconnect();
-    //this.bluetoothService.closeConnection(this.connectedDeviceAdr$.value);
   }
 
   logEvent(){
@@ -125,15 +124,11 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   check(){
     console.log("Checked");
-    //this.bluetoothWebService.read();
 
   }
   startScan(){
     this.bluetoothService.startScanning();
-    
-    
-    //this.bluetoothWebService.startScanning();
-   // this.bluetoothWebService.getMessage().subscribe(message => console.log("Message in Page: ", message));
+  
   }
   stopScan(){
     this.bluetoothService.stopScanning();
@@ -142,40 +137,15 @@ export class ProfilePage implements OnInit, OnDestroy {
   connect(dvc_address: string){
       this.bluetoothService.connect(dvc_address);
 
-     
-      //this.updateConnected();
-
   }
 
-
-
-
-
-
   closeConnection(){
-   // console.log(this.connectedDeviceAdr$.getValue());
-    
     this.bluetoothService.closeConnection(this.connectedDevice$.value.address);
-   // console.log("AFER CLOSING: ", this.connectedDevice$.value, this.connectedDeviceAdr$.value);
-    //this.updateConnected();
   }
 
   logout(){
     this.authService.logout();
-  
+
   }
-
-  // helper functions
-
-  // updateConnected(){
-  //   this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
-  //     console.log("NEW CONNECTION STATUS IN PAGE.TS", deviceInfo.address);
-  //     this.ngZone.run( () => {
-  //       this.connectedDevice$.next(deviceInfo.address);
-       
-  //     });
-  //   });;
-
-  // }
 
 }

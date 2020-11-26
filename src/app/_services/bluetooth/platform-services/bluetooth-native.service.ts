@@ -81,6 +81,8 @@ constructor(
     //this.closeConnection(this.deviceInfo$.getValue().dvc_address);
     // Add all connected devices to scanning list
     
+
+    // Doesn't work. Should add connected devices to scan list in order to provide disconnect option for the user
     this.bluetoothle.retrieveConnected().then((connected) => 
     {
       
@@ -106,7 +108,7 @@ constructor(
 
     
     this.bluetoothle.startScan({
-      "services": [this.PRIMARY_SERVICE_UID], // error when connecting to different devices
+      "services": [this.PRIMARY_SERVICE_UID], // bugs when connecting to different devices or services
       "allowDuplicates": true,  
       "scanMode": this.bluetoothle.SCAN_MODE_LOW_LATENCY,
       "matchMode": this.bluetoothle.MATCH_MODE_AGGRESSIVE,
@@ -209,7 +211,7 @@ constructor(
     
     }, (err) => 
     {
-      if(err.message == "Device previously connected, reconnect or close for new device"){
+      if(err.message == "Device previously connected, reconnect or close for a new device"){
       
         this.bluetoothle.close({
           address: err.address

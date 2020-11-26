@@ -20,6 +20,7 @@ export class BluetoothService {
 
 
   // instantiate native service for android/iOS
+  // get metod is called only when methods from bluetoothNativeService are called thus bluetoothNativeService is not instantiated instantly(lazy loading?)
   public get bluetoothNativeService(): BluetoothNativeService{
     if(!this._bluetoothNativeService){
       this._bluetoothNativeService = this.injector.get(BluetoothNativeService);
