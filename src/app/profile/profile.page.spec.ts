@@ -19,6 +19,6 @@ describe('ProfilePage', () => {
   }));
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component).toBeTruthy();//.catch(error => console.error("While compiling component profile an error occured: "));
   });
 });

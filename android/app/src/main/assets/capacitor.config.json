@@ -22,7 +22,8 @@
     }
   },
   "server": {
-    "url": "http://localhost:8100",
-    "originalUrl": "http://localhost:8100"
+    "cleartext": true,
+    "url": "http://192.168.0.108:8100",
+    "originalUrl": "http://192.168.0.108:8100"
   }
 }

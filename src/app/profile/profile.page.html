@@ -48,7 +48,7 @@
   <ion-row>
     <ion-list>
       
-      <ion-item lines="full" color="danger" *ngFor="let element of (devicesFound$ | async)">
+      <ion-item lines="full" color="danger" *ngFor="let element of (devicesFound)">
           <ion-label class="ion-text-wrap"> {{element.address}} </ion-label><ion-badge color = "primary">{{element.name}}</ion-badge>
           <div *ngIf="element.address != (connectedDeviceAdr$ | async) && (connectedDevice$ | async) != 'connecting'">
           <ion-button color="medium" (click) = "connect(element.address)">Connect</ion-button>
@@ -69,7 +69,7 @@
     <ion-toolbar>
     <ion-title>
       <ion-list-header lines="inset">
-      <ion-content class ="battery">Bollard battery level: {{message$.value}}%</ion-content>
+      <ion-content class ="battery">Bollard battery level: {{message}}%</ion-content>
     </ion-list-header>
   </ion-title>
     </ion-toolbar>

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { BluetoothService } from './bluetooth.service';
+import { ErrorService } from './error.service';
 
-describe('BluetoothService', () => {
-  let service: BluetoothService;
+describe('ErrorService', () => {
+  let service: ErrorService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(BluetoothService);
+    service = TestBed.inject(ErrorService);
   });
 
   it('should be created', () => {

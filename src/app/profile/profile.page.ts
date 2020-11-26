@@ -8,8 +8,8 @@ import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { BluetoothService } from '../_services/bluetooth.service';
-
+import { BluetoothNativeService } from '../_services/bluetooth-native.service';
+import { BluetoothWebService } from '../_services/bluetooth-web.service'
 
 
 
@@ -21,16 +21,21 @@ import { BluetoothService } from '../_services/bluetooth.service';
 export class ProfilePage implements OnInit, OnDestroy {
 
   private response: Observable<Array<any>>;
-  private devicesFound$: BehaviorSubject<Array<any>>;
+
   private connectedDevice$: BehaviorSubject<any>;
   private connectedDeviceAdr$: BehaviorSubject<any>;
-  private message$: BehaviorSubject<any>;
+
+  
+
+  private devicesFound;
+  private message: string;
 
   constructor
   (
     private http: HttpClient,
     private router: Router,
-    private bluetoothService: BluetoothService,
+    private bluetoothNativeService: BluetoothNativeService,
+   // private bluetoothWebService: BluetoothWebService,
     private authService: AuthService,
     private ngZone: NgZone
   ) {
@@ -38,40 +43,46 @@ export class ProfilePage implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.devicesFound$ = new BehaviorSubject<Array<any>>(null);
+
     this.connectedDevice$ = new BehaviorSubject<any>(null);
     this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
-    this.message$ = new BehaviorSubject<any>(null);
-//tre
-    this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {
-      this.ngZone.run( () => {this.devicesFound$.next(devicesFound); });
+
+    this.bluetoothNativeService.getDevicesFound().subscribe((devicesFound) => {
+      this.ngZone.run( () => {
+        //this.devicesFound$.next(devicesFound); 
+        this.devicesFound = devicesFound;
+      
+      
+      });
     });
 
-    this.bluetoothService.getMessage().subscribe((message) => {
+    this.bluetoothNativeService.getMessage().subscribe((message) => {
       this.ngZone.run( () => {
-       
-        this.message$.next(message); 
+        this.message = message;
+    
   
       });
     });
 
-    this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
+    this.bluetoothNativeService.getConnectedDevices().subscribe((deviceInfo) => {
         this.connectedDevice$.next(deviceInfo);
 
         console.log("devieInfo in page", `${deviceInfo}`);
         try{
           if(deviceInfo.address != undefined){
             this.ngZone.run( () => {
+         
               this.connectedDeviceAdr$.next(deviceInfo.address.toString());
             });
           }
           else{
+    
             this.connectedDeviceAdr$.next(null);
           }
 
         }
         catch(error){
-          console.log(error);
+          console.error(error);
         }      
       
     });
@@ -81,8 +92,8 @@ export class ProfilePage implements OnInit, OnDestroy {
     
   }
   reset(){
- 
-    this.bluetoothService.closeConnection(this.connectedDeviceAdr$.value);
+    //this.bluetoothWebService.disconnect();
+    //this.bluetoothNativeService.closeConnection(this.connectedDeviceAdr$.value);
   }
 
   logEvent(){
@@ -105,26 +116,21 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
 
   check(){
-    this.bluetoothService.checkStatus();
-    // this.bluetoothService.getMessage().subscribe((response) => {
-    //   this.ngZone.run( () => {
-    //     console.log("new value");
-    //     this.message$.next(response.value); 
-      
-    //   });
-    // });
-  }
-  startScan(){
-    this.bluetoothService.startScanning();
-    
+    console.log("Checked");
+    //this.bluetoothWebService.read();
 
   }
+  startScan(){
+    this.bluetoothNativeService.startScanning();
+    //this.bluetoothWebService.startScanning();
+   // this.bluetoothWebService.getMessage().subscribe(message => console.log("Message in Page: ", message));
+  }
   stopScan(){
-    this.bluetoothService.stopScanning();
+    this.bluetoothNativeService.stopScanning();
   }
 
   connect(dvc_address: string){
-      this.bluetoothService.connect(dvc_address);
+      this.bluetoothNativeService.connect(dvc_address);
 
      
       //this.updateConnected();
@@ -139,7 +145,7 @@ export class ProfilePage implements OnInit, OnDestroy {
   closeConnection(){
    // console.log(this.connectedDeviceAdr$.getValue());
     
-    this.bluetoothService.closeConnection(this.connectedDevice$.value.address);
+    this.bluetoothNativeService.closeConnection(this.connectedDevice$.value.address);
     console.log("AFER CLOSING: ", this.connectedDevice$.value, this.connectedDeviceAdr$.value);
     //this.updateConnected();
   }

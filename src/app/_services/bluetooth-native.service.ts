@@ -2,26 +2,33 @@ import { Injectable } from '@angular/core';
 import { BluetoothLE, DeviceInfo, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Observer, of, throwError } from 'rxjs';
-
+import { peripheral } from './bluetooth.config.json';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class BluetoothService {
+export class BluetoothNativeService {
+
+  //UID in AAAA format, not AxAAAA
+  private PRIMARY_SERVICE_UID = peripheral.service.UUID.substring(2);
+  private PRIMARY_CHARACTERISTIC_UID = peripheral.characteristic.UUID.substring(2);
+
 
   scanStatus: ScanStatus;
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
-  deviceInfo$: BehaviorSubject<any>;
+  bluetoothDevice$: BehaviorSubject<any>;
   message$: BehaviorSubject<any>;
 
-constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
+constructor(
+  public bluetoothle: BluetoothLE, 
+  public plt: Platform) {
 
 
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
-  this.deviceInfo$ = new BehaviorSubject<any>(null);
+  this.bluetoothDevice$ = new BehaviorSubject<any>(null);
   this.message$ = new BehaviorSubject<any>(null);
   // this.bluetoothle.retrieveConnected().then((retrieved) => {
   //   this.deviceInfo$ = new BehaviorSubject(retrieved.devices[1]);
@@ -99,7 +106,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
 
     
     this.bluetoothle.startScan({
-      //"services": ["1101"], // error when connecting to different devices
+      "services": [this.PRIMARY_SERVICE_UID], // error when connecting to different devices
       "allowDuplicates": true,  
       "scanMode": this.bluetoothle.SCAN_MODE_LOW_LATENCY,
       "matchMode": this.bluetoothle.MATCH_MODE_AGGRESSIVE,
@@ -149,7 +156,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
     return this.devicesFound$;
   }
   getConnectedDevices(): BehaviorSubject<any>{
-    return this.deviceInfo$;
+    return this.bluetoothDevice$;
   }
   getMessage(): BehaviorSubject<any>{
     return this.message$;
@@ -159,10 +166,10 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
   connect(dvc_address: string)
   {
 
-    this.deviceInfo$.next("connecting");
+    this.bluetoothDevice$.next("connecting");
     this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
 
-    {  this.deviceInfo$.next(deviceInfo);
+    {  this.bluetoothDevice$.next(deviceInfo);
       //console.log("IS connected?",deviceInfo.isConnected);
       if(deviceInfo.isConnected){
         //this.closeConnection(dvc_address);
@@ -190,9 +197,9 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
         "clearCache": true
       }).then((onfulfilled) => {
         
-        this.deviceInfo$.next(deviceInfo);
+        this.bluetoothDevice$.next(deviceInfo);
         
-        console.log("New value: ", this.deviceInfo$.value);
+        console.log("New value: ", this.bluetoothDevice$.value);
         this.read();
         console.log("Services: ", onfulfilled.services);
         
@@ -231,7 +238,7 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
   }
 
   read(){
-    console.log("reading...", this.deviceInfo$.getValue());
+    console.log("reading...", this.bluetoothDevice$.getValue());
 
     // this.bluetoothle.retrieveConnected().then((retrieved) => {
     //   this.deviceInfo$.next(retrieved.devices[1]);
@@ -251,9 +258,9 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
     // });
 
     this.bluetoothle.subscribe({
-      "address": this.deviceInfo$.getValue().address,
-      "service": "1101",
-      "characteristic": "2101",
+      "address": this.bluetoothDevice$.getValue().address,
+      "service": this.PRIMARY_SERVICE_UID,
+      "characteristic": this.PRIMARY_CHARACTERISTIC_UID,
     }).subscribe((onfulfilled) => 
     {
    
@@ -282,14 +289,14 @@ constructor(public bluetoothle: BluetoothLE, public plt: Platform) {
         address: dvc_address
       }
     ).then((deviceInfo) =>  {
-     this.deviceInfo$.next(deviceInfo.status);
+     this.bluetoothDevice$.next(deviceInfo.status);
      }
      );
    
     //  if(this.cntnStatus$.getValue() != ""){
     //    return of(this.error(this.cntnStatus$.getValue()));
     //  }
-     return this.deviceInfo$;
+     return this.bluetoothDevice$;
   }
 
   

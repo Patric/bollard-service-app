@@ -1,0 +1,13 @@
+{
+    "peripheral":
+    {
+        "service": {
+            "UUID": "0x1101"
+        },
+        "characteristic": {
+            "UUID": "0x2101"
+        }
+    }
+    
+
+}

@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -11,18 +11,18 @@ import { AppRoutingModule } from './app-routing.module';
 
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-
 import { FormsModule } from '@angular/forms';
 
-
+import { CookieService } from 'ngx-cookie-service';
 
 import { BackendInterceptor } from './_interceptors/backendInterceptor';
-import { CookieService } from 'ngx-cookie-service';
 import { ErrorInterceptor } from './_interceptors/errorInterceptor';
 import { JwtInterceptor } from './_interceptors/jwtInterceptor';
+
 import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
+import { WebBluetoothModule } from '@manekinekko/angular-web-bluetooth';
 
-
+import { ErrorService } from './_services/error.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -33,17 +33,25 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
     IonicModule.forRoot(), 
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    WebBluetoothModule.forRoot({
+      enableTracing: true // or false, this will enable logs in the browser's console
+    })
   ],
   providers: [
     StatusBar,
     SplashScreen,
+    {
+      provide: ErrorHandler,
+      useClass: ErrorService,
+     },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: BackendInterceptor, multi: true},
     CookieService,
     BluetoothLE
+
 
     // provider used to create fake backend
     //fakeBackendProvider
