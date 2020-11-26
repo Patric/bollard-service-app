@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BluetoothCore, BrowserWebBluetooth} from '@manekinekko/angular-web-bluetooth';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import { peripheral } from './bluetooth.config.json'
+import { peripheral } from '../config/bluetooth.config.json'
 
 
 @Injectable({

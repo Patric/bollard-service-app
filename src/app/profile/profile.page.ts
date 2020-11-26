@@ -9,8 +9,8 @@ import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 
-import { BluetoothWebService } from '../_services/bluetooth-web.service'
-import { BluetoothService } from '../_services/bluetooth.service';
+import { BluetoothWebService } from '../_services/bluetooth/platform-services/bluetooth-web.service'
+import { BluetoothService } from '../_services/bluetooth/bluetooth.service';
 import { Platform } from '@ionic/angular';
 
 

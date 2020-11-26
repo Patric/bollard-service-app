@@ -23,7 +23,7 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
 import { WebBluetoothModule } from '@manekinekko/angular-web-bluetooth';
 
 import { ErrorService } from './_services/error.service';
-import { BluetoothModule } from './_services/bluetooth.module';
+import { BluetoothModule } from './_services/bluetooth/bluetooth.module';
 
 @NgModule({
   declarations: [AppComponent],

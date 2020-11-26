@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BluetoothLE, DeviceInfo, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Observer, of, throwError } from 'rxjs';
-import { peripheral } from './bluetooth.config.json';
+import { peripheral } from '../config/bluetooth.config.json'
 
 
 @Injectable({
