@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BluetoothCore, BrowserWebBluetooth} from '@manekinekko/angular-web-bluetooth';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import { peripheral} from './bluetooth.config.json';
+import { peripheral } from './bluetooth.config.json'
 
 
 @Injectable({
@@ -10,65 +10,54 @@ import { peripheral} from './bluetooth.config.json';
 })
 export class BluetoothWebService {
 
-  //UID in AxAAAA format
+
   private PRIMARY_SERVICE_UID = Number(peripheral.service.UUID);
   private PRIMARY_CHARACTERISTIC_UID = Number(peripheral.characteristic.UUID);
 
   private remoteGATTServer: BluetoothRemoteGATTServer;
   private remoteGATTCharacteristic: BluetoothRemoteGATTCharacteristic;
   
-  private message$: Observable<any>;
+  private message$: BehaviorSubject<any>;
 
   constructor(
     public readonly ble: BluetoothCore,
     ) {
-      
+      this.message$ = new BehaviorSubject<any>(null);
      }
 
     startScanning(){
      // console.log(Number("0x1101"));
+    
+      
       this.ble.streamValues$().pipe(
-        map(value => value.getInt8(0))).
-          pipe(
-            map(value => (this.arrayBufferToString(value))))
-              .subscribe(value => console.log("GOT A NEW VALUE: ", value));
+        map(value => value.getInt8(0)))
+        .subscribe(value => 
+          {
+            //console.log("Value", value)
+            this.message$.next(value);
+          }
+          );
       
     // eAasy way
     //   this.ble.value$({
     //     service: 0x1101,
     //     characteristic: 0x2101
     //   }).subscribe(value => console.log("Value: ", this.arrayBufferToString(value)));
-        this.message$ = this.getValue$().pipe(map(value => (this.arrayBufferToString(value)))); //subscribe(value => console.log("Value: ", this.arrayBufferToString(value)));
+    
+      this.getValue$().subscribe(value => console.log("Value from getValue ", this.arrayBufferToString(value)));
      }
 
      getMessage(){
-       return this.message$;
+
+      
+      //this.message$.subscribe((value)=>console.log("New message in getMessage"));
+      //console.log("Returning message observable");
+      return this.message$;
      }
 
-  
 
-    disconnect(){
-      this.ble.disconnectDevice();
-    }
-
-    private arrayBufferToString(buffer){
-
-      var Uint = new Uint16Array(buffer);
-      var len = Uint.length;
-      var result = '';
-      var addition = Math.pow(2,16)-1;
-      for(var i = 0;i<length;i+=addition){
-  
-          if(i + addition > len){
-              addition = len - i;
-          }
-          result += String.fromCharCode.apply(null, Uint.subarray(i,i+addition));
-      }
-      return result;
-  
-  }
-
-  private getValue$(){
+    getValue$(){
+    console.log("Getting value...");
     let options = {
             filters: [
             {services: [this.PRIMARY_SERVICE_UID]},
@@ -101,6 +90,27 @@ export class BluetoothWebService {
             map((value: DataView) => value.getUint8(0))
           )
     }
+
+    disconnect(){
+      this.ble.disconnectDevice();
+    }
+
+    arrayBufferToString(buffer){
+
+      var Uint = new Uint16Array(buffer);
+      var len = Uint.length;
+      var result = '';
+      var addition = Math.pow(2,16)-1;
+      for(var i = 0;i<length;i+=addition){
+  
+          if(i + addition > len){
+              addition = len - i;
+          }
+          result += String.fromCharCode.apply(null, Uint.subarray(i,i+addition));
+      }
+      return result;
+  
+  }
 
 
 }

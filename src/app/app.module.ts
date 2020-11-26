@@ -23,6 +23,7 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
 import { WebBluetoothModule } from '@manekinekko/angular-web-bluetooth';
 
 import { ErrorService } from './_services/error.service';
+import { BluetoothModule } from './_services/bluetooth.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,7 +37,8 @@ import { ErrorService } from './_services/error.service';
     FormsModule,
     WebBluetoothModule.forRoot({
       enableTracing: true // or false, this will enable logs in the browser's console
-    })
+    }),
+    BluetoothModule
   ],
   providers: [
     StatusBar,

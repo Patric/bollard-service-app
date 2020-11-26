@@ -8,9 +8,10 @@ import { environment } from '../../environments/environment';
 import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { BluetoothNativeService } from '../_services/bluetooth-native.service';
-import { BluetoothWebService } from '../_services/bluetooth-web.service'
 
+import { BluetoothWebService } from '../_services/bluetooth-web.service'
+import { BluetoothService } from '../_services/bluetooth.service';
+import { Platform } from '@ionic/angular';
 
 
 @Component({
@@ -28,72 +29,79 @@ export class ProfilePage implements OnInit, OnDestroy {
   
 
   private devicesFound;
-  private message: string;
+  private message;
 
   constructor
-  (
+
+  ( private bluetoothService: BluetoothService,
     private http: HttpClient,
     private router: Router,
-    private bluetoothNativeService: BluetoothNativeService,
-   // private bluetoothWebService: BluetoothWebService,
+  //  private bluetoothNativeService: bluetoothService,
     private authService: AuthService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
   ) {
   }
 
 
   ngOnInit() {
+    this.bluetoothService.canInitiateBluetooth().then(()=>{
 
-    this.connectedDevice$ = new BehaviorSubject<any>(null);
-    this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
-
-    this.bluetoothNativeService.getDevicesFound().subscribe((devicesFound) => {
-      this.ngZone.run( () => {
-        //this.devicesFound$.next(devicesFound); 
-        this.devicesFound = devicesFound;
-      
-      
-      });
-    });
-
-    this.bluetoothNativeService.getMessage().subscribe((message) => {
-      this.ngZone.run( () => {
-        this.message = message;
     
-  
-      });
-    });
+      this.connectedDevice$ = new BehaviorSubject<any>(null);
+      this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
 
-    this.bluetoothNativeService.getConnectedDevices().subscribe((deviceInfo) => {
-        this.connectedDevice$.next(deviceInfo);
+      this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {this.ngZone.run( () => {
+          this.devicesFound = devicesFound;
+        });
+      }, 
+      (err) => console.error("this.bluetoothService.getDevicesFound() error", err));
+   
 
-        console.log("devieInfo in page", `${deviceInfo}`);
-        try{
-          if(deviceInfo.address != undefined){
-            this.ngZone.run( () => {
+      this.bluetoothService.getMessage().subscribe((message) => {
+        this.ngZone.run( () => {
+
+          if(message != null && message != undefined){
+            this.message = message;
+          }
          
-              this.connectedDeviceAdr$.next(deviceInfo.address.toString());
-            });
-          }
-          else{
-    
-            this.connectedDeviceAdr$.next(null);
-          }
+        });
+      }, 
+      (err) => console.error("this.bluetoothService.getMessage() error", err));
 
-        }
-        catch(error){
-          console.error(error);
-        }      
+ 
+
+      this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
+          this.connectedDevice$.next(deviceInfo);
+
+          //console.log("devieInfo in page", `${deviceInfo}`);
+          try{
+            if(deviceInfo.address != undefined){
+              this.ngZone.run( () => {
+          
+                this.connectedDeviceAdr$.next(deviceInfo.address.toString());
+              });
+            }
+            else{
       
-    });
+              this.connectedDeviceAdr$.next(null);
+            }
+          }
+          catch(error){
+            console.error("deviceInfo.address is null. It should be null only during initialisation or in browser mode.", error);
+          }      
+        
+      });
+  }, 
+  (err) => console.error("this.bluetoothService.getConnectedDevices() error", err));
   }
 
   ngOnDestroy(){
     
   }
   reset(){
+    this.bluetoothService.disconnect();
     //this.bluetoothWebService.disconnect();
-    //this.bluetoothNativeService.closeConnection(this.connectedDeviceAdr$.value);
+    //this.bluetoothService.closeConnection(this.connectedDeviceAdr$.value);
   }
 
   logEvent(){
@@ -121,16 +129,18 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   }
   startScan(){
-    this.bluetoothNativeService.startScanning();
+    this.bluetoothService.startScanning();
+    
+    
     //this.bluetoothWebService.startScanning();
    // this.bluetoothWebService.getMessage().subscribe(message => console.log("Message in Page: ", message));
   }
   stopScan(){
-    this.bluetoothNativeService.stopScanning();
+    this.bluetoothService.stopScanning();
   }
 
   connect(dvc_address: string){
-      this.bluetoothNativeService.connect(dvc_address);
+      this.bluetoothService.connect(dvc_address);
 
      
       //this.updateConnected();
@@ -145,8 +155,8 @@ export class ProfilePage implements OnInit, OnDestroy {
   closeConnection(){
    // console.log(this.connectedDeviceAdr$.getValue());
     
-    this.bluetoothNativeService.closeConnection(this.connectedDevice$.value.address);
-    console.log("AFER CLOSING: ", this.connectedDevice$.value, this.connectedDeviceAdr$.value);
+    this.bluetoothService.closeConnection(this.connectedDevice$.value.address);
+   // console.log("AFER CLOSING: ", this.connectedDevice$.value, this.connectedDeviceAdr$.value);
     //this.updateConnected();
   }
 

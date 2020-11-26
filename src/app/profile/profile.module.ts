@@ -9,9 +9,6 @@ import { ProfilePageRoutingModule } from './profile-routing.module';
 import { ProfilePage } from './profile.page';
 
 
-
-
-
 @NgModule({
   imports: [
     CommonModule,
