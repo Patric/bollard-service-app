@@ -5,9 +5,15 @@
             "UUID": "0x1101"
         },
         "characteristic": {
-            "UUID": "0x2101"
-        }
-    }
-    
+            "UUID": "0x2101",
+            "peripheralChallengeUUID": "0x3101",
+            "peripheralResponseUUID": "0x3102",
+            "webServerSyncChallengeUUID": "0x4101",
+            "peripheralSyncResponseUUID": "0x4102",
+            "webServerChallengeUUID": "0x5101",
+            "webServerResponseUUID": "0x5102"
 
+        }
+        
+    }
 }
