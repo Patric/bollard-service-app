@@ -53,7 +53,7 @@ void setup()
   Serial.begin(9600);
 
   //works only when serial is opened
-  while(!Serial);
+ // while(!Serial);
   //pinMode(LED_BUTTON, OUTPUT);
 
   if(!BLE.begin()){

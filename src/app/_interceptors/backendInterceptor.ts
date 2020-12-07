@@ -8,34 +8,89 @@ const usersData = {
       "id": "1",
       "email": "user_1",
       "pass": "test",
-      "token": null
+      "token": null,
+      "device": null
+      
     },
     {
       "id": "2",
       "email": "user_2",
       "pass": "test",
-      "token": null
+      "token": null,
+      "device": null
     },
     {
       "id": "3",
       "email": "user_3",
       "pass": "test",
-      "token": null
+      "token": null,
+      "device": null
     },
     {
       "id": "4",
       "email": "user_4",
       "pass": "test",
-      "token": null
+      "token": null,
+      "device": null
+    
     },
     {
       "id": "5",
       "email": "user_5",
       "pass": "test",
-      "token": null
+      "token": null,
+      "device": null
     },
     ]
    }
+
+const devicesData = [
+  {
+    // Actual device
+    "MAC": "3C:71:BF:CB:3B:EE",
+    "peripheralSyncResponseLocked": null,
+    "peripheralSyncResponseUnlocked": null,
+    "peripheralResponseLocked": null,
+    "peripheralResponseUnlocked": null,
+    "state": "locked",
+    "userID": null,
+    "isProcessed": false,
+    "ready": true,
+    "availableAction": null
+    
+  },
+
+  // FAKE ADDRESS
+  {
+    "MAC": "35:78:E8:59:7C:9C",
+    "peripheralSyncResponseLocked": null,
+    "peripheralSyncResponseUnlocked": null,
+    "peripheralResponseLocked": null,
+    "peripheralResponseUnlocked": null,
+    "state": "locked",
+    "userID": null,
+    "isProcessed": false,
+    "ready": false,
+    "availableAction": null
+    
+  },
+  // FAKE ADDRESS
+  {
+    "MAC": "BD:B7:EF:01:B0:1D",
+    "peripheralSyncResponseLocked": null,
+    "peripheralSyncResponseUnlocked": null,
+    "peripheralResponseLocked": null,
+    "peripheralResponseUnlocked": null,
+    "state": "locked",
+    "userID": null,
+    "isProcessed": false,
+    "ready": false,
+    "availableAction": null
+  }
+  
+]
+
+
 
 
 @Injectable()
@@ -72,8 +127,18 @@ export class BackendInterceptor implements HttpInterceptor {
               return testFunc();
             case url.endsWith('authenticate') && method === 'POST':
               return authenticate();
+            case url.endsWith('logout') && method === 'GET':
+              return logout();
             case url.endsWith('someInfo') && method === 'GET':
               return testFunc();
+            case url.endsWith('getSyncChallenge') && method === 'POST':
+              return generateChallenge();
+            case url.endsWith('synchronize') && method === 'POST':
+              return synchronize();
+            case url.endsWith('changeDeviceState') && method === 'POST':
+              return changeDeviceState();
+            case url.endsWith('confirmAction') && method === 'POST':
+              return confirmAction();
             default:
               return next.handle(request)
           }
@@ -105,6 +170,17 @@ export class BackendInterceptor implements HttpInterceptor {
 
         }
 
+        function logout(){
+          if(usersData.users[usersData.users.findIndex(user => user.id === headers.get('id'))].token){
+            usersData.users[usersData.users.findIndex(user => user.id === headers.get('id'))].token = null;
+            return ok("User logged out");
+          }
+          else{
+            return error("Error during logout");
+          }
+        }
+
+
         function testFunc(){
 
           
@@ -120,8 +196,202 @@ export class BackendInterceptor implements HttpInterceptor {
           
         }
 
+        // renting place and finishing renting
 
 
+
+
+        // I
+        // =================================================================================================================================================================================
+        // body: {MACAdress: macaddress}
+
+        function getRandomArbitrary(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+        
+        
+        function generateChallenge(){
+          if(!isLoggedIn()){    //} || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
+            return unauthorised();
+          }
+          
+          const MACAdress = body.MACAdress;
+          
+          // var array = new Uint32Array(10);
+          // window.crypto.getRandomValues(array);
+          let challenge = getRandomArbitrary(500, 999999);
+          // save solutions to generated challenge
+          devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseLocked = solveChallengeLocked(challenge);
+          devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseUnlocked = solveChallengeUnlocked(challenge);
+          devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed = true;
+
+          return ok({syncChallenge: challenge});
+        }
+
+
+
+        function solveChallengeLocked(challenge: number){
+          return challenge + 437;
+        }
+        
+        function solveChallengeUnlocked(challenge: number){
+          return challenge - 434;
+        }
+        
+
+        // II
+        // =================================================================================================================================================================================
+        // body: {MACAdress: macadress, response: solvedChallenge}
+
+        function synchronize(){
+          if(!isLoggedIn()){// || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
+            return unauthorised();
+          }
+          
+          const device = devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)];
+
+
+          // The device is locked
+          if(body.response == device.peripheralSyncResponseLocked)
+          {
+            // Synchronisation is correct
+            if(device.state == "locked"){
+              // The device is ready to use
+              if(device.ready){
+                devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = "unlock";
+                return ok({message: "Available action is to start renting this device.", availableAction: "unlock"});
+              }
+              // The device requires service or there is other problem with the device
+              else{
+                return error("Device unavailable");
+              }
+            }
+
+
+            // Synchronisation is incorrect
+            else if(device.state == "unlocked"){
+              
+              // The device is assigned to user
+              if(device.userID == headers.get('id')){
+                // TO DO:
+                  // Stop timer
+                  // Calculate amount due
+                  return error("Synchronization error has occured. You have been using this spot for HH:mm and you have been charged $$$. If you had been charged wrongly please contact us +00 321 342 323.")
+              }
+              else{
+                // The device is not assigned to user
+                  return error("Synchronization error has occured.")
+              }
+
+              
+            }
+            else{
+              throw error("Unknown device state");
+            }
+          }
+
+          // The device is unlocked
+         else if(body.response == device.peripheralSyncResponseUnlocked){
+
+          // Synchronisation is correct
+          if(device.state == "unlocked"){
+            if(device.userID == headers.get('id')){
+              devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = "lock";
+              return ok({message: "Available action is to stop renting this device.", availableAction: "lock"});
+            }
+            else{
+              return error("Device unavailable.");
+            }
+
+
+
+
+          }
+          // Synchronisation is incorrect(should not happen)
+          else if(device.state == "locked"){
+            return error("Unknown error occured");
+          }
+          else{
+            throw error("Unknown device state");
+
+          };
+
+          }
+          // Incorrect solution
+          else{
+            return unauthorised();
+          }
+        }
+
+        // III
+        // =================================================================================================================================================================================
+        // body: {peripheralChallenge: challenge, MACADress: macadress}
+
+
+        function changeDeviceState(){
+          if(!isLoggedIn()){// || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
+            return unauthorised();
+          }
+
+          const device = devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)];
+          let challenge = getRandomArbitrary(500, 999999);
+          // save solutions to generated challenge
+          devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseLocked = solveChallengeLocked(challenge);
+          devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseUnlocked = solveChallengeUnlocked(challenge);
+
+          if(device.availableAction == "lock"){
+            return ok({message: "Time counter will stop after locking confirmation.", webServerResponse: solveChallengeUnlocked(body.peripheralChallenge), webServerChallenge: challenge});
+            
+          }
+          else if(device.availableAction == "unlock"){
+            devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].state = "unlocked";
+            devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = "lock";
+            devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].userID = headers.get('id');
+      
+            return ok({message: "Renting started. Timer is on.", webServerResponse: solveChallengeLocked(body.peripheralChallenge), webServerChallenge: challenge});
+          }
+          else{
+            throw error("Unknown availableAction.")
+          }
+
+        }
+
+        // IV
+        // =================================================================================================================================================================================
+        // body: {peripheralResponse: response, MACADress: macadress}
+
+
+        function confirmAction(){
+          if(!isLoggedIn()){// || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
+            return unauthorised();
+          }
+          const device = devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)];
+          if(body.peripheralResponse == device.peripheralResponseLocked)
+          {
+             // STOP COUNTING TIME. 
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseLocked = null;
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseUnlocked = null;
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseLocked = null;
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseUnlocked = null;
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = null;
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].userID = null;
+             devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].state = "locked";
+
+             return ok({message: "Renting stopped. You have been using this spot for HH:mm and you have been charged $$$. If you had been charged wrongly please contact us +00 321 342 323."})
+           
+          }
+          else if(body.peripheralResponse == device.peripheralResponseUnlocked)
+          {
+            // NOTE DEVICE LOCK
+            return ok({message: "Unlock confirmed."});
+          }
+          else{
+            return unauthorised();
+          }
+
+
+        }
+        
 
 
         //helper functions
@@ -140,7 +410,7 @@ export class BackendInterceptor implements HttpInterceptor {
 
         function isLoggedIn(){
           //return true of false based on given condition
-          return headers.get('Authorization') === usersData.users.find(x => x.id === headers.get('id')).token;
+          return headers.get('Authorization') === usersData.users.find(user => user.id === headers.get('id')).token;
         };
 
         function getRandomString(length: number){

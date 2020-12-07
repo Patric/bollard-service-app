@@ -19,12 +19,12 @@ export class JwtInterceptor implements HttpInterceptor {
             
             request = request.clone({
                 setHeaders: { Authorization: `${currentUser.token}`, id: `${currentUser.id}`}
-
             })
+
            // console.log(request.headers.keys().forEach(key =>console.log(key)));
         }
         else{
-            console.log('User not logged in');
+            console.error('User not logged in');
         }
         console.log(request.headers);
         return next.handle(request);
