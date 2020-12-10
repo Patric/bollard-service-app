@@ -19,11 +19,9 @@ import { BackendInterceptor } from './_interceptors/backendInterceptor';
 import { ErrorInterceptor } from './_interceptors/errorInterceptor';
 import { JwtInterceptor } from './_interceptors/jwtInterceptor';
 
-import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
-import { WebBluetoothModule } from '@manekinekko/angular-web-bluetooth';
 
 import { ErrorService } from './_services/error.service';
-import { BluetoothModule } from './_services/bluetooth/bluetooth.module';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -34,11 +32,7 @@ import { BluetoothModule } from './_services/bluetooth/bluetooth.module';
     IonicModule.forRoot(), 
     AppRoutingModule,
     HttpClientModule,
-    FormsModule,
-    WebBluetoothModule.forRoot({
-      enableTracing: true // or false, this will enable logs in the browser's console
-    }),
-    BluetoothModule
+    FormsModule
   ],
   providers: [
     StatusBar,
@@ -51,8 +45,7 @@ import { BluetoothModule } from './_services/bluetooth/bluetooth.module';
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: BackendInterceptor, multi: true},
-    CookieService,
-    BluetoothLE
+    CookieService
 
 
     // provider used to create fake backend

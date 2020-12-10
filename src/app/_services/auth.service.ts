@@ -103,6 +103,10 @@ export class AuthService {
     //T O DO 
     //send request to logout
     //localStorage.removeItem('currentUser');
+    this.http.get(
+      `${this.url}/logout`,
+      this.httpOptions
+      ).subscribe(response => alert(response));
     this.cookieService.deleteAll();
     this.currentUserSubject.next(null);
     //this.router.navigateByUrl("/");

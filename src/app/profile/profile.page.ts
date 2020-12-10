@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 
+
 import { BluetoothWebService } from '../_services/bluetooth/platform-services/bluetooth-web.service'
 import { BluetoothService } from '../_services/bluetooth/bluetooth.service';
 import { Platform } from '@ionic/angular';
@@ -23,9 +24,10 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   private response: Observable<Array<any>>;
 
-  private connectedDevice$: BehaviorSubject<any>;
+  private connectionStatus$: BehaviorSubject<any>;
   private connectedDeviceAdr$: BehaviorSubject<any>;
 
+ 
   // Bonding with html
   private devicesFound;
   private message;
@@ -42,21 +44,27 @@ export class ProfilePage implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.bluetoothService.canInitiateBluetooth().then(()=>{
 
-    
-      this.connectedDevice$ = new BehaviorSubject<any>(null);
+ 
+
+
+    this.bluetoothService.ready().then(()=>{
+
+     
+      this.connectionStatus$ = new BehaviorSubject<any>(null);
       this.connectedDeviceAdr$ = new BehaviorSubject<any>(null);
 
       // ngZone forces instant update on html side
-      this.bluetoothService.getDevicesFound().subscribe((devicesFound) => {this.ngZone.run( () => {
+     
+      this.bluetoothService.ble.getDevicesFound().subscribe((devicesFound) => {this.ngZone.run( () => {
           this.devicesFound = devicesFound;
         });
       }, 
       (err) => console.error("this.bluetoothService.getDevicesFound() error", err));
    
 
-      this.bluetoothService.getMessage().subscribe((message) => {
+      
+      this.bluetoothService.ble.getMessage().subscribe((message) => {
         this.ngZone.run( () => {
 
           if(message != null && message != undefined){
@@ -67,20 +75,24 @@ export class ProfilePage implements OnInit, OnDestroy {
       }, 
       (err) => console.error("this.bluetoothService.getMessage() error", err));
 
-      this.bluetoothService.getConnectedDevices().subscribe((deviceInfo) => {
-          this.connectedDevice$.next(deviceInfo);
+      this.bluetoothService.ble.getConnectedDevice().subscribe((deviceInfo) => {
+        
+          console.log("Connected device: ", JSON.stringify(deviceInfo));
+          this.connectionStatus$.next(deviceInfo.status);
           // troublesome part. deviceInfo can either be returned as one value(e.g "closed") or in json format e.g:
           //("status: connected",
           // "address: 00:00:00:000",                                                                
           // "service": "1101")
           // that is due to bluetoothLE plugin imperfection
           // try and catch is necessary to catch deviceInfo.address error in case when the response in "closed", "connecting" format.
-          try{
-            if(deviceInfo.address != undefined){
-              this.ngZone.run( () => {
+          this.ngZone.run( () => {
           
-                this.connectedDeviceAdr$.next(deviceInfo.address.toString());
-              });
+            this.connectedDeviceAdr$.next(deviceInfo.address);
+          });
+          
+          try{
+            if(deviceInfo.address != undefined && deviceInfo.address != null){
+              
             }
             else{
       
@@ -100,7 +112,7 @@ export class ProfilePage implements OnInit, OnDestroy {
     
   }
   reset(){
-    this.bluetoothService.disconnect();
+    this.bluetoothService.ble.disconnect();
   }
 
   logEvent(){
@@ -123,24 +135,22 @@ export class ProfilePage implements OnInit, OnDestroy {
   }
 
   check(){
+  
     console.log("Checked");
 
   }
   startScan(){
-    this.bluetoothService.startScanning();
+    this.bluetoothService.ble.startScanning();
   
   }
-  stopScan(){
-    this.bluetoothService.stopScanning();
-  }
-
+  
   connect(dvc_address: string){
-      this.bluetoothService.connect(dvc_address);
+      this.bluetoothService.ble.connect(dvc_address);
 
   }
 
   closeConnection(){
-    this.bluetoothService.closeConnection(this.connectedDevice$.value.address);
+    this.bluetoothService.ble.closeConnection(this.connectedDeviceAdr$.value);
   }
 
   logout(){

@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
-import { BluetoothLE, DeviceInfo, ScanStatus } from '@ionic-native/bluetooth-le/ngx';
+import { BluetoothLE, DeviceInfo} from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Observer, of, throwError } from 'rxjs';
 import { peripheral } from '../config/bluetooth.config.json'
+import { BluetoothAbstract, ConnectionStatus } from './bluetooth-abstract';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class BluetoothNativeService {
+export class BluetoothNativeService implements BluetoothAbstract{
 
   //UID in AAAA format, not AxAAAA
   private PRIMARY_SERVICE_UID = peripheral.service.UUID.substring(2);
   private PRIMARY_CHARACTERISTIC_UID = peripheral.characteristic.UUID.substring(2);
 
-
-  scanStatus: ScanStatus;
+  connectionStatus$: Observable<ConnectionStatus>;
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
   bluetoothDevice$: BehaviorSubject<any>;
@@ -28,13 +28,12 @@ constructor(
 
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
-  this.bluetoothDevice$ = new BehaviorSubject<any>(null);
+
+  this.connectionStatus$ = new BehaviorSubject<ConnectionStatus>(new ConnectionStatus(null, null, ConnectionStatus.status.CLOSED));
+ 
+  this.bluetoothDevice$ = new BehaviorSubject<any>({address: null, name: null, status: "closed"});
   this.message$ = new BehaviorSubject<any>(null);
-  // this.bluetoothle.retrieveConnected().then((retrieved) => {
-  //   this.deviceInfo$ = new BehaviorSubject(retrieved.devices[1]);
-  // });
-  
-  
+
 
   console.log("Initiating bluetooth");
   this.plt.ready().then((readySource) => {
@@ -69,44 +68,75 @@ constructor(
    });
  }
 
-
   checkStatus(){
     console.log("CHECK");
-   // this.bluetoothle.retrieveConnected().then(status => console.log(status.devices));
 
   }
 
-
-  startScanning(){
-    //this.closeConnection(this.deviceInfo$.getValue().dvc_address);
-    // Add all connected devices to scanning list
+  read(){
+    console.log("reading...", this.bluetoothDevice$.getValue());
     
-
-    // Doesn't work. Should add connected devices to scan list in order to provide disconnect option for the user
-    this.bluetoothle.retrieveConnected().then((connected) => 
+    this.bluetoothle.subscribe({
+      "address": this.bluetoothDevice$.getValue().address,
+      "service": this.PRIMARY_SERVICE_UID,
+      "characteristic": this.PRIMARY_CHARACTERISTIC_UID,
+    }).subscribe((onfulfilled) => 
     {
-      
-      console.log("Devices connected:", connected.devices);
-      connected.devices.forEach((device: any) => 
-      {
-      this.devicesFound$.next(device);
-      console.log("Devices connected:", device);
+   
+      let value = onfulfilled.value;
     
-    })});
- 
+    
+      if(value != undefined){
+        this.message$.next(this.bluetoothle.encodedStringToBytes(`${value}`));
+      }
+      
+    });
+
+    
+  }
+
+  // Ensure device is not scanning all the time. Check after 2 seconds from the scanning start
+  superviseScan(){
+    const seconds = 2;
+    const interval_id = setInterval(() => {
+      this.bluetoothle.isScanning().then((status) => {
+
+        if(status.isScanning){
+          this.stopScanning();
+        }
+        else{
+          console.log("Interval for isScanning stopped");
+          clearInterval(interval_id);
+        }
+      });
+      // miliseconds
+    }, 1000*seconds);
+  }
 
 
+  stopScanning(){
+    
     this.bluetoothle.isScanning().then((status) => {
-      console.log(status.isScanning);
+      if(status.isScanning){
+        this.bluetoothle.stopScan().then(m => console.log("Stopped scanning ", m));
+
+      };
+    });
+
+
+  }
+
+  // INTERFACE BLUETOOTHABSTRACT =====================================================================================
+  startScanning(){
+   
+    this.bluetoothle.isScanning().then((status) => {
+      console.log("Is scanning =", status.isScanning);
 
     if(!status.isScanning){
+    this.superviseScan();
     this.devicesFound = [];
-    console.log(this.devicesFound);
-    const stop_scan = new Date();
-    stop_scan.setSeconds(stop_scan.getSeconds() + 3);
-    //this.stopScanning();
+    console.log("Devices found:", this.devicesFound);
 
-    
     this.bluetoothle.startScan({
       "services": [this.PRIMARY_SERVICE_UID], // bugs when connecting to different devices or services
       "allowDuplicates": true,  
@@ -115,71 +145,38 @@ constructor(
       "matchNum": this.bluetoothle.MATCH_NUM_MAX_ADVERTISEMENT,
       "callbackType": this.bluetoothle.CALLBACK_TYPE_ALL_MATCHES,
     }).subscribe((deviceInfo) => {
+        
+      // Avoid duplicates during 2 secs scan
       if(deviceInfo.status == "scanResult"){
         if(this.devicesFound.find(x => x.address == deviceInfo.address && x.name == deviceInfo.name)){}
         else{
           this.devicesFound.push(deviceInfo);
         };
       }
-      const myDate = new Date();
-      if(myDate.toString().substring(11, 30) == stop_scan.toString().substring(11,30)){
-        this.stopScanning();
-      }
-    
       this.devicesFound$.next(this.devicesFound);
     });
-   }});
+   }
+  });
 
 
   }
-
-  stopScanning(){
-   
-    this.bluetoothle.isScanning().then((status) => {
-      if(status.isScanning){
-        this.bluetoothle.stopScan().then(m => console.log(m));
-      };
-
-      
-      // if(status.isScanning && !this.isStopPlanned)
-      // {
-        
-      //   setTimeout(()=>{
-      //     console.log("clicked");
-      //     this.bluetoothle.stopScan().then(m => console.log(m));
-      //     this.isStopPlanned = false;
-      //   }, 600);
-      // this.isStopPlanned = true;
-      // }
-    });
-  }
-
-  getDevicesFound(): BehaviorSubject<Array<any>>{
-    return this.devicesFound$;
-  }
-  getConnectedDevices(): BehaviorSubject<any>{
-    return this.bluetoothDevice$;
-  }
-  getMessage(): BehaviorSubject<any>{
-    return this.message$;
-  }
-
 
   connect(dvc_address: string)
   {
+    
+    this.bluetoothDevice$.next({address: null, name: null, status: "connecting"});
+    //this.bluetoothDevice$.next("connecting");
+    console.log("DEVICEINFO", JSON.stringify(this.bluetoothDevice$.value));
+    // this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
+    // { this.bluetoothDevice$.next(deviceInfo);
+    //   //console.log("IS connected?",deviceInfo.isConnected);
+    //   if(deviceInfo.isConnected){
+    //     //this.closeConnection(dvc_address);
+    //     console.log("Already connected");
 
-    this.bluetoothDevice$.next("connecting");
-    this.bluetoothle.isConnected({address: dvc_address}).then((deviceInfo) =>
-
-    {  this.bluetoothDevice$.next(deviceInfo);
-      //console.log("IS connected?",deviceInfo.isConnected);
-      if(deviceInfo.isConnected){
-        //this.closeConnection(dvc_address);
-        console.log("Already connected");
-
-     //   return this.deviceInfo$;
-      }
-    });
+    //  //   return this.deviceInfo$;
+    //   }
+    // });
 
     console.log("Connecting initiated");
     this.bluetoothle.connect(
@@ -190,7 +187,7 @@ constructor(
     ).subscribe((deviceInfo) =>  {
     
     //console.log("NEW CONNECTION STATUS: ", deviceInfo.status)
-    
+    console.log("Device info before writing", JSON.stringify(deviceInfo));
     
     if(deviceInfo.status == "connected"){
       
@@ -198,15 +195,19 @@ constructor(
         "address": deviceInfo.address,
         "clearCache": true
       }).then((onfulfilled) => {
-        
+      
         this.bluetoothDevice$.next(deviceInfo);
-        
-        console.log("New value: ", this.bluetoothDevice$.value);
+        console.log("DEVICEINFO", JSON.stringify(this.bluetoothDevice$.value));
+
         this.read();
-        console.log("Services: ", onfulfilled.services);
+        console.log("Services: ", JSON.stringify(onfulfilled.services));
         
     });
       
+    }
+    else if(deviceInfo.status == "closed"){
+      this.bluetoothDevice$.next({status: deviceInfo});
+      console.log("DEVICEINFO", JSON.stringify(this.bluetoothDevice$.value));
     };
     
     }, (err) => 
@@ -229,63 +230,45 @@ constructor(
     }
     }
     );
-    
-    
-    // if(this.cntnStatus$.getValue() != ""){
-    //   return of(this.error(this.cntnStatus$.getValue()));
-    // }
-
-   // return this.deviceInfo$;
-    
   }
 
-  read(){
-    console.log("reading...", this.bluetoothDevice$.getValue());
 
-    // this.bluetoothle.retrieveConnected().then((retrieved) => {
-    //   this.deviceInfo$.next(retrieved.devices[1]);
 
-    // });
-   
-    // this.bluetoothle.read(
-    //   {
-    //     "address": this.deviceInfo$.getValue().address,
-    //     "service": "1101",
-    //     "characteristic": "2101"
-    //   }
-    // ).then((res) => {
-      
-    //   console.log(this.bluetoothle.encodedStringToBytes(res.value));
-    //   this.message$.next(this.bluetoothle.encodedStringToBytes(res.value));
-    // });
-
-    this.bluetoothle.subscribe({
-      "address": this.bluetoothDevice$.getValue().address,
-      "service": this.PRIMARY_SERVICE_UID,
-      "characteristic": this.PRIMARY_CHARACTERISTIC_UID,
-    }).subscribe((onfulfilled) => 
-    {
-   
-      let value = onfulfilled.value;
-      //let base64 new Base64();
-     // console.log(base64.decode(String(decoded)));
-     // console.log(this.bluetoothle.encodedStringToBytes("Kg=="));
-     // console.log(`This is decoded ${decoded}`);
-      //decoded = base64.decode(String(decoded));
-    
-      if(value != undefined){
-        //onsole.log(this.bluetoothle.encodedStringToBytes(`${value}`));
-        this.message$.next(this.bluetoothle.encodedStringToBytes(`${value}`));
-      }
-      
-    });
-
-    
+  request(code: number): Observable<any>{
+      return of(null);
   }
+
+  getMessage(): Observable<any>{
+    return this.message$.asObservable();
+  }
+
+  getConnectedDevice(): Observable<any>{
+    return this.bluetoothDevice$.asObservable();
+  }
+
+  getDevicesFound(): Observable<Array<any>>{
+    return this.devicesFound$.asObservable();
+  }
+  
+  disconnect(): Promise<any>{
+      return null;
+  }
+
   
   closeConnection(dvc_address: string)
   {
     console.log("closing");
+
+    this.bluetoothle.disconnect(
+      {
+      address: dvc_address
+      }
+    )
+    .then((deviceInfo) =>  {
+      this.bluetoothDevice$.next(deviceInfo.status);
+      }
+      );;
+
     this.bluetoothle.close(
       {
         address: dvc_address
@@ -295,10 +278,8 @@ constructor(
      }
      );
    
-    //  if(this.cntnStatus$.getValue() != ""){
-    //    return of(this.error(this.cntnStatus$.getValue()));
-    //  }
-     return this.bluetoothDevice$;
+    
+     return this.bluetoothDevice$.asObservable();
   }
 
   

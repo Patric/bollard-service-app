@@ -61,7 +61,7 @@ void setup()
     while(1);
   }
 
- BLE.setLocalName("Rising_Bollard_#001");
+ BLE.setLocalName("Bollard_#001");
  BLE.setAdvertisedService(bollardService);
 
 bollardService.addCharacteristic(peripheralChallenge);

@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BluetoothCore, BrowserWebBluetooth} from '@manekinekko/angular-web-bluetooth';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
-
+import {BluetoothAbstract, ConnectionStatus} from './bluetooth-abstract';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BluetoothWebService {
+export class BluetoothWebService implements BluetoothAbstract{
 
 
   private PRIMARY_SERVICE_UID = Number(peripheral.service.UUID);
@@ -21,6 +21,26 @@ export class BluetoothWebService {
     ) {
       this.message$ = new BehaviorSubject<any>(null);
      }
+  connectionStatus$: Observable<ConnectionStatus>;
+
+  connect(dvc_address?: string) {
+    //throw new Error('Method not implemented.');
+  }
+
+  request(code: number): Observable<any> {
+    return of(null); //throw new Error('Method not implemented.');
+  }
+  getConnectedDevice(): Observable<any> {
+    return of(null); //throw new Error('Method not implemented.');
+  }
+  getDevicesFound(): Observable<any> {
+    return of(null); //throw new Error('Method not implemented.');
+  }
+  closeConnection(dvc_address: string): Observable<any> {
+   // throw new Error('Method not implemented.');
+   this.disconnect();
+   return of(null);
+  }
 
     startScanning(){
      // console.log(Number("0x1101"));
@@ -90,6 +110,7 @@ export class BluetoothWebService {
 
     disconnect(){
       this.ble.disconnectDevice();
+      return new Promise(e => console.log("Promise not implemented"));
     }
 
     arrayBufferToString(buffer){

@@ -23,7 +23,7 @@
   },
   "server": {
     "cleartext": true,
-    "url": "http://192.168.0.102:8100",
-    "originalUrl": "http://192.168.0.108:8100"
+    "url": "https://192.168.0.100:8100",
+    "originalUrl": "http://192.168.0.100:8100"
   }
 }

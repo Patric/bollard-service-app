@@ -176,7 +176,7 @@ export class BackendInterceptor implements HttpInterceptor {
             return ok("User logged out");
           }
           else{
-            return error("Error during logout");
+            return error("Error during logout. User was not logged in.");
           }
         }
 

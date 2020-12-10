@@ -10,7 +10,7 @@ BLEUnsignedCharCharacteristic batteryLevelChar("2101", BLERead | BLENotify);
 void setup() 
 {
   Serial.begin(9600);
-  while(!Serial);
+  //while(!Serial);
   //pinMode(LED_BUTTON, OUTPUT);
 
   if(!BLE.begin()){
