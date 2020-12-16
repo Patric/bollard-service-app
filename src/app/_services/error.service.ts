@@ -14,8 +14,8 @@ export class ErrorService implements ErrorHandler{
       console.log(error.status);
     }
     else{
-      console.error(error);
-
+      console.error(error, "Stringified message: ", JSON.stringify(error.message));
+     // console.error(JSON.stringify(error));
     }
   }
 }

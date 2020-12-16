@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BluetoothCore, BrowserWebBluetooth} from '@manekinekko/angular-web-bluetooth';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
-import {BluetoothAbstract, ConnectionStatus} from './bluetooth-abstract';
+import {BluetoothAbstract, STATUS} from './bluetooth-abstract';
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,124 +11,187 @@ import {BluetoothAbstract, ConnectionStatus} from './bluetooth-abstract';
 export class BluetoothWebService implements BluetoothAbstract{
 
 
+  private device: BluetoothDevice;
+  constructor(
+
+    ) {
+      this.message$ = new BehaviorSubject<any>(null);
+      this.challenge$ = new BehaviorSubject<any>(null);
+      this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: null});
+      this.challenge$.subscribe(challenge => console.log("New challenge: ", challenge));
+      //this._characteristics = new Map<number, BluetoothRemoteGATTCharacteristic>();
+     }
+  connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
+
   private PRIMARY_SERVICE_UID = Number(peripheral.service.UUID);
   private PRIMARY_CHARACTERISTIC_UID = Number(peripheral.characteristic.UUID);
   
   private message$: BehaviorSubject<any>;
+  private challenge$: BehaviorSubject<any>;
 
-  constructor(
-    public readonly ble: BluetoothCore,
-    ) {
-      this.message$ = new BehaviorSubject<any>(null);
-     }
-  connectionStatus$: Observable<ConnectionStatus>;
+
+  private bluetoothRemoteGATTService: BluetoothRemoteGATTService;
 
   connect(dvc_address?: string) {
     //throw new Error('Method not implemented.');
   }
 
-  request(code: number): Observable<any> {
+  sendMessage(code: number): Observable<any> {
+    let message = JSON.stringify({auth: "authCode", code: "433"});
+    this.writeValue(this.bluetoothRemoteGATTService, Number(peripheral.characteristic.peripheralAuthUUID), message).then(onfullfilled => 
+      
+      {
+        console.log("Finished writing.")
+        this.readValue(this.bluetoothRemoteGATTService, Number(peripheral.characteristic.peripheralAuthUUID)).then(val => console.log("Auth char: ", val));
+        
+      
+      }
+      
+      );
+   
+
     return of(null); //throw new Error('Method not implemented.');
   }
-  getConnectedDevice(): Observable<any> {
-    return of(null); //throw new Error('Method not implemented.');
+  getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
+    return this.connectionInfo$.asObservable();
   }
+     
   getDevicesFound(): Observable<any> {
     return of(null); //throw new Error('Method not implemented.');
   }
-  closeConnection(dvc_address: string): Observable<any> {
-   // throw new Error('Method not implemented.');
-   this.disconnect();
-   return of(null);
-  }
+ 
 
-    startScanning(){
-     // console.log(Number("0x1101"));
-    
-      
-      this.ble.streamValues$().pipe(
-        map(value => value.getInt8(0)))
-        .subscribe(value => 
-          {
-            //console.log("Value", value)
-            this.message$.next(value);
+    connectToService(service: number[]){
+      return navigator.bluetooth.requestDevice({
+        filters: [{
+          services: service
+        }]
+      })
+      .then(device => {
+        device.addEventListener('gattserverdisconnected', this.onDisconnected);
+        this.device = device;
+        return device.gatt.connect();
+      })
+      .then(server => server.getPrimaryService(this.PRIMARY_SERVICE_UID))
+      .then(service => {
+        this.bluetoothRemoteGATTService = service;
+        //this._cacheCharacteristic(service, Number(peripheral.characteristic.UUID));
+        //this._cacheCharacteristic(service, Number(peripheral.characteristic.peripheralAuthUUID));
+        setTimeout(() =>  {  return service; }, 10);
+        
+      })
+      .catch(error => { console.error(error); });
+    }
+
+    stopReadingValue$(service: BluetoothRemoteGATTService, characteristicUID: number){
+      return service.getCharacteristic(characteristicUID)
+      .then(characteristic => characteristic.stopNotifications()
+      .then(characteristic => characteristic));
+    }
+
+    // Cannot read two at the same time
+    readValue$(service: BluetoothRemoteGATTService, characteristicUID: number){
+      let subject$ = new Subject<any>();
+      service.getCharacteristic(characteristicUID)
+      .then(characteristic => {characteristic.startNotifications()
+        .then(characteristic => characteristic.addEventListener('characteristicvaluechanged', (e: any) => {
+          const value = e.target.value;
+          let result = "";
+          let Uint = new Uint8Array(value.buffer);
+          for(let i =0; i< Uint.length; i++){
+            result += String.fromCharCode(Uint[i]);
           }
-          );
-      
-    // eAasy way
-    //   this.ble.value$({
-    //     service: 0x1101,
-    //     characteristic: 0x2101
-    //   }).subscribe(value => console.log("Value: ", this.arrayBufferToString(value)));
-    
-      this.getValue$().subscribe(value => console.log("Value from getValue ", this.arrayBufferToString(value)));
+          subject$.next(result);
+        }))
+        console.log("Subscribed to: ", characteristic);
+      }); 
+      return subject$.asObservable();
+    }
+
+
+    readValue(service: BluetoothRemoteGATTService, characteristicUID: number){
+      return service.getCharacteristic(characteristicUID)
+      .then(characteristic => characteristic.readValue().then(value =>{ 
+        
+        console.log("value read", this.arrayBufferToString(value.buffer));
+
+        //this.message$.next(this.arrayBufferToString(value.buffer));
+        return this.arrayBufferToString(value.buffer);
+      }));
+    }
+
+
+
+    writeValue(service: BluetoothRemoteGATTService, characteristicUID: number, value: string){
+      return service.getCharacteristic(characteristicUID)
+      .then(characteristic => {
+        
+        // Writing 1 is the signal to reset energy expended.
+        //const resetEnergyExpended = Uint8Array.of(1);
+        return characteristic.writeValue(this.string2ArrayBuffer(value));
+      })
+      .then(_ => {
+        console.log(value, " has been written.");
+      })
+      .catch(error => { console.error(error); });
+
+    }
+
+    onDisconnected(event){
+      const device = event.target;
+      console.log(`Device ${device.name} is disconnected.`);
+    }
+
+
+
+    startScanning(): Observable<{address: string,name: string, status: STATUS}>{
+
+
+      this.connectToService([this.PRIMARY_SERVICE_UID]).then(onfullfilled => {
+        this.readValue$(this.bluetoothRemoteGATTService, this.PRIMARY_CHARACTERISTIC_UID).subscribe(val => this.message$.next(val));
+        
+        
+      }
+      );
+
+      return this.connectionInfo$.asObservable();
+     }
+
+     debugButton(){
+       this.stopReadingValue$(this.bluetoothRemoteGATTService, this.PRIMARY_CHARACTERISTIC_UID).then(characteristic => console.log("Unsubscribed to: ", characteristic));
      }
 
      getMessage(){
-
-      
-      //this.message$.subscribe((value)=>console.log("New message in getMessage"));
-      //console.log("Returning message observable");
       return this.message$;
      }
 
 
-    getValue$(){
-    console.log("Getting value...");
-    let options = {
-            filters: [
-            {services: [this.PRIMARY_SERVICE_UID]},
-            ]
-             // ,acceptAllDevices: true
-            };
-    return this.ble
-          // 1) call the discover method will trigger the discovery process (by the browser)
-          .discover$(options)
-          .pipe(
-  
-            // 2) get that service
-            mergeMap((gatt: BluetoothRemoteGATTServer) => {
-              
-              return this.ble.getPrimaryService$(gatt, this.PRIMARY_SERVICE_UID);
-            }),
-  
-            // 3) get a specific characteristic on that service
-            mergeMap((primaryService: BluetoothRemoteGATTService) => {
-             // console.log(primaryService.uuid);
-              return this.ble.getCharacteristic$(primaryService, this.PRIMARY_CHARACTERISTIC_UID);
-            }),
-  
-            // 4) ask for the value of that characteristic (will return a DataView)
-            mergeMap((characteristic: BluetoothRemoteGATTCharacteristic) => {
-              return this.ble.readValue$(characteristic);
-            }),
-  
-            // 5) on that DataView, get the right value
-            map((value: DataView) => value.getUint8(0))
-          )
+
+    disconnect(): Observable<{address: string,name: string, status: STATUS}>{
+      this.device.gatt.disconnect();
+      return this.connectionInfo$.asObservable();
     }
 
-    disconnect(){
-      this.ble.disconnectDevice();
-      return new Promise(e => console.log("Promise not implemented"));
-    }
-
-    arrayBufferToString(buffer){
-
-      var Uint = new Uint16Array(buffer);
-      var len = Uint.length;
-      var result = '';
-      var addition = Math.pow(2,16)-1;
-      for(var i = 0;i<length;i+=addition){
   
-          if(i + addition > len){
-              addition = len - i;
-          }
-          result += String.fromCharCode.apply(null, Uint.subarray(i,i+addition));
+
+    string2ArrayBuffer(string: string): ArrayBuffer{
+
+      return (new Uint8Array([].map.call(string, x =>{
+     
+        return x.charCodeAt(0)
+    }
+    ))).buffer;
+    }    
+
+
+    arrayBufferToString(buffer: ArrayBuffer): string{
+      let result = "";
+      let Uint = new Uint8Array(buffer);
+      for(let i =0; i< Uint.length; i++){
+        result += String.fromCharCode(Uint[i]);
+        
       }
       return result;
-  
-  }
-
+    }
 
 }

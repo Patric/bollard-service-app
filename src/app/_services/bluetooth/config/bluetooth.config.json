@@ -6,7 +6,8 @@
         },
         "characteristic": {
             "UUID": "0x2101",
-            "peripheralChallengeUUID": "0x3101",
+            "peripheralControl": "0x2100",
+            "peripheralAuthUUID": "0x3101",
             "peripheralResponseUUID": "0x3102",
             "webServerSyncChallengeUUID": "0x4101",
             "peripheralSyncResponseUUID": "0x4102",

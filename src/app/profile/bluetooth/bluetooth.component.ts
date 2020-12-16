@@ -1,26 +1,19 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, defineInjectable, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
-import { AuthService } from '../_services/auth.service';
+import { AuthService } from '../../_services/auth.service';
 
-import { environment } from '../../environments/environment';
-import { map } from 'rxjs/operators';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
-
-
-import { BluetoothWebService } from '../_services/bluetooth/platform-services/bluetooth-web.service'
-import { BluetoothService } from '../_services/bluetooth/bluetooth.service';
-import { Platform } from '@ionic/angular';
-
+import { BluetoothService } from '../../_services/bluetooth/bluetooth.service';
+import { Observable } from 'rxjs';
 
 @Component({
-  selector: 'app-profile',
-  templateUrl: './profile.page.html',
-  styleUrls: ['./profile.page.scss'],
+  selector: 'app-bluetooth',
+  templateUrl: './bluetooth.component.html',
+  styleUrls: ['./bluetooth.component.scss'],
 })
-export class ProfilePage implements OnInit, OnDestroy {
+export class BluetoothComponent implements OnInit, OnDestroy {
 
   private response: Observable<Array<any>>;
   
@@ -44,10 +37,6 @@ export class ProfilePage implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-
- 
-
-
     this.bluetoothService.ready().then(()=>{
 
       // ngZone forces instant update on html side
@@ -75,8 +64,8 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   }
 
-  reset(){
-    this.bluetoothService.ble.disconnect();
+  disconnect(){
+    this.bluetoothService.ble.disconnect();//.subscribe(connectionInfo => console.log("connectionInfo on disconnect:: ", JSON.stringify(connectionInfo)));
   }
 
   logEvent(){
@@ -98,8 +87,12 @@ export class ProfilePage implements OnInit, OnDestroy {
   
   }
 
+  sendMessage(){
+    this.bluetoothService.ble.sendMessage(2);
+  }
+
   check(){
-  
+    this.bluetoothService.ble.debugButton();
     console.log("Checked");
 
   }
@@ -113,16 +106,8 @@ export class ProfilePage implements OnInit, OnDestroy {
 
   }
 
-  disconnect(){
-   // this.bluetoothService.ble.disconnect();
-  }
 
-  logout(){
-    if(this.connectionInfo.status == 'CONNECTED'){
-    }
-   
-    this.authService.logout();
 
-  }
+ 
 
 }

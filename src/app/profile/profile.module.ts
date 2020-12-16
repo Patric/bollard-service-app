@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ProfilePageRoutingModule } from './profile-routing.module';
 import { ProfilePage } from './profile.page';
-import { BluetoothModule } from '.././_services/bluetooth/bluetooth.module';
+import { BluetoothModule } from './bluetooth/bluetooth.module';
+import { BluetoothComponent } from './bluetooth/bluetooth.component';
 
 @NgModule({
   imports: [
@@ -14,6 +15,6 @@ import { BluetoothModule } from '.././_services/bluetooth/bluetooth.module';
     ProfilePageRoutingModule,
     BluetoothModule
   ],
-  declarations: [ProfilePage]
+  declarations: [ProfilePage, BluetoothComponent]
 })
 export class ProfilePageModule {}

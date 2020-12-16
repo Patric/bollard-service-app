@@ -1,65 +1,152 @@
-import { Observable } from 'rxjs';
-
-// IN PROGRESS
-enum Status{
-    CONNECTING,
-    CONNECTED,
-    CLOSED,
-    DISCONNECTED
-}
-
-export class ConnectionStatus{
-
-    public static readonly status = Status;
-    private _deviceAddress: string;
-    private _deviceName: string;
-    private _status: Status;
-
-    constructor(deviceAddress: string, deviceName: string, status: Status){
-        this._deviceAddress = deviceAddress;
-        this._deviceName = deviceName;
-        this._status = status;
-        
-    }
-
-    
-public get deviceAddress(): string{
-    return this._deviceAddress;
-}   
-
-public get deviceName(): string{
-    return this._deviceName;
-    }   
-
-public get status(): Status{
-    return this._status;
- }  
+import { BehaviorSubject, Observable } from 'rxjs';
 
 
+
+/**
+  * @description
+  * Describes the current state of the connection: 
+  * CONNECTING, CONNECTED, DISCONNECTED.
+  *@usage
+  * ```
+  * import {BluetoothAbstract, STATUS } from 'ionic-angular';
+  *
+  * @Component({...})
+  * export class BluetoothPlatformService {
+  *   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
+  *   constructor(...) {
+  *     // This will create a new JSON object with status: DISCONNECTED
+  *      this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED})
+  *   }
+  * }
+  * ```
+  */
+export enum STATUS{
+    CONNECTING = "CONNECTING",
+    CONNECTED = "CONNECTED",
+    DISCONNECTED = "DISCONNECTED"
 }
 
 
-export interface BluetoothAbstract{
+/**
+  * @description
+  * Interface for Bluetooth communication.
+  * @usage
+  * ```
+  * import { ConnectionInfo } from 'bluetooth-abstract';
+  *
+  * @Injectable({
+  * providedIn: 'root'
+  *  })
+  * export class BluetoothWebService implements BluetoothAbstract{
+  * connectionInfo$: BehaviorSubject<ConnectionInfo>;
+  * constructor({...}){}
+  * 
+  * startScanning();
 
+    connect(dvc_address?: string){...}
 
-   connectionStatus$: Observable<ConnectionStatus>;
+    request(code: number): Observable<any>{...}
 
-    startScanning();
+    getMessage(): Observable<any>{...}
 
-    connect(dvc_address?: string);
+    getConnectionInfo(): Observable<ConnectionInfo>{...}
 
-    request(code: number): Observable<any>;
+    getConnectedDevice(): Observable<any>{...}
 
-    getMessage(): Observable<any>;
+    getDevicesFound(): Observable<any>{...}
 
-    getConnectedDevice(): Observable<any>;
-
-    getDevicesFound(): Observable<any>;
-
-    disconnect(): Promise<any>;
+    disconnect(): Promise<any>{...}
 
     // DEL LATER
-    closeConnection(dvc_address: string): Observable<any>;
-    //updateConnectionStatus(status: ConnectionStatus);
-    
+    closeConnection(dvc_address: string): Observable<any>{...}
+  * 
+  * ```
+  */
+export interface  BluetoothAbstract{
+
+    /**
+   * @description
+   * Starts scanning for available devices. 
+   */
+    startScanning(): Observable<any>;
+
+
+    /**
+   * @description
+   * @param dvc_address - MAC Address of the device that should be connected
+   */
+    connect(dvc_address?: string);
+
+
+    /**
+   * @description
+   * @param code - Request code. Received by the peripheral to execute a specific action
+   * @returns ```Observable<any>```
+   */
+    sendMessage(code: number): Observable<any>;
+
+    /**
+   * @description
+   * @param code - Reads message from the peripheral
+   * @returns ```Observable<any>```
+   */
+    getMessage(): Observable<any>;
+
+
+    /**
+   * @description
+   * Returns ```Observable``` of JSON containing info of the device. Provides information of connection over time
+   *    
+   *    
+   * @param address - MAC Addres of the Bluetooth device
+   * @param name - Name of the Bluetooth device
+   * @param status - Connection status: CONNECTED | CONNECTING | DISCONNECTED
+   * 
+   * @returns ```Observable<{address: string,name: string, status: STATUS}>```
+   * 
+   * 
+   * @usage
+    * ```
+    * import {BluetoothAbstract, STATUS } from 'ionic-angular';
+    *
+    * @Component({...})
+    * export class BluetoothPlatformService {
+    *   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
+    *   constructor(...) {
+    *     // This will create a new JSON object with status: DISCONNECTED
+    *     this.connectionInfo$ = 
+    *       new BehaviorSubject<{address: string,name: string, status: STATUS}>({
+    *       address: null,
+    *       name: null, 
+    *       status: STATUS.DISCONNECTED})}
+    * 
+    * 
+    *  getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
+    *   return this.connectionInfo$.asObservable();}
+    * 
+    * 
+    * }
+    * ```
+    */
+    getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}>;
+
+    /**
+   * @description
+   * Returs devices found in ```startScanning()```
+   * @returns ```Observable<any>```
+   */
+    getDevicesFound(): Observable<any>;
+
+
+     /**
+   * @description
+   * Disconnects from currently connected device``
+   */
+    disconnect(): Observable<{address: string,name: string, status: STATUS}>;
+
+    debugButton();
+   
 }
+
+
+
