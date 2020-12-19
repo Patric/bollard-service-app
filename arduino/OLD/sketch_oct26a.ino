@@ -5,9 +5,9 @@
 BLEService controlService("1101");
 //BLEUnsignedCharCharacteristic batteryLevelChar("2101", BLERead | BLENotify | BLEWrite);
 BLEStringCharacteristic batteryLevelChar("2101", BLERead | BLENotify | BLEWrite, 20);
-BLEStringCharacteristic statusChar("3100", BLERead | BLEIndicate | BLENotify , 128);
-BLEStringCharacteristic messageChar("3101", BLERead | BLEIndicate| BLENotify | BLEWrite, 256);
-
+BLEStringCharacteristic statusChar("3100", BLERead | BLENotify , 128);
+BLEStringCharacteristic orderChar("3101", BLENotify | BLEWrite, 256);
+BLEStringCharacteristic responseChar("3102", BLERead | BLENotify, 256);
 
 JSONVar myObject;
 
@@ -33,7 +33,8 @@ void setup()
 
  controlService.addCharacteristic(batteryLevelChar);
  controlService.addCharacteristic(statusChar);
- controlService.addCharacteristic(messageChar);
+ controlService.addCharacteristic(orderChar);
+ controlService.addCharacteristic(responseChar);
 
 
  BLE.addService(controlService);
@@ -41,6 +42,8 @@ void setup()
 
  BLE.advertise();
  Serial.println("Bluetooth device active, waiting for connection...");
+statusChar.writeValue("Waiting");
+
 }
 
 void loop()
@@ -48,6 +51,7 @@ void loop()
   char output[100];
   //String output;
   BLEDevice central = BLE.central();
+  int i = 0;
   if(central){
     
     
@@ -64,24 +68,31 @@ void loop()
       Serial.print("Battery Level % is now: ");
       Serial.println(batteryLevel);
       batteryLevelChar.writeValue(String(batteryLevel));
-      statusChar.writeValue("Waiting");
-      Serial.print("The message is: ");
-      Serial.println(messageChar.value());
+     // statusChar.writeValue("Waiting");
+      Serial.print("The incoming message is: ");
+      Serial.println(orderChar.value());
       Serial.print("Status now is: ");
       Serial.println(statusChar.value());
-      //messageChar.writeValue("1234567890123456789011115");
+      //orderChar.writeValue("1234567890123456789011115");
 
       //Json failed on mobile
-      if(messageChar.written()){
-        myObject = JSON.parse(messageChar.value());
+      
+      if(orderChar.written()){
+        i++;
+        myObject = JSON.parse(orderChar.value());
         Serial.print("CODE is: ");
         Serial.println((const char*)myObject["code"]);
         myObject = null;
-        myObject["challenge"] = "someChallenge";
+        //myObject["challenge"] = "9WVXEG3B0D8rhG8zBrIFI2kF7a627kP88FHkcJxloaZlzoXKeYm6EpS7v5QBxcwPnXRHGvhy1pXvac";
+        myObject["challenge"] = String(i);
         myObject["status"] = "received";
-        messageChar.writeValue(JSON.stringify(myObject));
+        responseChar.writeValue(JSON.stringify(myObject));
+        statusChar.writeValue("Written");
+        Serial.print("Status now is: ");
+        //Char.writeValue("Value has changed and this message should now be sent");
         delay(200 * 1);
-       // messageChar.writeValue("123456789012345");
+        statusChar.writeValue("Waiting");
+       // orderChar.writeValue("123456789012345");
        
       }
       

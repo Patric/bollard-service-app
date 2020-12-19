@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BluetoothLE, DeviceInfo} from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
-import { BehaviorSubject, Observable, Observer, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, Observer, of, Subject, throwError } from 'rxjs';
+import { map, take } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
 import { BluetoothAbstract, STATUS } from './bluetooth-abstract';
 
@@ -14,14 +15,14 @@ export class BluetoothNativeService implements BluetoothAbstract{
   //UID in AAAA format, not AxAAAA
   private PRIMARY_SERVICE_UID = peripheral.service.UUID.substring(2);
   private PRIMARY_CHARACTERISTIC_UID = peripheral.characteristic.UUID.substring(2);
-  private peripheral_CHALLENGE_UID = peripheral.characteristic.peripheralControl.substring(2);
+ 
 
   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
   message$: BehaviorSubject<any>;
 
-  
+  response$: Subject<any>;
 
 constructor(
   public bluetoothle: BluetoothLE, 
@@ -32,11 +33,11 @@ constructor(
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
   this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
   this.message$ = new BehaviorSubject<any>(null);
+  this.response$ = new Subject<any>();
 
+    
 
   this.plt.ready().then((readySource) => {
- 
-
     console.log('Platform ready from', readySource);
     
     this.bluetoothle.hasPermission().then((response) => {
@@ -75,31 +76,63 @@ constructor(
 
   }
 
-  read(){
-    console.log("reading...", this.connectionInfo$.getValue());
-    
-    this.bluetoothle.subscribe({
+  readValue$(characteristicUID: string){
+    return this.bluetoothle.subscribe({
       "address": this.connectionInfo$.getValue().address,
       "service": this.PRIMARY_SERVICE_UID,
-      "characteristic": this.PRIMARY_CHARACTERISTIC_UID,
-    }).subscribe((onfulfilled) => 
-    {
-   
-      let value = onfulfilled.value;
-    
-    
-      if(value != undefined){
-        this.message$.next(atob(value));
-      }
-      
+      "characteristic": characteristicUID,
     });
-
-    
+  
   }
 
-  debugButton(){
+  // read(){
+  //   console.log("reading...", this.connectionInfo$.getValue());
+  //   this.bluetoothle.subscribe({
+  //     "address": this.connectionInfo$.getValue().address,
+  //     "service": this.PRIMARY_SERVICE_UID,
+  //     "characteristic": this.PRIMARY_CHARACTERISTIC_UID
+  //   }).subscribe((onfulfilled) => 
     
+  //   {let value = onfulfilled.value;
+  //     if(value != undefined){
+  //       this.message$.next(atob(value));
+  //     } 
+  //   });
+  // }
 
+  debugButton(){}
+
+  readValue(characteristicUID: string){
+
+    return this.bluetoothle.read({
+      "address": this.connectionInfo$.getValue().address,
+      "service": this.PRIMARY_SERVICE_UID,
+      "characteristic": characteristicUID,
+    });
+  }
+
+
+  watchResponsesFrom(characteristicUID: string, statusCharacteristicUID: string){
+    const subject$ = new Subject<any>()
+
+    this.readValue$(statusCharacteristicUID).subscribe(operationResult =>{
+      let val = operationResult.value;
+      if(val != undefined){
+        val = atob(val);
+      }
+      if(val == "Written" && val != undefined){
+        this.readValue(characteristicUID).then(onfullfilled => {
+          let value = onfullfilled.value;
+          if(value != undefined){
+            value = atob(value);
+            subject$.next(value);
+          }
+        })
+      }
+    });
+  
+    return subject$.asObservable();
+    
   }
 
   getResponse(characteristicUID: string){
@@ -225,11 +258,12 @@ constructor(
             console.log("MTU SET ", JSON.stringify(onfullfilled));
         
 
-            this.read();
-            this.getResponse("3101");
+            //this.read();
+           // this.getResponse("3101");
+           this.watchResponsesFrom(peripheral.characteristic.response.substring(2), peripheral.characteristic.status.substring(2))
+           .subscribe(val => this.response$.next(val));
           });
          
-          
           
           console.log("Services: ", JSON.stringify(onfulfilled.services));
           
@@ -271,21 +305,32 @@ constructor(
   }
 
 
-
-  sendMessage(code: number): Observable<any>{
+  send(code: number): Observable<any>{
    
 
- 
-
-    
     let message = JSON.stringify({auth: "authCode", code: "433"});
     this.bluetoothle.write({address: this.connectionInfo$.value.address,
     service: this.PRIMARY_SERVICE_UID,
-    characteristic: '3101',
+    characteristic: peripheral.characteristic.order.substring(2),
     value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
     }).then(response => console.log("WROTE: ", JSON.stringify(response)));
 
-      return of(null);
+      return this.response$.pipe(take(1));
+  }
+
+
+  sendMessage(code: number): Observable<any>{
+   
+    this.send(212).subscribe(res => console.log("response is ", res));
+    // let message = JSON.stringify({auth: "authCode", code: "433"});
+    // this.bluetoothle.write({address: this.connectionInfo$.value.address,
+    // service: this.PRIMARY_SERVICE_UID,
+    // characteristic: peripheral.characteristic.order.substring(2),
+    // value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
+    // }).then(response => console.log("WROTE: ", JSON.stringify(response)));
+
+    //   return this.response$.pipe(take(1));
+    return of(null);
   }
 
   getMessage(): Observable<any>{

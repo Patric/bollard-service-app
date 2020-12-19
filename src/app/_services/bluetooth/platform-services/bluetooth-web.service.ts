@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
+import { last, map, mergeMap, take } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
 import {BluetoothAbstract, STATUS} from './bluetooth-abstract';
 
@@ -19,9 +19,20 @@ export class BluetoothWebService implements BluetoothAbstract{
       this.challenge$ = new BehaviorSubject<any>(null);
       this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: null});
       this.challenge$.subscribe(challenge => console.log("New challenge: ", challenge));
-      //this._characteristics = new Map<number, BluetoothRemoteGATTCharacteristic>();
+      this.response$ = new Subject<any>();
+      this._characteristics = new Map<number, {
+        characteristic: BluetoothRemoteGATTCharacteristic,
+        subject: BehaviorSubject<any>,
+        listener: any
+      }>();
      }
   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
+
+  private _characteristics: Map<number, {
+    characteristic: BluetoothRemoteGATTCharacteristic,
+    subject: BehaviorSubject<any>,
+    listener: any
+  }>;
 
   private PRIMARY_SERVICE_UID = Number(peripheral.service.UUID);
   private PRIMARY_CHARACTERISTIC_UID = Number(peripheral.characteristic.UUID);
@@ -29,28 +40,52 @@ export class BluetoothWebService implements BluetoothAbstract{
   private message$: BehaviorSubject<any>;
   private challenge$: BehaviorSubject<any>;
 
-
-  private bluetoothRemoteGATTService: BluetoothRemoteGATTService;
+  private response$: Subject<any>;
 
   connect(dvc_address?: string) {
     //throw new Error('Method not implemented.');
   }
 
-  sendMessage(code: number): Observable<any> {
-    let message = JSON.stringify({auth: "authCode", code: "433"});
-    this.writeValue(this.bluetoothRemoteGATTService, Number(peripheral.characteristic.peripheralAuthUUID), message).then(onfullfilled => 
+  send(code: number){
+   // let subject$ = new Subject();
+    // this.watchResponsesFrom(Number(peripheral.characteristic.response), Number(peripheral.characteristic.status)).
+    // subscribe(val => {
       
-      {
-        console.log("Finished writing.")
-        this.readValue(this.bluetoothRemoteGATTService, Number(peripheral.characteristic.peripheralAuthUUID)).then(val => console.log("Auth char: ", val));
-        
-      
-      }
-      
-      );
-   
+    //   //this.response$.next(val)
+    //  subject$.next(val);
+    //  // this._characteristics.get(Number(peripheral.characteristic.status)).characteristic.stopNotifications().then(_ => console.log("Notifications stopped"));
+    //   //this.stopReadingValue$(Number(peripheral.characteristic.status));
+    // }
+    
+    // );
 
-    return of(null); //throw new Error('Method not implemented.');
+    
+    let message = JSON.stringify({auth: "authCode", code: "433"});
+   setTimeout(() =>  {
+      this.writeValue(Number(peripheral.characteristic.order), message).then(onfullfilled =>   
+        { 
+          console.log("Finished writing.") } 
+        );
+     }, 500);
+
+    return this.response$.pipe(take(1)); //throw new Error('Method not implemented.');
+  }
+
+
+  sendMessage(code: number): Observable<any> {
+
+    this.send(231).subscribe(res => console.log("res from send message: ", res));
+
+
+    // let message = JSON.stringify({auth: "authCode", code: "433"});
+    // setTimeout(() =>  {
+    //    this.writeValue(Number(peripheral.characteristic.order), message).then(onfullfilled =>   
+    //      { 
+    //        console.log("Finished writing.") } 
+    //      );
+    //   }, 500);
+ 
+     return this.response$.pipe(take(1));
   }
   getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
     return this.connectionInfo$.asObservable();
@@ -61,10 +96,23 @@ export class BluetoothWebService implements BluetoothAbstract{
   }
  
 
-    connectToService(service: number[]){
+  _cacheCharacteristic(service, characteristicUuid): Promise<boolean> {
+    return service.getCharacteristic(characteristicUuid)
+    .then(characteristic => {
+      this._characteristics.set(characteristicUuid, {
+        characteristic: characteristic,
+        subject: new BehaviorSubject<any>(null),
+        listener: false
+      
+      })
+      return service;
+    });
+  }
+
+    connectToService(service: number){
       return navigator.bluetooth.requestDevice({
         filters: [{
-          services: service
+          services: [service]
         }]
       })
       .then(device => {
@@ -72,85 +120,116 @@ export class BluetoothWebService implements BluetoothAbstract{
         this.device = device;
         return device.gatt.connect();
       })
-      .then(server => server.getPrimaryService(this.PRIMARY_SERVICE_UID))
+      .then(server => server.getPrimaryService(service))
       .then(service => {
-        this.bluetoothRemoteGATTService = service;
-        //this._cacheCharacteristic(service, Number(peripheral.characteristic.UUID));
-        //this._cacheCharacteristic(service, Number(peripheral.characteristic.peripheralAuthUUID));
-        setTimeout(() =>  {  return service; }, 10);
-        
+        //this.bluetoothRemoteGATTService = service;
+        this._cacheCharacteristic(service, Number(peripheral.characteristic.order));
+        this._cacheCharacteristic(service, Number(peripheral.characteristic.response));
+        return this._cacheCharacteristic(service, Number(peripheral.characteristic.status));
       })
+      .then(onfulfilled => console.log("Connected to", service))
       .catch(error => { console.error(error); });
     }
 
-    stopReadingValue$(service: BluetoothRemoteGATTService, characteristicUID: number){
-      return service.getCharacteristic(characteristicUID)
-      .then(characteristic => characteristic.stopNotifications()
-      .then(characteristic => characteristic));
+    stopReadingValue$(characteristicUID: number){
+     this._characteristics.get(characteristicUID).characteristic.stopNotifications()
+      .then(characteristic =>{
+
+        characteristic.removeEventListener('characteristicvaluechange', this._characteristics.get(characteristicUID).listener);
+
+        console.log("Removed event listener");
+      } );
+      
+     
     }
 
-    // Cannot read two at the same time
-    readValue$(service: BluetoothRemoteGATTService, characteristicUID: number){
-      let subject$ = new Subject<any>();
-      service.getCharacteristic(characteristicUID)
-      .then(characteristic => {characteristic.startNotifications()
-        .then(characteristic => characteristic.addEventListener('characteristicvaluechanged', (e: any) => {
+    
+    // Cannot read two at the same time. When reading is stopped. stopReadingValue$ shall be
+    readValue$(characteristicUID: number){
+      //let subject$ = new Subject();
+     // if(this._characteristics.get(characteristicUID).listener == false){
+        this._characteristics.get(characteristicUID).listener = (e: any) => {
           const value = e.target.value;
           let result = "";
           let Uint = new Uint8Array(value.buffer);
           for(let i =0; i< Uint.length; i++){
             result += String.fromCharCode(Uint[i]);
           }
-          subject$.next(result);
-        }))
-        console.log("Subscribed to: ", characteristic);
-      }); 
-      return subject$.asObservable();
+          this._characteristics.get(characteristicUID).subject.next(result);
+        }
+
+        this._characteristics.get(characteristicUID).characteristic.startNotifications()
+        .then(characteristic => characteristic.addEventListener('characteristicvaluechanged', this._characteristics.get(characteristicUID).listener))
+        console.log("Added listener to: ", this._characteristics.get(characteristicUID));
+
+     // }
+     // else{
+
+      //  this._characteristics.get(characteristicUID).characteristic.startNotifications().then(_ => console.log("Notification started"));
+      //}
+    
+       return this._characteristics.get(characteristicUID).subject;
+      /// return subject$;
     }
 
+   
 
-    readValue(service: BluetoothRemoteGATTService, characteristicUID: number){
-      return service.getCharacteristic(characteristicUID)
-      .then(characteristic => characteristic.readValue().then(value =>{ 
+    
+    
+
+
+    readValue(characteristicUID: number){
+      
+      return this._characteristics.get(characteristicUID).characteristic.readValue().then(value =>{ 
         
-        console.log("value read", this.arrayBufferToString(value.buffer));
+        //console.log("value read:", this.arrayBufferToString(value.buffer));
 
         //this.message$.next(this.arrayBufferToString(value.buffer));
         return this.arrayBufferToString(value.buffer);
-      }));
+      });
     }
 
 
-
-    writeValue(service: BluetoothRemoteGATTService, characteristicUID: number, value: string){
-      return service.getCharacteristic(characteristicUID)
-      .then(characteristic => {
-        
-        // Writing 1 is the signal to reset energy expended.
-        //const resetEnergyExpended = Uint8Array.of(1);
-        return characteristic.writeValue(this.string2ArrayBuffer(value));
-      })
+    writeValue(characteristicUID: number, value: string){
+      return this._characteristics.get(characteristicUID).characteristic
+      .writeValue(this.string2ArrayBuffer(value))
       .then(_ => {
         console.log(value, " has been written.");
       })
-      .catch(error => { console.error(error); });
+      .catch(error => { console.error(error.message); });
 
     }
 
     onDisconnected(event){
       const device = event.target;
+    
       console.log(`Device ${device.name} is disconnected.`);
     }
 
 
+    watchResponsesFrom(characteristicUID: number, statusCharacteristicUID: number){
+      const subject$ = new Subject<any>();
+      this.readValue$(statusCharacteristicUID).subscribe(val =>{
+        if(val == "Written"){
+           this.readValue(characteristicUID).then(val => subject$.next(val));
+        }
+      });
+    
+      return subject$.asObservable();
+      
+    }
+
 
     startScanning(): Observable<{address: string,name: string, status: STATUS}>{
+      this.connectToService(this.PRIMARY_SERVICE_UID).then(onfullfilled => {
 
 
-      this.connectToService([this.PRIMARY_SERVICE_UID]).then(onfullfilled => {
-        this.readValue$(this.bluetoothRemoteGATTService, this.PRIMARY_CHARACTERISTIC_UID).subscribe(val => this.message$.next(val));
-        
-        
+        this.watchResponsesFrom(Number(peripheral.characteristic.response), Number(peripheral.characteristic.status))
+        .subscribe(val => {
+          this.response$.next(val);
+        });
+     //   this.sendMessage(231).subscribe();
+        //this.send(231).subscribe(res => console.log("res: ", res));
       }
       );
 
@@ -158,8 +237,11 @@ export class BluetoothWebService implements BluetoothAbstract{
      }
 
      debugButton(){
-       this.stopReadingValue$(this.bluetoothRemoteGATTService, this.PRIMARY_CHARACTERISTIC_UID).then(characteristic => console.log("Unsubscribed to: ", characteristic));
-     }
+       //this.stopReadingValue$(this.PRIMARY_CHARACTERISTIC_UID).then(characteristic => console.log("Unsubscribed to: ", characteristic));
+      //this.readValue(Number(peripheral.characteristic.response)).then(value => console.log("value READ"));
+      this.send(231).subscribe(res => console.log("res: ", res));
+      //this.stopReadingValue$(Number(peripheral.characteristic.status));
+      }
 
      getMessage(){
       return this.message$;

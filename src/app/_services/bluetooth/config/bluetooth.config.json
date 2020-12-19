@@ -6,13 +6,10 @@
         },
         "characteristic": {
             "UUID": "0x2101",
-            "peripheralControl": "0x2100",
-            "peripheralAuthUUID": "0x3101",
-            "peripheralResponseUUID": "0x3102",
-            "webServerSyncChallengeUUID": "0x4101",
-            "peripheralSyncResponseUUID": "0x4102",
-            "webServerChallengeUUID": "0x5101",
-            "webServerResponseUUID": "0x5102"
+            "status": "0x3100",
+            "order": "0x3101",
+            "response": "0x3102"
+
 
         }
         
