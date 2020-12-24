@@ -57,13 +57,13 @@ export class ProfilePage implements OnInit, OnDestroy {
       }, 
       (err) => console.error("this.bluetoothService.getDevicesFound() error", err));
    
-      this.bluetoothService.ble.getMessage().subscribe((message) => {this.ngZone.run( () => {
-         if(message != null && message != undefined){
-            this.message = message;
-          }
-          });
-}, 
-      (err) => console.error("this.bluetoothService.getMessage() error", err));
+//       this.bluetoothService.ble.getMessage().subscribe((message) => {this.ngZone.run( () => {
+//          if(message != null && message != undefined){
+//             this.message = message;
+//           }
+//           });
+// }, 
+//       (err) => console.error("this.bluetoothService.getMessage() error", err));
 
       this.bluetoothService.ble.getConnectionInfo().subscribe((connectionInfo) => {this.ngZone.run( () => {
         this.connectionInfo = connectionInfo;

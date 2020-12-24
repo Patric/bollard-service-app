@@ -174,11 +174,8 @@ void loop()
           break;
         }
       };
-
       //Add proper timeout
-
       }
-
   delay(200);
   }
   //digitalWrite(BOLLARD_BLOCK, LOW);
@@ -187,9 +184,7 @@ void loop()
   if(shallWait4Disconnect){
   reinitiate();
   };
-
   Serial.println(central.address());
-
 }
 
 

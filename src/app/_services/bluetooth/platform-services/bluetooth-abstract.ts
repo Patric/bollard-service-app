@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 
 
@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   * CONNECTING, CONNECTED, DISCONNECTED.
   *@usage
   * ```
-  * import {BluetoothAbstract, STATUS } from 'ionic-angular';
+  * import {BluetoothAbstract, STATUS } from 'bluetooth-abstract';
   *
   * @Component({...})
   * export class BluetoothPlatformService {
@@ -45,9 +45,7 @@ export enum STATUS{
 
     connect(dvc_address?: string){...}
 
-    request(code: number): Observable<any>{...}
-
-    getMessage(): Observable<any>{...}
+    order(body: string): Observable<any>{...}
 
     getConnectionInfo(): Observable<ConnectionInfo>{...}
 
@@ -57,8 +55,8 @@ export enum STATUS{
 
     disconnect(): Promise<any>{...}
 
-    // DEL LATER
-    closeConnection(dvc_address: string): Observable<any>{...}
+    //TO DEL
+    debugButton()
   * 
   * ```
   */
@@ -80,17 +78,22 @@ export interface  BluetoothAbstract{
 
     /**
    * @description
-   * @param code - Request code. Received by the peripheral to execute a specific action
-   * @returns ```Observable<any>```
+   * @param body - Body of the message. Can be respresented in JSON format, eg. 
+   * ```{authCode: daw3REvcx4, 
+   * code: 341}```. 
+   * Received by the peripheral to execute a specific action
+   * @returns ```Observable<any>``` of first response emitted by response characteristic of a bluetooth device.
    */
-    sendMessage(code: number): Observable<any>;
+    order(body: string): Observable<any>;
 
-    /**
-   * @description
-   * @param code - Reads message from the peripheral
-   * @returns ```Observable<any>```
-   */
-    getMessage(): Observable<any>;
+
+
+  //   /**
+  //  * @description
+  //  * @param code - Reads message from the peripheral
+  //  * @returns ```Observable<any>```
+  //  */
+  //   getMessage(): Observable<any>;
 
 
     /**
@@ -107,7 +110,7 @@ export interface  BluetoothAbstract{
    * 
    * @usage
     * ```
-    * import {BluetoothAbstract, STATUS } from 'ionic-angular';
+    * import {BluetoothAbstract, STATUS } from 'bluetooth-abstract';
     *
     * @Component({...})
     * export class BluetoothPlatformService {

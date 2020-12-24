@@ -14,29 +14,22 @@ export class BluetoothNativeService implements BluetoothAbstract{
 
   //UID in AAAA format, not AxAAAA
   private PRIMARY_SERVICE_UID = peripheral.service.UUID.substring(2);
-  private PRIMARY_CHARACTERISTIC_UID = peripheral.characteristic.UUID.substring(2);
- 
 
   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
-  message$: BehaviorSubject<any>;
+  //message$: BehaviorSubject<any>;
 
   response$: Subject<any>;
 
 constructor(
   public bluetoothle: BluetoothLE, 
   public plt: Platform) {
-
-
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
   this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
-  this.message$ = new BehaviorSubject<any>(null);
+ // this.message$ = new BehaviorSubject<any>(null);
   this.response$ = new Subject<any>();
-
-    
-
   this.plt.ready().then((readySource) => {
     console.log('Platform ready from', readySource);
     
@@ -46,44 +39,41 @@ constructor(
         this.bluetoothle.requestPermission().then(status => console.log(status));
       }
     });
-
     bluetoothle.isLocationEnabled().then((isLocationEnabled) => {
       console.log(isLocationEnabled);
       if(!isLocationEnabled){
         this.bluetoothle.requestLocation().then(status => console.log(status));
       }
-
     });
     this.bluetoothle.initialize({
       "request": true, // request = true / false (default) - Should user be prompted to enable Bluetooth
       "statusReceiver": true, // Should change in Bluetooth status notifications be sent.
       "restoreKey" : "bluetoothleplugin" // A unique string to identify your app. Bluetooth Central background mode is required to use this, but background mode doesn't seem to require specifying the restoreKey.
-      
+
     }).subscribe(ble => {
       console.log('ble', ble.status) // logs 'enabled'
       this.bluetoothle.enable();
       this.bluetoothle.getAdapterInfo().then(info => console.log(info));
     });
    });
-
-   console.log("BluetoothNativeService constructor called");
-
  }
+
+ getMessage(): Observable<any>{
+  return this.response$.asObservable();
+}
+
+getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
+  return this.connectionInfo$.asObservable();
+}
+
+getDevicesFound(): Observable<Array<any>>{
+  return this.devicesFound$.asObservable();
+}
   
   checkStatus(){
-
     console.log("CHECK");
-
   }
 
-  readValue$(characteristicUID: string){
-    return this.bluetoothle.subscribe({
-      "address": this.connectionInfo$.getValue().address,
-      "service": this.PRIMARY_SERVICE_UID,
-      "characteristic": characteristicUID,
-    });
-  
-  }
 
   // read(){
   //   console.log("reading...", this.connectionInfo$.getValue());
@@ -102,90 +92,7 @@ constructor(
 
   debugButton(){}
 
-  readValue(characteristicUID: string){
-
-    return this.bluetoothle.read({
-      "address": this.connectionInfo$.getValue().address,
-      "service": this.PRIMARY_SERVICE_UID,
-      "characteristic": characteristicUID,
-    });
-  }
-
-
-  watchResponsesFrom(characteristicUID: string, statusCharacteristicUID: string){
-    const subject$ = new Subject<any>()
-
-    this.readValue$(statusCharacteristicUID).subscribe(operationResult =>{
-      let val = operationResult.value;
-      if(val != undefined){
-        val = atob(val);
-      }
-      if(val == "Written" && val != undefined){
-        this.readValue(characteristicUID).then(onfullfilled => {
-          let value = onfullfilled.value;
-          if(value != undefined){
-            value = atob(value);
-            subject$.next(value);
-          }
-        })
-      }
-    });
-  
-    return subject$.asObservable();
-    
-  }
-
-  getResponse(characteristicUID: string){
-
-        this.bluetoothle.subscribe({
-          "address": this.connectionInfo$.getValue().address,
-          "service": this.PRIMARY_SERVICE_UID,
-          "characteristic": characteristicUID//,
-          //"response": "No"
-        }).subscribe((operationResult) => 
-        {
-          let value = operationResult.value;
-
-          console.log("New message received", JSON.stringify(operationResult));
-          if(value != undefined){
-            console.log("Received message: ", atob(value));
-            //this.message$.next(this.bluetoothle.encodedStringToBytes(`${value}`));
-          }
-        })
-  }
-
-
-  // Ensure device is not scanning all the time. Check after 2 seconds from the scanning start
-  superviseScan(){
-    const seconds = 2;
-    const interval_id = setInterval(() => {
-      this.bluetoothle.isScanning().then((status) => {
-
-        if(status.isScanning){
-          this.stopScanning();
-        }
-        else{
-          console.log("Interval for isScanning stopped");
-          clearInterval(interval_id);
-        }
-      });
-      // miliseconds
-    }, 1000*seconds);
-  }
-
-
-  stopScanning(){
-    
-    this.bluetoothle.isScanning().then((status) => {
-      if(status.isScanning){
-        this.bluetoothle.stopScan().then(m => console.log("Stopped scanning ", m));
-
-      };
-    });
-
-
-  }
-
+ 
   // INTERFACE BLUETOOTHABSTRACT =====================================================================================
   startScanning(): Observable<{address: string,name: string, status: STATUS}>{
    
@@ -193,7 +100,7 @@ constructor(
       console.log("Is scanning =", status.isScanning);
 
     if(!status.isScanning){
-    this.superviseScan();
+    this._superviseScan();
     this.devicesFound = [];
     // Add currently connected device
     if(this.devicesFound.find(device => device.address == this.connectionInfo$.value.address) || this.connectionInfo$.value.address == null){
@@ -241,34 +148,21 @@ constructor(
           autoConnect: false
         }
       ).subscribe((deviceInfo) =>  {
-      
-      //console.log("NEW CONNECTION STATUS: ", deviceInfo.status)
-      console.log("Device info before writing", JSON.stringify(deviceInfo));
-      
       if(deviceInfo.status == "connected"){
-        
         this.bluetoothle.discover({
           "address": deviceInfo.address,
           "clearCache": true
         }).then((onfulfilled) => {
-        
           this.connectionInfo$.next({address: deviceInfo.address, name: deviceInfo.name, status: STATUS.CONNECTED});
-
           this.bluetoothle.mtu({address: this.connectionInfo$.getValue().address, mtu: 242}).then(onfullfilled => {
             console.log("MTU SET ", JSON.stringify(onfullfilled));
         
-
-            //this.read();
-           // this.getResponse("3101");
-           this.watchResponsesFrom(peripheral.characteristic.response.substring(2), peripheral.characteristic.status.substring(2))
+           this._watchResponsesFrom(peripheral.characteristic.response.substring(2), peripheral.characteristic.status.substring(2))
            .subscribe(val => this.response$.next(val));
           });
-         
-          
+    
           console.log("Services: ", JSON.stringify(onfulfilled.services));
-          
       });
-        
       }
       else if(deviceInfo.status == "closed"){
         this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
@@ -292,36 +186,27 @@ constructor(
       }
       }
       );
-
-
-
     }
     else{
       console.error("Device ", JSON.stringify(this.connectionInfo$.value), " already connected. Disconnect to this device to establish a new connection");
     }
-    
-   
-
   }
 
 
-  send(code: number): Observable<any>{
-   
+  order(body: string): Observable<any>{
 
-    let message = JSON.stringify({auth: "authCode", code: "433"});
     this.bluetoothle.write({address: this.connectionInfo$.value.address,
     service: this.PRIMARY_SERVICE_UID,
     characteristic: peripheral.characteristic.order.substring(2),
-    value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
+    value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(body))
     }).then(response => console.log("WROTE: ", JSON.stringify(response)));
-
-      return this.response$.pipe(take(1));
+    //alternatively first(response => response.header == orderhearder)
+    return this.response$.pipe(take(1));
   }
-
 
   sendMessage(code: number): Observable<any>{
    
-    this.send(212).subscribe(res => console.log("response is ", res));
+    this._send(212).subscribe(res => console.log("response is ", res));
     // let message = JSON.stringify({auth: "authCode", code: "433"});
     // this.bluetoothle.write({address: this.connectionInfo$.value.address,
     // service: this.PRIMARY_SERVICE_UID,
@@ -333,17 +218,6 @@ constructor(
     return of(null);
   }
 
-  getMessage(): Observable<any>{
-    return this.message$.asObservable();
-  }
-
-  getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
-    return this.connectionInfo$.asObservable();
-  }
-
-  getDevicesFound(): Observable<Array<any>>{
-    return this.devicesFound$.asObservable();
-  }
   
   disconnect(): Observable<{address: string,name: string, status: STATUS}>{
     console.log("Disconnecting...");
@@ -379,12 +253,99 @@ constructor(
     return this.connectionInfo$.asObservable();
   }
 
-  
-  
-
   //helper functions
 
-  error(message: string){
+  
+  // for debug
+  _send(code: number): Observable<any>{
+   
+
+    let message = JSON.stringify({auth: "authCode", code: "433"});
+    this.bluetoothle.write({address: this.connectionInfo$.value.address,
+    service: this.PRIMARY_SERVICE_UID,
+    characteristic: peripheral.characteristic.order.substring(2),
+    value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
+    }).then(response => console.log("WROTE: ", JSON.stringify(response)));
+
+      return this.response$.pipe(take(1));
+  }
+
+
+  _readValue$(characteristicUID: string){
+    return this.bluetoothle.subscribe({
+      "address": this.connectionInfo$.getValue().address,
+      "service": this.PRIMARY_SERVICE_UID,
+      "characteristic": characteristicUID,
+    });
+  
+  }
+
+  _readValue(characteristicUID: string){
+
+    return this.bluetoothle.read({
+      "address": this.connectionInfo$.getValue().address,
+      "service": this.PRIMARY_SERVICE_UID,
+      "characteristic": characteristicUID,
+    });
+  }
+
+
+  _watchResponsesFrom(characteristicUID: string, statusCharacteristicUID: string){
+    const subject$ = new Subject<any>()
+
+    this._readValue$(statusCharacteristicUID).subscribe(operationResult =>{
+      let val = operationResult.value;
+      if(val != undefined){
+        val = atob(val);
+      }
+      if(val == "Written" && val != undefined){
+        this._readValue(characteristicUID).then(onfullfilled => {
+          let value = onfullfilled.value;
+          if(value != undefined){
+            value = atob(value);
+            subject$.next(value);
+          }
+        })
+      }
+    });
+  
+    return subject$.asObservable();
+    
+  }
+
+
+  // Ensure device is not scanning all the time. Check after 2 seconds from the scanning start
+  _superviseScan(){
+    const seconds = 2;
+    const interval_id = setInterval(() => {
+      this.bluetoothle.isScanning().then((status) => {
+
+        if(status.isScanning){
+          this._stopScanning();
+        }
+        else{
+          console.log("Interval for isScanning stopped");
+          clearInterval(interval_id);
+        }
+      });
+      // miliseconds
+    }, 1000*seconds);
+  }
+
+
+  _stopScanning(){
+    
+    this.bluetoothle.isScanning().then((status) => {
+      if(status.isScanning){
+        this.bluetoothle.stopScan().then(m => console.log("Stopped scanning ", m));
+
+      };
+    });
+
+
+  }
+
+  _error(message: string){
     return throwError ({error: { message }})
   }
 

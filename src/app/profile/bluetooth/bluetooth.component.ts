@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 
 import { BluetoothService } from '../../_services/bluetooth/bluetooth.service';
 import { Observable } from 'rxjs';
+import {BridgeService} from '../../_services/bridge.service'
 
 @Component({
   selector: 'app-bluetooth',
@@ -20,12 +21,12 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   // Bonding with html
   private connectionInfo;
   private devicesFound;
-  private message;
 
   constructor
 
   ( private bluetoothService: BluetoothService,
     private http: HttpClient,
+    private bridgeService: BridgeService,
     private router: Router,
     private authService: AuthService,
     private ngZone: NgZone,
@@ -45,14 +46,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
         });
       }, 
       (err) => console.error("this.bluetoothService.getDevicesFound() error", err));
-   
-      this.bluetoothService.ble.getMessage().subscribe((message) => {this.ngZone.run( () => {
-         if(message != null && message != undefined){
-            this.message = message;
-          }
-          });
-}, 
-      (err) => console.error("this.bluetoothService.getMessage() error", err));
 
       this.bluetoothService.ble.getConnectionInfo().subscribe((connectionInfo) => {this.ngZone.run( () => {
         this.connectionInfo = connectionInfo;
@@ -61,7 +54,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   }, 
   (err) => console.error("this.bluetoothService.ready() error", err));
-
   }
 
   disconnect(){
@@ -88,11 +80,14 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(){
-    this.bluetoothService.ble.sendMessage(2);
+    let message = JSON.stringify({auth: "authCode", code: 432});
+    this.bluetoothService.ble.order(message).subscribe(response => console.log("got response: ", response));
   }
 
   check(){
-    this.bluetoothService.ble.debugButton();
+    //this.bluetoothService.ble.debugButton();
+    let message = JSON.stringify({auth: "authCode", code: 432});
+    this.bridgeService.authoriseOrder(432);
     console.log("Checked");
 
   }

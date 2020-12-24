@@ -5,6 +5,7 @@ import { BluetoothWebService } from '../../_services/bluetooth/platform-services
 import { BluetoothService } from '../../_services/bluetooth/bluetooth.service';
 import { WebBluetoothModule } from '@manekinekko/angular-web-bluetooth';
 import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
+import {BridgeService} from '../../_services/bridge.service';
 
 @NgModule({
     imports: [
@@ -18,7 +19,8 @@ import { BluetoothLE } from '@ionic-native/bluetooth-le/ngx';
     BluetoothLE,
     BluetoothNativeService,
     BluetoothWebService,
-    BluetoothService
+    BluetoothService,
+    BridgeService
     ]
   })
   export class BluetoothModule { }
