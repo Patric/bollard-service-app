@@ -1,7 +1,24 @@
 #include <ArduinoBLE.h>
 #include <Arduino_JSON.h>
+#include <sha256.h>
 
-//#include <list>
+
+
+uint8_t hmacKey[]={
+  0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c
+};
+
+String salt = "9U01j34NVW06kzb1uVyMIoqCi";
+
+String stringifyHash(uint8_t* hash) {
+  int i;
+  String result = "";
+  for (i=0; i<32; i++) {
+    result += "0123456789abcdef"[hash[i]>>4];
+    result +="0123456789abcdef"[hash[i]&0xf];
+  }
+  return result;
+}
 
 
 BLEService controlService("1101");
@@ -181,6 +198,7 @@ void handleJSONOrder(String order){
     Serial.println(auth);
     Serial.print("Proper solution is: ");
     Serial.println(solutionBuffer);
+    unauthorized();
     }
  
 
@@ -248,8 +266,6 @@ String generateChallenge(){
     }
    Serial.print("Challenge array");
    Serial.println(challenge);
-
-
   
   }
 
@@ -257,12 +273,18 @@ String generateChallenge(){
 }
 
 String solveChallenge(String challenge){
-    char key = '1';
-    challenge[0] = key;
+  Sha256.initHmac(hmacKey, sizeof(hmacKey));
+  Sha256.print(challenge + salt);
+  //printHash(Sha256.resultHmac());
+  Serial.println();
+
+
+    //char key = '1';
+   // challenge[0] = key;
     //for(int i=0; i<challenge.length(); i++){
       //challenge[i] = (char)challenge[i] + 4;
     //}
-  return challenge;
+  return stringifyHash(Sha256.resultHmac());
 }
 
 

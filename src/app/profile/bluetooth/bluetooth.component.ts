@@ -9,6 +9,10 @@ import { BluetoothService } from '../../_services/bluetooth/bluetooth.service';
 import { Observable } from 'rxjs';
 import {BridgeService} from '../../_services/bridge.service'
 
+
+// TO BE DELTED
+import { SHA } from '../../_interceptors/crypto';
+
 @Component({
   selector: 'app-bluetooth',
   templateUrl: './bluetooth.component.html',
@@ -80,14 +84,17 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(){
-    let message = JSON.stringify({auth: "authCode", code: 432});
-    this.bluetoothService.ble.order(message).subscribe(response => console.log("got response: ", response));
+    //let message = JSON.stringify({auth: "authCode", code: String(432)});
+    this.bridgeService.authoriseOrder(100).subscribe(res => console.log("Authorizing order status: ", res));
+    //this.bluetoothService.ble.order(message).subscribe(response => console.log("got response: ", response));
   }
 
   check(){
-    //this.bluetoothService.ble.debugButton();
-    let message = JSON.stringify({auth: "authCode", code: 432});
-    this.bridgeService.authoriseOrder(432);
+     // TO BE DELETED
+     //let sha256 = new SHA();
+     //sha256.generate();
+
+    this.bridgeService.authoriseOrder(100).subscribe(res => console.log("Authorizing order status: ", res));
     console.log("Checked");
 
   }

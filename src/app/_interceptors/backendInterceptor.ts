@@ -1,7 +1,10 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Injectable, Injector } from "@angular/core";
-import { Observable, of, throwError } from 'rxjs';
-import { delay, mergeMap, materialize, dematerialize } from 'rxjs/operators';
+import { from, Observable, of, throwError } from 'rxjs';
+import { delay, mergeMap, materialize, dematerialize, switchMap } from 'rxjs/operators';
+
+
+
 const usersData = {
     "users": [
     {
@@ -49,7 +52,8 @@ const devicesData = [
     // Actual device
     "id": "1",
     "state": "locked",
-    "key": "1",
+    "key": new Uint8Array([0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c]),
+    "salt": "9U01j34NVW06kzb1uVyMIoqCi",
     "userID": null,
     "isProcessed": false,
     "ready": true,
@@ -60,7 +64,8 @@ const devicesData = [
   {
     "id": "2",
     "state": "locked",
-    "key": "1",
+    "key": new Uint8Array([0x0c,0x0c,0x1c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c]),
+    "salt": "9U01j34NVW0fdfMIoqCi",
     "userID": null,
     "isProcessed": false,
     "ready": true,
@@ -71,7 +76,8 @@ const devicesData = [
   {
     "id": "3",
     "state": "locked",
-    "key": "3",
+    "key": new Uint8Array([0x1c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c]),
+    "salt": "9U01j34NVW06kzb1bnuVyMIoqCi",
     "userID": null,
     "isProcessed": false,
     "ready": true,
@@ -198,8 +204,13 @@ export class BackendInterceptor implements HttpInterceptor {
         function authorizeRemoteOrder(){
           console.log("Authorizing remoteo order: ", body);
          
-          console.log("Authorizing solution: ", solveChallenge(body.challenge, devicesData.find(device => device.id == body.id).key));
-          return ok({auth: solveChallenge(body.challenge, devicesData.find(device => device.id == body.id).key)});
+          console.log("Authorizing solution: ", sign(body.challenge, devicesData.find(device => device.id == body.id).key, devicesData.find(device => device.id == body.id).salt));
+          return from(sign(body.challenge, devicesData.find(device => device.id == body.id).key, devicesData.find(device => device.id == body.id).salt))
+          .pipe(switchMap(value => 
+            {
+              return ok({auth: value});
+            })
+          );
         }
 
 
@@ -208,9 +219,34 @@ export class BackendInterceptor implements HttpInterceptor {
         // =================================================================================================================================================================================
         // body: {MACAdress: macaddress}
 
-        function solveChallenge(challenge: string, key: string){
-          console.log()
-          return key + challenge.substring(1);
+        function sign(challenge: string, key: Uint8Array, salt: String){
+          let encoder = new TextEncoder();
+          return window.crypto.subtle.importKey(
+            "raw", // raw format of the key - should be Uint8Array
+            //this.encoder.encode("mysecretkey"),
+            key,
+            { // algorithm details
+                name: "HMAC",
+                hash: {name: "SHA-256"}
+            },
+            false, // export = false
+            ["sign", "verify"] // what this key can do
+        ).then( key => {
+
+            return window.crypto.subtle.sign(
+                "HMAC",
+                key,
+                encoder.encode(challenge + salt)
+            ).then(signature => {
+                var b = new Uint8Array(signature);
+                var str = Array.prototype.map.call(b, x => ('00'+x.toString(16)).slice(-2)).join("");
+                console.log("key: ", str);
+                return str;
+            });
+            
+        });
+
+
         }
 
         function getRandomArbitrary(min, max) {
