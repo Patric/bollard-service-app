@@ -219,7 +219,7 @@ export class BackendInterceptor implements HttpInterceptor {
           return from(sign(jsonbody.ch, jsonbody.c, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
           .pipe(switchMap(value => 
             {
-              return ok({s: value, ch: jsonbody.ch, c: jsonbody.c, mtucheck: "dsfbsdiufhbiuwbfiuwebfiuwvufywekuvfujsvfduyds9pwgfihdwb"});
+              return ok({s: value, ch: jsonbody.ch, c: jsonbody.c});
             })
           );
 
