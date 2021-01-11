@@ -20,15 +20,18 @@ export class BridgeService {
 
   // order -> response -> httppost -> respone -> order -> response -> httppost
   authoriseOrder(code: number): Observable<any>{
-    let message = JSON.stringify({auth: "000", code: String(code)});
+    let message = JSON.stringify({ch: "requested", c: String(code)});
+
+    // send order to bluetooth
     return this.bluetoothService.ble.order(message)
     .pipe(switchMap(response => {
   
-      console.log("Received challenge: ", response)
+    console.log("Received challenge: ", response)
+    // get authorisation signature from server
     return this.http.post
     (
       `${environment.apiUrl}/authorizeRemoteOrder`,
-      JSON.parse(response),
+      {response: response},
       this.authService.httpOptions
     ).pipe(switchMap((res: any) =>{
       console.log("Solved challenge ", JSON.stringify(res), "status: ", res.status);
@@ -40,7 +43,7 @@ export class BridgeService {
       //   this.bluetoothService.ble.order(message).subscribe(response => console.log("got response from bridge after resrver: ", response));
       // }
       // else{
-        message = JSON.stringify({auth: res.auth});
+        message = JSON.stringify(res);
         return this.bluetoothService.ble.order(message);//.subscribe(response => console.log("Devices response:  ", response));
       //}
       }));

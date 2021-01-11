@@ -23,9 +23,6 @@ export class JwtInterceptor implements HttpInterceptor {
 
            // console.log(request.headers.keys().forEach(key =>console.log(key)));
         }
-        else{
-            console.error('User not logged in');
-        }
         console.log(request.headers);
         return next.handle(request);
 

@@ -3,8 +3,6 @@ import { Injectable, Injector } from "@angular/core";
 import { from, Observable, of, throwError } from 'rxjs';
 import { delay, mergeMap, materialize, dematerialize, switchMap } from 'rxjs/operators';
 
-
-
 const usersData = {
     "users": [
     {
@@ -46,6 +44,9 @@ const usersData = {
     },
     ]
    }
+
+   
+
 
 const devicesData = [
   {
@@ -194,53 +195,73 @@ export class BackendInterceptor implements HttpInterceptor {
           
         }
 
-        // renting place and finishing renting
-
-
-
 
         // NEW CHALLENGE
-        // {auth: challenge, id: number}
+        // {response: "{auth: challenge, id: number}", orderCode: "code"}
         function authorizeRemoteOrder(){
-          console.log("Authorizing remoteo order: ", body);
-         
-          console.log("Authorizing solution: ", sign(body.challenge, devicesData.find(device => device.id == body.id).key, devicesData.find(device => device.id == body.id).salt));
-          return from(sign(body.challenge, devicesData.find(device => device.id == body.id).key, devicesData.find(device => device.id == body.id).salt))
+            
+          // if(isLoggedIn())
+          // {
+          console.log("Authorizing remote order: ", body.response);
+
+
+
+          // let challenge = JSON.parse(body.response).challenge;
+          let jsonbody = JSON.parse(body.response);
+          console.log("jsonbody: ", jsonbody)
+          // let id = JSON.parse(body.response).id;
+          // console.log("challenge: ", challenge);
+          // let code = body.orderCode;
+          // console.log("code: ", code);
+          
+          console.log("Authorizing solution: ", sign(jsonbody.ch, jsonbody.c, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
+          
+          return from(sign(jsonbody.ch, jsonbody.c, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
           .pipe(switchMap(value => 
             {
-              return ok({auth: value});
+              return ok({s: value, ch: jsonbody.ch, c: jsonbody.c, mtucheck: "dsfbsdiufhbiuwbfiuwebfiuwvufywekuvfujsvfduyds9pwgfihdwb"});
             })
           );
+
+          // }
+          // else{
+          //   return unauthorised();
+   
+          // }
+
+
+
+          
         }
 
+        // repleace crypto api with something else
+        function sign(challenge: string, code: string, key: Uint8Array, salt: String){
+          console.log("challenge and code", challenge + salt + code);
+          if(code == "150"){
+            return new Promise((resolve, reject) => {
+             resolve("SIGNATURE_FROM_CODE_150");             
+              });
+          }
 
-
-        // I
-        // =================================================================================================================================================================================
-        // body: {MACAdress: macaddress}
-
-        function sign(challenge: string, key: Uint8Array, salt: String){
           let encoder = new TextEncoder();
           return window.crypto.subtle.importKey(
             "raw", // raw format of the key - should be Uint8Array
-            //this.encoder.encode("mysecretkey"),
             key,
             { // algorithm details
                 name: "HMAC",
                 hash: {name: "SHA-256"}
             },
             false, // export = false
-            ["sign", "verify"] // what this key can do
+            ["sign"] // what this key can do
         ).then( key => {
-
+            console.log("Generating key...");
             return window.crypto.subtle.sign(
                 "HMAC",
                 key,
-                encoder.encode(challenge + salt)
+                encoder.encode(challenge + salt + code)
             ).then(signature => {
                 var b = new Uint8Array(signature);
                 var str = Array.prototype.map.call(b, x => ('00'+x.toString(16)).slice(-2)).join("");
-                console.log("key: ", str);
                 return str;
             });
             
@@ -456,7 +477,7 @@ export class BackendInterceptor implements HttpInterceptor {
           //return true of false based on given condition
           return headers.get('Authorization') === usersData.users.find(user => user.id === headers.get('id')).token;
         };
-
+        // use crypto API for JWT auth
         function getRandomString(length: number){
           var result = "";
 

@@ -18,8 +18,7 @@ export class BluetoothNativeService implements BluetoothAbstract{
   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
-  //message$: BehaviorSubject<any>;
-
+ 
   response$: Subject<any>;
 
 constructor(
@@ -28,7 +27,7 @@ constructor(
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
   this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
- // this.message$ = new BehaviorSubject<any>(null);
+
   this.response$ = new Subject<any>();
   this.plt.ready().then((readySource) => {
     console.log('Platform ready from', readySource);
@@ -58,9 +57,6 @@ constructor(
    });
  }
 
- getMessage(): Observable<any>{
-  return this.response$.asObservable();
-}
 
 getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
   return this.connectionInfo$.asObservable();
@@ -204,19 +200,19 @@ getDevicesFound(): Observable<Array<any>>{
     return this.response$.pipe(take(1));
   }
 
-  sendMessage(code: number): Observable<any>{
+  // sendMessage(code: number): Observable<any>{
    
-    this._send(212).subscribe(res => console.log("response is ", res));
-    // let message = JSON.stringify({auth: "authCode", code: "433"});
-    // this.bluetoothle.write({address: this.connectionInfo$.value.address,
-    // service: this.PRIMARY_SERVICE_UID,
-    // characteristic: peripheral.characteristic.order.substring(2),
-    // value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
-    // }).then(response => console.log("WROTE: ", JSON.stringify(response)));
+  //   this._writeValue(212).subscribe(res => console.log("response is ", res));
+  //   // let message = JSON.stringify({auth: "authCode", code: "433"});
+  //   // this.bluetoothle.write({address: this.connectionInfo$.value.address,
+  //   // service: this.PRIMARY_SERVICE_UID,
+  //   // characteristic: peripheral.characteristic.order.substring(2),
+  //   // value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
+  //   // }).then(response => console.log("WROTE: ", JSON.stringify(response)));
 
-    //   return this.response$.pipe(take(1));
-    return of(null);
-  }
+  //   //   return this.response$.pipe(take(1));
+  //   return of(null);
+  // }
 
   
   disconnect(): Observable<{address: string,name: string, status: STATUS}>{
@@ -257,18 +253,17 @@ getDevicesFound(): Observable<Array<any>>{
 
   
   // for debug
-  _send(code: number): Observable<any>{
+  // _writeValue(code): Observable<any>{
    
+  //   let message = JSON.stringify({auth: "authCode", code: "433"});
+  //   this.bluetoothle.write({address: this.connectionInfo$.value.address,
+  //   service: this.PRIMARY_SERVICE_UID,
+  //   characteristic: peripheral.characteristic.order.substring(2),
+  //   value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
+  //   }).then(response => console.log("WROTE: ", JSON.stringify(response)));
 
-    let message = JSON.stringify({auth: "authCode", code: "433"});
-    this.bluetoothle.write({address: this.connectionInfo$.value.address,
-    service: this.PRIMARY_SERVICE_UID,
-    characteristic: peripheral.characteristic.order.substring(2),
-    value: this.bluetoothle.bytesToEncodedString(this.bluetoothle.stringToBytes(message))
-    }).then(response => console.log("WROTE: ", JSON.stringify(response)));
-
-      return this.response$.pipe(take(1));
-  }
+  //     return this.response$.pipe(take(1));
+  // }
 
 
   _readValue$(characteristicUID: string){

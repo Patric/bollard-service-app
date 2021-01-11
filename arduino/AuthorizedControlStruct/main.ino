@@ -1,14 +1,26 @@
 #include <ArduinoBLE.h>
 #include <Arduino_JSON.h>
 #include <sha256.h>
-
-
+#include <rBase64.h>
 
 uint8_t hmacKey[]={
   0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c
 };
 
 String salt = "9U01j34NVW06kzb1uVyMIoqCi";
+
+JSONVar myObject;
+
+JSONVar response;
+ //std::list<String> codeBuffer;       
+
+
+String codeBuffer;
+String solutionBuffer;
+
+
+int deviceId = 1;
+
 
 String stringifyHash(uint8_t* hash) {
   int i;
@@ -23,19 +35,12 @@ String stringifyHash(uint8_t* hash) {
 
 BLEService controlService("1101");
 
-BLEStringCharacteristic batteryLevelChar("2101", BLERead | BLENotify | BLEWrite, 20);
-BLEStringCharacteristic statusChar("3100", BLERead | BLENotify , 128);
+BLEStringCharacteristic batteryLevelChar("2101", BLERead | BLEIndicate | BLEWrite, 20);
+BLEStringCharacteristic statusChar("3100", BLERead | BLEIndicate , 128);
 BLEStringCharacteristic orderChar("3101", BLENotify | BLEWrite, 256);
-BLEStringCharacteristic responseChar("3102", BLERead | BLENotify, 256);
-
-JSONVar myObject;
-
-JSONVar response;
- //std::list<String> codeBuffer;       
+BLEStringCharacteristic responseChar("3102", BLERead | BLEIndicate, 256);
 
 
-String codeBuffer;
-String solutionBuffer;
 bool wait4response;
 
 
@@ -101,11 +106,7 @@ void loop()
  
     while(central.connected()){
 
-      int battery = analogRead(A0);
-      int batteryLevel = map(battery, 0,1023, 0, 100);
-      Serial.print("Battery Level % is now: ");
-      Serial.println(batteryLevel);
-      batteryLevelChar.writeValue(String(batteryLevel));
+
      // statusChar.writeValue("Waiting");
       Serial.print("The incoming message is: ");
       Serial.println(orderChar.value());
@@ -148,20 +149,21 @@ void handleJSONOrder(String order){
     JSONVar order_json = JSON.parse(order);
 
 
-    String auth = (const char*)order_json["auth"];
-    String code = (const char*)order_json["code"];
+    String signature = (const char*)order_json["s"];
+    String challenge = (const char*)order_json["ch"];
+    String code = (const char*)order_json["c"];
     
     
     // challenge required
-    if(auth == "000")
+    if(challenge == "requested")
     {
       wait4response = true;
       // cache code
-      codeBuffer = code;
+     // codeBuffer = code;
       Serial.print("CODE is: ");
      Serial.println(code);
       
-      String challenge = generateChallenge();
+    String challenge = generateChallenge();
 
 
 
@@ -170,13 +172,15 @@ void handleJSONOrder(String order){
       // generate challenge
 
       // solve and cache challenge
-      solutionBuffer = solveChallenge(challenge);
-      Serial.print("Solution");
-      Serial.println(solutionBuffer);
+      //solutionBuffer = authenticate(challenge);
+      //Serial.print("Solution");
+      //Serial.println(solutionBuffer);
     
       response = null;
-      response["challenge"] = challenge;
-      response["id"] = 1;
+      response["id"] = deviceId;
+      response["ch"] = challenge;
+      response["c"] = code;
+     
       responseChar.writeValue(JSON.stringify(response));
       statusChar.writeValue("Written");
       delay(1000 * 0.5);
@@ -184,20 +188,27 @@ void handleJSONOrder(String order){
 
       // write response
     }
-    else if(auth == solutionBuffer)
+    else if(authenticate(challenge, code, signature))
     {
-     if(codeBuffer == "100"){
+     if(code == "100"){
        execute_100();
      }
-     else if(codeBuffer == "200"){
+     else if(code == "200"){
        execute_200();
      }
+     else{
+       unknown();
+     }
+    }
+    // FOR NATIVE TESTS WITHOUT HASHING
+    else if(signature == "SIGNATURE_FROM_CODE_150"){
+      execute_150();
     }
     else{
-    Serial.print("Received solution is incorrect: ");
-    Serial.println(auth);
-    Serial.print("Proper solution is: ");
-    Serial.println(solutionBuffer);
+    Serial.print("Received signature is incorrect: ");
+    Serial.println(signature);
+    //Serial.print("Proper signature is: ");
+    //Serial.println(solutionBuffer);
     unauthorized();
     }
  
@@ -210,12 +221,35 @@ void execute_200(){
   wait4response = false;
       response = null;
       response["status"] = "executed";
+      int battery = analogRead(A0);
+      int batteryLevel = map(battery, 0,1023, 0, 100);
+      Serial.print("Battery Level % is now: ");
+      Serial.println(batteryLevel);
+    
+      response["batteryLevel"] = String(batteryLevel);
       responseChar.writeValue(JSON.stringify(response));
       statusChar.writeValue("Written");
       delay(1000 * 0.5);
       statusChar.writeValue("Waiting");
-  Serial.println("Task 2 executed");
+      // empty order char
+      orderChar.writeValue("");
+  Serial.println("Task 200 executed");
 }
+
+void execute_150(){
+  wait4response = false;
+      response = null;
+      response["status"] = "executed";  
+      response["message"] = "NON HASHED SIGNATURE RECEIVED. TEST COMPLETED";
+      responseChar.writeValue(JSON.stringify(response));
+      statusChar.writeValue("Written");
+      delay(1000 * 0.5);
+      statusChar.writeValue("Waiting");
+      // empty order char
+      orderChar.writeValue("");
+  Serial.println("Task 150 executed");
+}
+
 
 void execute_100(){
     wait4response = false;
@@ -225,8 +259,9 @@ void execute_100(){
       statusChar.writeValue("Written");
       delay(1000 * 0.5);
       statusChar.writeValue("Waiting");
-  
-Serial.println("Task 1 executed");
+      // empty order char
+      orderChar.writeValue("");
+Serial.println("Task 100 executed");
 }
 
 
@@ -238,12 +273,27 @@ void unauthorized(){
       statusChar.writeValue("Written");
       delay(1000 * 0.5);
       statusChar.writeValue("Waiting");
+      // empty order char
+      orderChar.writeValue("");
+}
+
+
+void unknown(){
+   wait4response = false;
+      response = null;
+      response["status"] = "unknown";
+      responseChar.writeValue(JSON.stringify(response));
+      statusChar.writeValue("Written");
+      delay(1000 * 0.5);
+      statusChar.writeValue("Waiting");
+      // empty order char
+      orderChar.writeValue("");
 }
 
 String generateChallenge(){
    char challenge[60];
   
-       
+ 
     
   memset(challenge, '\0', sizeof(challenge));
 
@@ -272,20 +322,24 @@ String generateChallenge(){
    return challenge;
 }
 
-String solveChallenge(String challenge){
+boolean authenticate(String challenge, String code, String signature){
+  Serial.print("challenge");
+  Serial.println(challenge);
+
   Sha256.initHmac(hmacKey, sizeof(hmacKey));
-  Sha256.print(challenge + salt);
-  //printHash(Sha256.resultHmac());
+  Sha256.print(challenge + salt + code);
+
+  Serial.print("Correct signature is: ");
+  String result = stringifyHash(Sha256.resultHmac());
+  Serial.print(stringifyHash(Sha256.resultHmac()));
   Serial.println();
+  if(result.equals(signature)){
+    return true;
+  }
+  return false;
 
-
-    //char key = '1';
-   // challenge[0] = key;
-    //for(int i=0; i<challenge.length(); i++){
-      //challenge[i] = (char)challenge[i] + 4;
-    //}
-  return stringifyHash(Sha256.resultHmac());
 }
+
 
 
 

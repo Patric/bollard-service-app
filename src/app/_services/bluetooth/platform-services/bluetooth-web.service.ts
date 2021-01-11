@@ -23,7 +23,7 @@ export class BluetoothWebService implements BluetoothAbstract{
       }>();
      }
 
-  connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
+  private connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
   private _characteristics: Map<number, {
     characteristic: BluetoothRemoteGATTCharacteristic,
     subject: BehaviorSubject<any>,
@@ -79,6 +79,7 @@ export class BluetoothWebService implements BluetoothAbstract{
 
     disconnect(): Observable<{address: string,name: string, status: STATUS}>{
       this.device.gatt.disconnect();
+      this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
       return this.connectionInfo$.asObservable();
     }
 
@@ -106,6 +107,7 @@ export class BluetoothWebService implements BluetoothAbstract{
       .then(device => {
         device.addEventListener('gattserverdisconnected', this._onDisconnected);
         this.device = device;
+        this.connectionInfo$.next({address: null, name: null, status: STATUS.CONNECTING});
         return device.gatt.connect();
       })
       .then(server => server.getPrimaryService(service))
@@ -144,7 +146,7 @@ export class BluetoothWebService implements BluetoothAbstract{
         this._characteristics.get(characteristicUID).characteristic.startNotifications()
         .then(characteristic => characteristic.addEventListener('characteristicvaluechanged', this._characteristics.get(characteristicUID).listener))
         console.log("Added listener to: ", this._characteristics.get(characteristicUID));
-    
+        this.connectionInfo$.next({address: null, name: this.device.name, status: STATUS.CONNECTED});
         return this._characteristics.get(characteristicUID).subject;
     }
 
@@ -173,7 +175,6 @@ export class BluetoothWebService implements BluetoothAbstract{
 
     _onDisconnected(event){
       const device = event.target;
-    
       console.log(`Device ${device.name} is disconnected.`);
     }
 

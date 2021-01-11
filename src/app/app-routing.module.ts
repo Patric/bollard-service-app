@@ -3,11 +3,6 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './_guards/auth.guard';
 import { AuthService } from './_services/auth.service';
 
-var route = 'home';
-if(localStorage.getItem("currentUser")){
-  route = 'profile';
-}
-
 
 const routes: Routes = [
   {

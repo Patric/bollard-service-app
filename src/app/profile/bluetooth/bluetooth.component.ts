@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../_services/auth.service';
 
@@ -22,9 +22,13 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   private response: Observable<Array<any>>;
   
+  //isNaN: Function = Number.isNaN;
   // Bonding with html
-  private connectionInfo;
+  private connectionInfo; 
   private devicesFound;
+  private deviceResponse;
+  //@Input() code: String;
+
 
   constructor
 
@@ -35,7 +39,12 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private ngZone: NgZone,
   ) {
+    this.ngZone.run( () => {
+      this.connectionInfo = {address: null, name: "null", status: "DISCONNECTED"};
+    });
+
   }
+
   ngOnDestroy(): void {
     this.disconnect();
   }
@@ -53,6 +62,10 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
       this.bluetoothService.ble.getConnectionInfo().subscribe((connectionInfo) => {this.ngZone.run( () => {
         this.connectionInfo = connectionInfo;
+        if(connectionInfo.status == "CONNECTED"){
+          this.deviceResponse = null;
+        }
+
       });},
       (err) => console.error("this.bluetoothService.ble.getConnectionInfo() error", err));
 
@@ -62,6 +75,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   disconnect(){
     this.bluetoothService.ble.disconnect();//.subscribe(connectionInfo => console.log("connectionInfo on disconnect:: ", JSON.stringify(connectionInfo)));
+
   }
 
   logEvent(){
@@ -83,10 +97,15 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   
   }
 
-  sendMessage(){
-    //let message = JSON.stringify({auth: "authCode", code: String(432)});
-    this.bridgeService.authoriseOrder(100).subscribe(res => console.log("Authorizing order status: ", res));
-    //this.bluetoothService.ble.order(message).subscribe(response => console.log("got response: ", response));
+  sendMessage(code: String){
+  
+      this.bridgeService.authoriseOrder(Number(code)).subscribe(res =>{
+        console.log("Authorizing order status: ", res);
+        res = JSON.stringify(JSON.parse(res), null, 2);
+        res = res.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        this.ngZone.run( () => {this.deviceResponse = res;});
+      })
+
   }
 
   check(){
@@ -108,8 +127,14 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   }
 
+  isEmpty(input): Boolean{
+    if(String(input).length > 0){
+      return false;
+    }
+    return true;
+  }
 
-
+ 
  
 
 }

@@ -86,16 +86,6 @@ export interface  BluetoothAbstract{
    */
     order(body: string): Observable<any>;
 
-
-
-  //   /**
-  //  * @description
-  //  * @param code - Reads message from the peripheral
-  //  * @returns ```Observable<any>```
-  //  */
-  //   getMessage(): Observable<any>;
-
-
     /**
    * @description
    * Returns ```Observable``` of JSON containing info of the device. Provides information of connection over time
@@ -139,7 +129,6 @@ export interface  BluetoothAbstract{
    * @returns ```Observable<any>```
    */
     getDevicesFound(): Observable<any>;
-
 
      /**
    * @description
