@@ -79,7 +79,7 @@ export class BluetoothWebService implements BluetoothAbstract{
 
     disconnect(): Observable<{address: string,name: string, status: STATUS}>{
       this.device.gatt.disconnect();
-      this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
+     // this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
       return this.connectionInfo$.asObservable();
     }
 
@@ -105,7 +105,11 @@ export class BluetoothWebService implements BluetoothAbstract{
         }]
       })
       .then(device => {
-        device.addEventListener('gattserverdisconnected', this._onDisconnected);
+        device.addEventListener('gattserverdisconnected', (event: any) =>{
+          const device = event.target;
+          this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
+          console.log(`Device ${device.name} is disconnected.`);
+        } );
         this.device = device;
         this.connectionInfo$.next({address: null, name: null, status: STATUS.CONNECTING});
         return device.gatt.connect();
@@ -172,11 +176,9 @@ export class BluetoothWebService implements BluetoothAbstract{
       .catch(error => { console.error(error.message); });
 
     }
+  
 
-    _onDisconnected(event){
-      const device = event.target;
-      console.log(`Device ${device.name} is disconnected.`);
-    }
+   
 
     _watchResponsesFrom(characteristicUID: number, statusCharacteristicUID: number){
       const subject$ = new Subject<any>();

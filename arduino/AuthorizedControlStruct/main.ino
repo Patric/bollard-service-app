@@ -57,7 +57,7 @@ void foo(int a)
 
 void setup() 
 {
-
+ 
 
   Serial.begin(9600);
   //while(!Serial);
@@ -84,7 +84,7 @@ void setup()
  BLE.advertise();
  Serial.println("Bluetooth device active, waiting for connection...");
   statusChar.writeValue("Waiting");
-
+  randomSeed(analogRead(0));
 }
 
 void loop()
@@ -291,32 +291,24 @@ void unknown(){
 }
 
 String generateChallenge(){
-   char challenge[60];
+   char challenge[81];
   
  
     
   memset(challenge, '\0', sizeof(challenge));
 
   uint8_t cnt = 0;
-  while (cnt != sizeof(challenge) - 1)
+  while (cnt != sizeof(challenge) -1)
   {
-    challenge[cnt] = random(0, 0x7F);
-    Serial.println(challenge[cnt]);
-    if (challenge[cnt] == 0)
-    {
-      break;
-    }
+    challenge[cnt] = random(48, 122);
     if (isAlphaNumeric(challenge[cnt]) == true)
     {
       cnt++;
     }
     else
     {
-      challenge[cnt] = '\0';
+      challenge[cnt] = random(65, 90);
     }
-   Serial.print("Challenge array");
-   Serial.println(challenge);
-  
   }
 
    return challenge;
