@@ -203,23 +203,14 @@ export class BackendInterceptor implements HttpInterceptor {
           // if(isLoggedIn())
           // {
           console.log("Authorizing remote order: ", body.response);
-
-
-
-          // let challenge = JSON.parse(body.response).challenge;
           let jsonbody = JSON.parse(body.response);
-          console.log("jsonbody: ", jsonbody)
-          // let id = JSON.parse(body.response).id;
-          // console.log("challenge: ", challenge);
-          // let code = body.orderCode;
-          // console.log("code: ", code);
-          
-          console.log("Authorizing solution: ", sign(jsonbody.ch, jsonbody.c, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
-          
-          return from(sign(jsonbody.ch, jsonbody.c, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
+          let jsoncode = body.code;
+
+          console.log("Authorizing solution: ", sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
+          return from(sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
           .pipe(switchMap(value => 
             {
-              return ok({s: value, ch: jsonbody.ch, c: jsonbody.c});
+              return ok({s: value});
             })
           );
 
@@ -236,7 +227,7 @@ export class BackendInterceptor implements HttpInterceptor {
 
         // repleace crypto api with something else
         function sign(challenge: string, code: string, key: Uint8Array, salt: String){
-          console.log("challenge and code", challenge + salt + code);
+ 
           if(code == "150"){
             return new Promise((resolve, reject) => {
              resolve("SIGNATURE_FROM_CODE_150");             
@@ -267,199 +258,7 @@ export class BackendInterceptor implements HttpInterceptor {
             
         });
 
-
         }
-
-        function getRandomArbitrary(min, max) {
-          return Math.random() * (max - min) + min;
-        }
-        
-        
-        // function generateChallenge(){
-        //   if(!isLoggedIn()){    //} || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
-        //     return unauthorised();
-        //   }
-          
-        //   const MACAdress = body.MACAdress;
-          
-        //   // var array = new Uint32Array(10);
-        //   // window.crypto.getRandomValues(array);
-        //   let challenge = getRandomArbitrary(500, 999999);
-        //   // save solutions to generated challenge
-        //   devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseLocked = solveChallengeLocked(challenge);
-        //   devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseUnlocked = solveChallengeUnlocked(challenge);
-        //   devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed = true;
-
-        //   return ok({syncChallenge: challenge});
-        // }
-
-
-
-        // function solveChallengeLocked(challenge: number){
-        //   return challenge + 437;
-        // }
-        
-        // function solveChallengeUnlocked(challenge: number){
-        //   return challenge - 434;
-        // }
-        
-
-        // II
-        // =================================================================================================================================================================================
-        // body: {MACAdress: macadress, response: solvedChallenge}
-
-        // function synchronize(){
-        //   if(!isLoggedIn()){// || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
-        //     return unauthorised();
-        //   }
-          
-        //   const device = devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)];
-
-
-        //   // The device is locked
-        //   if(body.response == device.peripheralSyncResponseLocked)
-        //   {
-        //     // Synchronisation is correct
-        //     if(device.state == "locked"){
-        //       // The device is ready to use
-        //       if(device.ready){
-        //         devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = "unlock";
-        //         return ok({message: "Available action is to start renting this device.", availableAction: "unlock"});
-        //       }
-        //       // The device requires service or there is other problem with the device
-        //       else{
-        //         return error("Device unavailable");
-        //       }
-        //     }
-
-
-        //     // Synchronisation is incorrect
-        //     else if(device.state == "unlocked"){
-              
-        //       // The device is assigned to user
-        //       if(device.userID == headers.get('id')){
-        //         // TO DO:
-        //           // Stop timer
-        //           // Calculate amount due
-        //           return error("Synchronization error has occured. You have been using this spot for HH:mm and you have been charged $$$. If you had been charged wrongly please contact us +00 321 342 323.")
-        //       }
-        //       else{
-        //         // The device is not assigned to user
-        //           return error("Synchronization error has occured.")
-        //       }
-
-              
-        //     }
-        //     else{
-        //       throw error("Unknown device state");
-        //     }
-        //   }
-
-        //   // The device is unlocked
-        //  else if(body.response == device.peripheralSyncResponseUnlocked){
-
-        //   // Synchronisation is correct
-        //   if(device.state == "unlocked"){
-        //     if(device.userID == headers.get('id')){
-        //       devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = "lock";
-        //       return ok({message: "Available action is to stop renting this device.", availableAction: "lock"});
-        //     }
-        //     else{
-        //       return error("Device unavailable.");
-        //     }
-
-
-
-
-        //   }
-        //   // Synchronisation is incorrect(should not happen)
-        //   else if(device.state == "locked"){
-        //     return error("Unknown error occured");
-        //   }
-        //   else{
-        //     throw error("Unknown device state");
-
-        //   };
-
-        //   }
-        //   // Incorrect solution
-        //   else{
-        //     return unauthorised();
-        //   }
-        // }
-
-        // III
-        // =================================================================================================================================================================================
-        // body: {peripheralChallenge: challenge, MACADress: macadress}
-
-
-        // function changeDeviceState(){
-        //   if(!isLoggedIn()){// || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
-        //     return unauthorised();
-        //   }
-
-        //   const device = devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)];
-        //   let challenge = getRandomArbitrary(500, 999999);
-        //   // save solutions to generated challenge
-        //   devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseLocked = solveChallengeLocked(challenge);
-        //   devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseUnlocked = solveChallengeUnlocked(challenge);
-
-        //   if(device.availableAction == "lock"){
-        //     return ok({message: "Time counter will stop after locking confirmation.", webServerResponse: solveChallengeUnlocked(body.peripheralChallenge), webServerChallenge: challenge});
-            
-        //   }
-        //   else if(device.availableAction == "unlock"){
-        //     devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].state = "unlocked";
-        //     devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = "lock";
-        //     devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].userID = headers.get('id');
-      
-        //     return ok({message: "Renting started. Timer is on.", webServerResponse: solveChallengeLocked(body.peripheralChallenge), webServerChallenge: challenge});
-        //   }
-        //   else{
-        //     throw error("Unknown availableAction.")
-        //   }
-
-        // }
-
-        // IV
-        // =================================================================================================================================================================================
-        // body: {peripheralResponse: response, MACADress: macadress}
-
-
-        // function confirmAction(){
-        //   if(!isLoggedIn()){// || devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].isProcessed){
-        //     return unauthorised();
-        //   }
-        //   const device = devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)];
-        //   if(body.peripheralResponse == device.peripheralResponseLocked)
-        //   {
-        //      // STOP COUNTING TIME. 
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseLocked = null;
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralResponseUnlocked = null;
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseLocked = null;
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].peripheralSyncResponseUnlocked = null;
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].availableAction = null;
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].userID = null;
-        //      devicesData[devicesData.findIndex(device => device.MAC == body.MACAdress)].state = "locked";
-
-        //      return ok({message: "Renting stopped. You have been using this spot for HH:mm and you have been charged $$$. If you had been charged wrongly please contact us +00 321 342 323."})
-           
-        //   }
-        //   else if(body.peripheralResponse == device.peripheralResponseUnlocked)
-        //   {
-        //     // NOTE DEVICE LOCK
-        //     return ok({message: "Unlock confirmed."});
-        //   }
-        //   else{
-        //     return unauthorised();
-        //   }
-
-
-        // }
-        
-
-
-        //helper functions
 
         function ok(body?: any){
           return of(new HttpResponse({status: 200, body: body}))

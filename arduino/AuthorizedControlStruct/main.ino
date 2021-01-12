@@ -12,11 +12,9 @@ String salt = "9U01j34NVW06kzb1uVyMIoqCi";
 JSONVar myObject;
 
 JSONVar response;
- //std::list<String> codeBuffer;       
-
 
 String codeBuffer;
-String solutionBuffer;
+String signatureBuffer;
 
 
 int deviceId = 1;
@@ -60,7 +58,7 @@ void setup()
  
 
   Serial.begin(9600);
-  //while(!Serial);
+  while(!Serial);
   //pinMode(LED_BUTTON, OUTPUT);
 
   if(!BLE.begin()){
@@ -93,7 +91,7 @@ void loop()
   //String output;
   BLEDevice central = BLE.central();
   wait4response = false;
-  solutionBuffer = "";
+  signatureBuffer = "";
   codeBuffer = "";
 
   int id = 0;
@@ -150,36 +148,31 @@ void handleJSONOrder(String order){
 
 
     String signature = (const char*)order_json["s"];
-    String challenge = (const char*)order_json["ch"];
     String code = (const char*)order_json["c"];
-    
+
+   
     
     // challenge required
-    if(challenge == "requested")
+    if(signature == "null")
     {
       wait4response = true;
       // cache code
-     // codeBuffer = code;
+      codeBuffer = code;
       Serial.print("CODE is: ");
-     Serial.println(code);
+      Serial.println(code);
+     // generate challenge
+      String challenge = generateChallenge();
+ 
       
-    String challenge = generateChallenge();
-
-
-
-      Serial.print("Challenge ");
-      Serial.println(challenge);
-      // generate challenge
-
-      // solve and cache challenge
-      //solutionBuffer = authenticate(challenge);
-      //Serial.print("Solution");
-      //Serial.println(solutionBuffer);
+      // solve challenge and cache signature
+      signatureBuffer = getSignature(challenge);
+      Serial.print("Signature: ");
+      Serial.println(signatureBuffer);
     
       response = null;
       response["id"] = deviceId;
       response["ch"] = challenge;
-      response["c"] = code;
+   
      
       responseChar.writeValue(JSON.stringify(response));
       statusChar.writeValue("Written");
@@ -188,12 +181,12 @@ void handleJSONOrder(String order){
 
       // write response
     }
-    else if(authenticate(challenge, code, signature))
+    else if(signature == signatureBuffer)
     {
-     if(code == "100"){
+     if(codeBuffer == "100"){
        execute_100();
      }
-     else if(code == "200"){
+     else if(codeBuffer == "200"){
        execute_200();
      }
      else{
@@ -292,9 +285,6 @@ void unknown(){
 
 String generateChallenge(){
    char challenge[81];
-  
- 
-    
   memset(challenge, '\0', sizeof(challenge));
 
   uint8_t cnt = 0;
@@ -311,24 +301,22 @@ String generateChallenge(){
     }
   }
 
+  Serial.print("Challenge generated: ");
+  Serial.println(challenge);
+
    return challenge;
 }
 
-boolean authenticate(String challenge, String code, String signature){
-  Serial.print("challenge");
-  Serial.println(challenge);
-
+String getSignature(String challenge){
   Sha256.initHmac(hmacKey, sizeof(hmacKey));
-  Sha256.print(challenge + salt + code);
+  Sha256.print(challenge + salt + codeBuffer);
 
   Serial.print("Correct signature is: ");
   String result = stringifyHash(Sha256.resultHmac());
-  Serial.print(stringifyHash(Sha256.resultHmac()));
+  Serial.print(result);
   Serial.println();
-  if(result.equals(signature)){
-    return true;
-  }
-  return false;
+
+  return result;
 
 }
 
