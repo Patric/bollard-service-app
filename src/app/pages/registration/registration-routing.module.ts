@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, Router } from '@angular/router';
-import { AuthService } from '../_services/auth.service';
+import { AuthService } from '../../_services/auth.service';
 
 import { RegistrationPage } from './registration.page';
 
@@ -20,7 +20,7 @@ export class RegistrationPageRoutingModule {
    // navigate to profile if logged in
    constructor(private authService: AuthService, private router: Router) {
     if(this.authService.currentUserValue){
-      this.router.navigate(['/profile']);
+      this.router.navigate(['/authenticated']);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { BluetoothLE, DeviceInfo} from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
 import { BehaviorSubject, Observable, Observer, of, Subject, throwError } from 'rxjs';
@@ -8,9 +8,10 @@ import { BluetoothAbstract, STATUS } from './bluetooth-abstract';
 
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
+ 
 })
-export class BluetoothNativeService implements BluetoothAbstract{
+export class BluetoothNativeService implements BluetoothAbstract, OnDestroy{
 
   //UID in AAAA format, not AxAAAA
   private PRIMARY_SERVICE_UID = peripheral.service.UUID.substring(2);
@@ -18,12 +19,14 @@ export class BluetoothNativeService implements BluetoothAbstract{
   connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
   devicesFound: Array<any>;
   devicesFound$: BehaviorSubject<Array<any>>;
- 
+  public bluetoothle: BluetoothLE;
   response$: Subject<any>;
 
 constructor(
-  public bluetoothle: BluetoothLE, 
-  public plt: Platform) {
+  public plt: Platform) 
+  {
+  console.log("INITIATED BLENATIVE");
+  this.bluetoothle = new BluetoothLE();
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
   this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
@@ -38,7 +41,7 @@ constructor(
         this.bluetoothle.requestPermission().then(status => console.log(status));
       }
     });
-    bluetoothle.isLocationEnabled().then((isLocationEnabled) => {
+    this.bluetoothle.isLocationEnabled().then((isLocationEnabled) => {
       console.log(isLocationEnabled);
       if(!isLocationEnabled){
         this.bluetoothle.requestLocation().then(status => console.log(status));
@@ -56,7 +59,13 @@ constructor(
     });
    });
  }
-
+ngOnDestroy(){
+  this.devicesFound = new Array();
+  this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
+  this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
+  this.response$ = new Subject<any>();
+  delete this.bluetoothle;
+}
 
 getConnectionInfo(): Observable<{address: string,name: string, status: STATUS}> {
   return this.connectionInfo$.asObservable();

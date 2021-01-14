@@ -110,7 +110,14 @@ export class AuthService {
     this.cookieService.deleteAll();
     this.currentUserSubject.next(null);
     //this.router.navigateByUrl("/");
-    this.navCtrl.navigateRoot("/");
+      
+
+    this.navCtrl.navigateRoot('/');
+    
+   
+    
+    //this.router.navigate(['/'], { replaceUrl: true });
+    //this.router.navigate(['/'], {replaceUrl: true});
   }
     
   // helper functions

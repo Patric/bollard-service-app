@@ -39,6 +39,9 @@ import { BluetoothAbstract } from './platform-services/bluetooth-abstract';
   providedIn: 'root'
 })
 export class BluetoothService{
+
+
+  
   /**
   * @description
   * Getter for Bluetooth services. Needs to be preceded by fulfilled ready() Promise.
@@ -66,7 +69,8 @@ export class BluetoothService{
   */
   public get ble(): BluetoothAbstract{
     
-    if(this.platform.is(`mobile`) && this.platform.is(`cordova`) ){
+    if(this.platform.is(`mobile`) && !this.platform.is(`mobileweb`) ){
+    
       return this.injector.get(BluetoothNativeService);
     }
     else if(this.platform.is(`mobileweb`) || this.platform.is(`desktop`)){

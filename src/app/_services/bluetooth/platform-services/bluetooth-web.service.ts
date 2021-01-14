@@ -3,8 +3,9 @@ import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
 import { last, map, mergeMap, take } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
 import {BluetoothAbstract, STATUS} from './bluetooth-abstract';
-
-
+// only used for compiler to see navigator - delete later
+import { WebBluetoothModule } from '@manekinekko/angular-web-bluetooth';
+/// <reference types="web-bluetooth" />
 @Injectable({
   providedIn: 'root'
 })
@@ -22,7 +23,8 @@ export class BluetoothWebService implements BluetoothAbstract{
         listener: any
       }>();
      }
-
+  
+  
   private connectionInfo$: BehaviorSubject<{address: string,name: string, status: STATUS}>;
   private _characteristics: Map<number, {
     characteristic: BluetoothRemoteGATTCharacteristic,
@@ -97,7 +99,7 @@ export class BluetoothWebService implements BluetoothAbstract{
         return service;
       });
     }
-  
+    
     _connectToService(service: number){
       return navigator.bluetooth.requestDevice({
         filters: [{
@@ -185,6 +187,7 @@ export class BluetoothWebService implements BluetoothAbstract{
       this._readValue$(statusCharacteristicUID).subscribe(val =>{
         if(val == "Written"){
             this._readValue(characteristicUID).then(val => subject$.next(val));
+            
         }
       });
     

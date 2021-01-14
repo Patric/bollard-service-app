@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+
 import { AuthGuard } from './_guards/auth.guard';
 import { AuthService } from './_services/auth.service';
 
@@ -7,7 +8,7 @@ import { AuthService } from './_services/auth.service';
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+    loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
   },
   {
     path: '',
@@ -16,21 +17,22 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
   },
   {
     path: 'registration',
-    loadChildren: () => import('./registration/registration.module').then( m => m.RegistrationPageModule)
+    loadChildren: () => import('./pages/registration/registration.module').then( m => m.RegistrationPageModule)
   },
   {
     path: 'forgot-password',
-    loadChildren: () => import('./forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
   },
   {
-    path: 'profile',
-    loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule),
+    path: 'authenticated',
+    loadChildren: () => import('./pages/authenticated/authenticated.module').then( m => m.AuthenticatedPageModule),
     canActivate: [AuthGuard]
   },
+
 ];
 
 @NgModule({
@@ -40,6 +42,8 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { 
+
+  
  
 }
 export { RouterModule };

@@ -1,22 +1,20 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../_services/auth.service';
+import { AuthService } from '../../../_services/auth.service';
 
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
-import { BluetoothService } from '../../_services/bluetooth/bluetooth.service';
+import { BluetoothService } from '../../../_services/bluetooth/bluetooth.service';
 import { Observable } from 'rxjs';
-import {BridgeService} from '../../_services/bridge.service'
+import {BridgeService} from '../../../_services/bridge.service'
 
-
-// TO BE DELTED
-import { SHA } from '../../_interceptors/crypto';
 
 @Component({
   selector: 'app-bluetooth',
   templateUrl: './bluetooth.component.html',
-  styleUrls: ['./bluetooth.component.scss'],
+  styleUrls: ['./bluetooth.component.scss']
+  
 })
 export class BluetoothComponent implements OnInit, OnDestroy {
 
@@ -27,7 +25,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   private connectionInfo; 
   private devicesFound;
   private deviceResponse;
-  //@Input() code: String;
+  //@Input() code: String;//bou
 
 
   constructor
@@ -38,6 +36,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private ngZone: NgZone,
+    private injector: Injector
   ) {
     this.ngZone.run( () => {
       this.connectionInfo = {address: null, name: "null", status: "DISCONNECTED"};
@@ -46,7 +45,9 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.disconnect();
+
+    console.log("ON DESTROY CALLED");
+    //this.disconnect();
   }
 
 
@@ -134,7 +135,9 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     return true;
   }
 
- 
+  ionViewWillLeave() {
+    console.log("Looks like I'm about to leave :(");
+  }
  
 
 }

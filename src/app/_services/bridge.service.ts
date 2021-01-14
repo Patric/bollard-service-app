@@ -18,40 +18,51 @@ export class BridgeService {
     private authService: AuthService
     ) { }
 
-  // order -> response -> httppost -> respone -> order -> response -> httppost
+ 
   authoriseOrder(code: number): Observable<any>{
-    let message = JSON.stringify({s: "null", c: String(code)});
-
-    // send order to bluetooth
-    return this.bluetoothService.ble.order(message)
+   
+    // get challenge and initiate authentication
+    return this.getChallenge(code)
     .pipe(switchMap(response => {
   
     console.log("Received challenge: ", response)
-    // get authorisation signature from server
-    return this.http.post
-    (
-      `${environment.apiUrl}/authorizeRemoteOrder`,
-      {response: response, code: String(code)},
-      this.authService.httpOptions
-    ).pipe(switchMap((res: any) =>{
-      console.log("Solved challenge ", JSON.stringify(res), "status: ", res.status);
-      // if(res.status == "401"){
-      //   console.error("Unauthorized");
-      // }
-      // else if(res.status == "200"){
-      //   message = JSON.stringify({auth: res.auth});
-      //   this.bluetoothService.ble.order(message).subscribe(response => console.log("got response from bridge after resrver: ", response));
-      // }
-      // else{
-        message = JSON.stringify(res);
-        return this.bluetoothService.ble.order(message);//.subscribe(response => console.log("Devices response:  ", response));
-      //}
+
+
+    // pass challenge and get authorisation signature from server
+    return this.passChallenge(response, code)
+    .pipe(switchMap((httpResponse: any) =>{
+  
+
+
+      
+     // send sigature back to device
+    return this.passSignature(httpResponse);//.subscribe(response => console.log("Devices response:  ", response));
       }));
 
     }));
-    // pass the message to the server
-    // get response from the server and pass to the device
-    // get response from the device and pass to the server
+
+
+
+  }
+
+
+  getChallenge(code){
+    let message = JSON.stringify({s: "null", c: String(code)});
+    return this.bluetoothService.ble.order(message);
+  }
+
+  passChallenge(deviceResponse, code){
+    return this.http.post
+    (
+      `${environment.apiUrl}/authorizeRemoteOrder`,
+      {response: deviceResponse, code: String(code)},
+      this.authService.httpOptions
+    )
+
+  }
+
+  passSignature(httpResponse){
+    return this.bluetoothService.ble.order(JSON.stringify(httpResponse))
   }
 
 }

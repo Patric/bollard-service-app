@@ -1,35 +1,10 @@
-<ion-header>
-  <ion-toolbar>
-    
-    <ion-title>User's profile</ion-title>
-  </ion-toolbar>
-</ion-header>
-<ion-content>
-  <app-bluetooth></app-bluetooth>
-</ion-content>
+<!-- <ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav> -->
 
-
-
-
-<!-- 
-<ion-content class = "info">
-  <ion-grid>
-    <ion-row class="ion-align-items-center">
-       <ion-title class = "info">Some profile info</ion-title>
-    </ion-row>
-    <ion-row class="ion-align-items-center">
-      <ion-button expand = "round" color ="primary" (click) = "logEvent()">Action</ion-button>
-    </ion-row>
-
-
+<ion-grid>
     <ion-row class="ion-align-items-center">
       <ion-button expand = "round" color ="primary" (click) = "check()">Check status</ion-button>
     </ion-row>
-
-
     <ion-row>
-
-
       <ion-row class="ion-align-items-center">
         <ion-button expand = "round" color ="primary" (click) = "startScan()">Start scan</ion-button>
       </ion-row>
@@ -41,6 +16,27 @@
          
       </ion-list>
     </ion-row>
+    <ion-input inputmode="text" class = "code" #code placeholder = "code" type="text" ></ion-input>
+    <ion-row>
+
+      <div>
+      <div *ngIf="connectionInfo != undefined">
+          <ion-card>
+            <ion-card-header>Connection information</ion-card-header>
+            <ion-card-content>
+            <p>Status: {{connectionInfo.status}}</p> 
+            <p>Device name: {{connectionInfo.name}}</p> 
+            </ion-card-content>
+            <div *ngIf="deviceResponse != undefined">
+            <ion-card-header>Messages</ion-card-header>
+            <ion-card-content> {{deviceResponse}} </ion-card-content>
+
+            </div>
+          </ion-card>      
+      </div>
+    </div>
+    </ion-row>
+
   <ion-row>
     <ion-list>
       
@@ -49,33 +45,19 @@
           <div *ngIf="element.address != connectionInfo.address && connectionInfo.status != 'CONNECTING'">
           <ion-button color="medium" (click) = "connect(element.address)">Connect</ion-button>
         </div>
+  
+
         <div *ngIf="element.address == connectionInfo.address && connectionInfo.status != 'CONNECTING'">
-          <ion-button color="medium" (click) = "closeConnection()">Disconnect</ion-button>
+          <ion-button color="medium" (click) = "disconnect()">Disconnect</ion-button>
         </div>
         <div *ngIf="connectionInfo.status == 'CONNECTING'">
           <ion-button color="warning">Connecting...</ion-button>
         </div>
-        
       </ion-item>
   </ion-list>
-  <ion-button color="medium" (click) = "reset()">Disconnect</ion-button>
-  
+    <ion-button [disabled] = "(connectionInfo != undefined &&  connectionInfo.status != 'CONNECTED') ? true : false"color="medium" (click) = "disconnect()">Disconnect</ion-button>
+    <ion-button [disabled] = "isEmpty(code.value) || (connectionInfo != undefined &&  connectionInfo.status != 'CONNECTED') ? true : false" color="medium" (click) = "sendMessage(code.value)">Send order</ion-button>
   </ion-row>
-  <ion-row>
-    <ion-toolbar>
-    <ion-title>
-      <ion-list-header lines="inset">
-      <ion-content class ="battery">Device battery level: {{message}}%</ion-content>
-    </ion-list-header>
-  </ion-title>
-    </ion-toolbar>
-      
-  </ion-row>
- 
- 
-
   </ion-grid>
-  
-</ion-content> -->
-<ion-button class = "logout" color="danger" expand = "round" (click) = "logout()">Logout</ion-button>
 
+  

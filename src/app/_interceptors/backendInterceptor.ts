@@ -144,7 +144,8 @@ export class BackendInterceptor implements HttpInterceptor {
 
         }
 
-        //routeFunctions
+        //routeFunctions ====================================================================================
+
         function authenticate(){
           //console.log(headers, body);
           const {email, pass} = body;
@@ -153,20 +154,19 @@ export class BackendInterceptor implements HttpInterceptor {
           const userID = usersData.users.findIndex(x => x.email === email && x.pass === pass );
           
 
-
+          // If user cannot be found
           if(!user){
             return error("Email or password is incorrect");
           }
           // TO DO
           // Hash user id
-          const generatedToken = getRandomString(121);
+          const generatedToken = generateJWT(121);
           usersData.users[userID].token = generatedToken;
           console.log(usersData.users[userID]);
           return ok({
             id: user.id,//hashed user id
             token: generatedToken
           });
-
         }
 
         function logout(){
@@ -181,25 +181,19 @@ export class BackendInterceptor implements HttpInterceptor {
 
 
         function testFunc(){
-
-          
           if(isLoggedIn())
           {
             return ok(usersData)
           }
           else{
             return unauthorised();
-   
           }
-
-          
         }
 
 
         // NEW CHALLENGE
         // {response: "{auth: challenge, id: number}", orderCode: "code"}
         function authorizeRemoteOrder(){
-            
           // if(isLoggedIn())
           // {
           console.log("Authorizing remote order: ", body.response);
@@ -213,27 +207,19 @@ export class BackendInterceptor implements HttpInterceptor {
               return ok({s: value});
             })
           );
-
           // }
           // else{
           //   return unauthorised();
-   
           // }
-
-
-
-          
         }
 
         // repleace crypto api with something else
         function sign(challenge: string, code: string, key: Uint8Array, salt: String){
- 
           if(code == "150"){
             return new Promise((resolve, reject) => {
              resolve("SIGNATURE_FROM_CODE_150");             
               });
           }
-
           let encoder = new TextEncoder();
           return window.crypto.subtle.importKey(
             "raw", // raw format of the key - should be Uint8Array
@@ -254,11 +240,12 @@ export class BackendInterceptor implements HttpInterceptor {
                 var b = new Uint8Array(signature);
                 var str = Array.prototype.map.call(b, x => ('00'+x.toString(16)).slice(-2)).join("");
                 return str;
-            });
-            
+            }); 
         });
-
         }
+
+
+        // Helper functions ====================================================================================
 
         function ok(body?: any){
           return of(new HttpResponse({status: 200, body: body}))
@@ -276,8 +263,14 @@ export class BackendInterceptor implements HttpInterceptor {
           //return true of false based on given condition
           return headers.get('Authorization') === usersData.users.find(user => user.id === headers.get('id')).token;
         };
+
         // use crypto API for JWT auth
-        function getRandomString(length: number){
+        function isAuthenticated(JWTtoken: String){
+          
+
+        }
+
+        function generateJWT(length: number){
           var result = "";
 
           var randomChars = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890';

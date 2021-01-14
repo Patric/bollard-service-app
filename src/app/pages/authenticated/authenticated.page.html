@@ -1,0 +1,67 @@
+<ion-menu side="start" contentId="main-content">
+  <ion-header>
+    <ion-toolbar translucent>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list lines = "none">
+
+      <ion-list-header>
+          Service
+      </ion-list-header>
+   
+      <ion-menu-toggle autoHide="false" *ngFor="let p of servicePages; let i = index">
+          <ion-item [routerLink] = "p.url" routerLinkActive="selected" routerDirection="root" detail="false">
+            <ion-icon [name]="p.icon" slot="start"></ion-icon>
+            <ion-label>{{p.title}}</ion-label>
+          </ion-item>
+          </ion-menu-toggle>
+
+
+
+      <ion-list-header>
+          Account
+        </ion-list-header>
+
+
+        <ion-menu-toggle autoHide="false" *ngFor="let p of accountPages; let i = index">
+        <ion-item [routerLink] = "p.url" routerLinkActive="selected" routerDirection="root" detail="false">
+          <ion-icon [name]="p.icon" slot="start"></ion-icon>
+          <ion-label>{{p.title}}</ion-label>
+        </ion-item>
+        </ion-menu-toggle>
+
+
+        <ion-menu-toggle autoHide="false">
+          <ion-item button (click) = "logout()" detail = "false">
+            <ion-icon slot="start" name="log-out"> </ion-icon>
+            <ion-label>Logout</ion-label>
+            </ion-item>
+        </ion-menu-toggle>
+
+
+
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Intelligent bollard service app</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+     <ion-content>
+      <router-outlet></router-outlet>
+     </ion-content>
+ 
+
+
+  </div>
+
+

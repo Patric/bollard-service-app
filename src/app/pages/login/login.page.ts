@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { User } from '../_models/user';
-import { AuthService } from '../_services/auth.service';
+import { User } from '../../_models/user';
+import { AuthService } from '../../_services/auth.service';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -37,7 +37,7 @@ export class LoginPage implements OnInit {
     {
       this.user = user;
       if(user.token){
-        this.router.navigate([`/profile`]);
+        this.router.navigate([`/authenticated`]);
       }
       
     }
