@@ -28,7 +28,7 @@ export class AuthenticatedPage implements OnInit {
     },
     {
       title: 'Guide',
-      url: ['/authenticated', 'orders'],
+      url: ['/authenticated', 'guide'],
       icon: 'information-circle'
     }
   ];
@@ -47,7 +47,7 @@ export class AuthenticatedPage implements OnInit {
   }
 
   ngOnInit() {
-    this.navCtrl.navigateRoot(['/authenticated', 'profile']);
+   this.navCtrl.navigateRoot(['/authenticated', 'profile']);
   }
 
   logEvent(){
