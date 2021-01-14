@@ -43,7 +43,7 @@ export class AuthService {
   ) 
   { 
     //update with cookie observable
-    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['id', 'token'])));
+    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['token'])));
     this.currentUser = this.currentUserSubject.asObservable();
     this.cookieExpMin = 15;
     //console.log("Value: ", this.currentUserValue);
@@ -73,14 +73,6 @@ export class AuthService {
       const expDate = new Date();
       expDate.setMinutes(expDate.getMinutes() + this.cookieExpMin);
       this.cookieService.set(
-        'id', // name 
-        (decodeURIComponent(user.id)), // value
-        expDate, // cookie expiration in addition to session expiration 
-        null, // path
-        null, //domain
-        null, // secure SET TO TRUE
-      );
-      this.cookieService.set(
         'token', // name 
         (decodeURIComponent(user.token)), // value
         expDate, // cookie expiration in addition to session expiration 
@@ -89,14 +81,24 @@ export class AuthService {
         null, // secure
       );
       
-   
-
       this.currentUserSubject.next(user);
           return user;
     }));
     
   }
 
+  isLoggedIn(){
+    if(this.getCookies(['token'])){
+      console.log("IS LOGGED IN");
+     return true;
+    }
+    else{
+      return false;
+    }
+
+  }
+
+  
 
 
   logout(){
@@ -106,7 +108,7 @@ export class AuthService {
     this.http.get(
       `${this.url}/logout`,
       this.httpOptions
-      ).subscribe(response => alert(response));
+      ).subscribe(response => console.log(response));
     this.cookieService.deleteAll();
     this.currentUserSubject.next(null);
     //this.router.navigateByUrl("/");

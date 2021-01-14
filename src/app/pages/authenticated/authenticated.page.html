@@ -1,6 +1,6 @@
 <route-redirect from="/authenticated" to="authenticated/profile"></route-redirect>
 <ion-menu side="start" contentId="main-content">
-  <ion-header>
+  <ion-header class = "ion-no-border">
     <ion-toolbar translucent>
       <ion-title>Menu</ion-title>
     </ion-toolbar>
@@ -48,15 +48,6 @@
 </ion-menu>
 
 <div class="ion-page" id="main-content">
-  <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-      </ion-buttons>
-      <ion-title>Intelligent bollard service app</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
      <ion-content>
       <router-outlet></router-outlet>
      </ion-content>

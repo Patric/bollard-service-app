@@ -45,9 +45,11 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
-    console.log("ON DESTROY CALLED");
-    //this.disconnect();
+    //add clearing func
+    if(this.connectionInfo.status == "CONNECTED"){
+      this.disconnect();
+    }
+   
   }
 
 
@@ -87,11 +89,11 @@ export class BluetoothComponent implements OnInit, OnDestroy {
       // map emits a new transformed observable, pipe used to combine functions
       // store user details and jwt token in local storage to keep user logged in between page refreshes
     ).subscribe((res: any) =>{
-      if(res.status == "401"){
-        this.router.navigateByUrl(this.router.getCurrentNavigation.toString());
-      }
+      // if(res.status == "401"){
+      //   this.router.navigateByUrl(this.router.getCurrentNavigation.toString());
+      // }
 
-      //console.log(res);
+      console.log(res);
       this.response = res.users;
       
     } );
@@ -114,7 +116,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
      //let sha256 = new SHA();
      //sha256.generate();
 
-    this.bridgeService.authoriseOrder(100).subscribe(res => console.log("Authorizing order status: ", res));
+    //this.bridgeService.authoriseOrder(100).subscribe(res => console.log("Authorizing order status: ", res));
     console.log("Checked");
 
   }

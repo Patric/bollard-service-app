@@ -11,19 +11,20 @@ const routes: Routes =  [
     component: AuthenticatedPage,
     children: [
       {
+        //Default route
         path: 'operations',
-        loadChildren: () => import('./operations/operations.module').then( m => m.OperationsPageModule)
+        loadChildren: () => import('./operations/operations.module').then( m => m.OperationsPageModule),
       },
       {
-        path: 'profile',
+        path: '',
         loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule)
       },
       {
         path: 'guide',
         component: GuideComponent
       }
-    ],
-  //  redirectTo: 'profile',
+    ]
+
   }
 
 ];

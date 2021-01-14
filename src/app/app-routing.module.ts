@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
-import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { PreloadAllModules, Router, RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from './_guards/auth.guard';
 import { AuthService } from './_services/auth.service';
+
+
 
 
 const routes: Routes = [
@@ -42,8 +44,13 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule { 
+ // navigate to profile if logged in
+ constructor(private authService: AuthService, private router: Router) {
+  if(this.authService.isLoggedIn){
+    console.log("App routing redirect triggered");
+    this.router.navigate(['/authenticated']);
+  }
+}
 
-  
- 
 }
 export { RouterModule };

@@ -13,12 +13,12 @@ export class JwtInterceptor implements HttpInterceptor {
     {
 
         let currentUser = this.authService.currentUserValue;
-        //console.log(currentUser);
+        
         if (currentUser && currentUser.token)
         {
             
             request = request.clone({
-                setHeaders: { Authorization: `${currentUser.token}`, id: `${currentUser.id}`}
+                setHeaders: { Authorization: `${currentUser.token}`}
             })
 
            // console.log(request.headers.keys().forEach(key =>console.log(key)));

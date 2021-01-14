@@ -160,18 +160,19 @@ export class BackendInterceptor implements HttpInterceptor {
           }
           // TO DO
           // Hash user id
-          const generatedToken = generateJWT(121);
+          const generatedToken = generateJWT(121,user.id);
           usersData.users[userID].token = generatedToken;
           console.log(usersData.users[userID]);
           return ok({
-            id: user.id,//hashed user id
+          //  id: user.id,//hashed user id
             token: generatedToken
           });
         }
 
         function logout(){
-          if(usersData.users[usersData.users.findIndex(user => user.id === headers.get('id'))].token){
-            usersData.users[usersData.users.findIndex(user => user.id === headers.get('id'))].token = null;
+          if(usersData.users[usersData.users.findIndex(user => user.id === headers.get('Authorization')[0])].token){
+            usersData.users[usersData.users.findIndex(user => user.id === headers.get('Authorization')[0])].token = null;
+    
             return ok("User logged out");
           }
           else{
@@ -261,7 +262,8 @@ export class BackendInterceptor implements HttpInterceptor {
 
         function isLoggedIn(){
           //return true of false based on given condition
-          return headers.get('Authorization') === usersData.users.find(user => user.id === headers.get('id')).token;
+          console.log("headers get ",  headers.get('Authorization')[0]);
+          return headers.get('Authorization') === usersData.users.find(user => user.id === headers.get('Authorization')[0]).token;
         };
 
         // use crypto API for JWT auth
@@ -270,7 +272,7 @@ export class BackendInterceptor implements HttpInterceptor {
 
         }
 
-        function generateJWT(length: number){
+        function generateJWT(length: number, userID: String){
           var result = "";
 
           var randomChars = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890';
@@ -279,6 +281,7 @@ export class BackendInterceptor implements HttpInterceptor {
             result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
           };
           
+          result = userID + result;
           return result;
         }
 

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, defineInjectable, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, defineInjectable, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../../_services/auth.service';
@@ -13,7 +13,9 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })
-export class ProfilePage implements OnInit, OnDestroy {
+export class ProfilePage implements OnInit, OnDestroy, AfterViewInit {
+
+
 
   constructor
   ( 
@@ -23,12 +25,17 @@ export class ProfilePage implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private menu: MenuController,
     private activatedRoute: ActivatedRoute
-  ) {}
+  ) {
+
+  }
+  ngAfterViewInit(): void {
+    //do smth
+  }
   ngOnDestroy(): void {
   }
 
   ngOnInit() {
-
+    
   }
 
   

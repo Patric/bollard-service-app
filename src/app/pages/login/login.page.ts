@@ -35,6 +35,7 @@ export class LoginPage implements OnInit {
     //returns user
     this.authService.authenticate($email, $pass).subscribe((user) => 
     {
+      console.log(user.token);
       this.user = user;
       if(user.token){
         this.router.navigate([`/authenticated`]);

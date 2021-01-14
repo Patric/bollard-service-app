@@ -16,9 +16,5 @@ const routes: Routes = [
 })
 export class HomePageRoutingModule {
    // navigate to profile if logged in
-   constructor(private authService: AuthService, private router: Router) {
-    if(this.authService.currentUserValue){
-      this.router.navigate(['/authenticated']);
-    }
-  }
+ 
 }

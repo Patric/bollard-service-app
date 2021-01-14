@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, NgZone, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MenuController, NavController } from '@ionic/angular';
+import { AlertController, MenuController, NavController } from '@ionic/angular';
 import { AuthService } from 'src/app/_services/auth.service';
 import { environment } from 'src/environments/environment';
+
+
 
 @Component({
   selector: 'app-authenticated',
@@ -16,7 +18,7 @@ export class AuthenticatedPage implements OnInit {
   accountPages = [
     {
       title: 'Profile',
-      url: ['/authenticated', 'profile'],
+      url: ['/authenticated'],
       icon: 'person'
     }
   ];
@@ -33,6 +35,8 @@ export class AuthenticatedPage implements OnInit {
     }
   ];
 
+  private currentRoute;
+  private componentTitle = "Starter"
   constructor
   ( 
     private http: HttpClient,
@@ -41,13 +45,18 @@ export class AuthenticatedPage implements OnInit {
     private ngZone: NgZone,
     private menu: MenuController,
     private activatedRoute: ActivatedRoute,
-    private navCtrl: NavController
-  ) {}
+    private navCtrl: NavController,
+    private alertCtrl: AlertController
+  ) {
+
+
+  }
   ngOnDestroy(): void {
+    
   }
 
   ngOnInit() {
-   this.navCtrl.navigateRoot(['/authenticated', 'profile']);
+
   }
 
   logEvent(){
@@ -95,9 +104,32 @@ export class AuthenticatedPage implements OnInit {
     this.router.navigate(['operations'], {relativeTo: this.activatedRoute});
   }
 
-  logout(){
-    this.authService.logout();
+  
+  async logout(){
+    //T O DO 
+    //send request to logout
+    //localStorage.removeItem('currentUser');
+
+    const alert = await this.alertCtrl.create({
+      header: 'Logout',
+      buttons: [
+        'Cancel',
+        {
+          text: 'Ok',
+          handler: (data: any) => {
+            return this.authService.logout();
+          }
+        }
+      ],
+      message: "Do you want to log out?",
+    });
+
+    await alert.present()
+    //this.router.navigateByUrl("/");
+    //this.router.navigate(['/'], { replaceUrl: true });
+    //this.router.navigate(['/'], {replaceUrl: true});
   }
+    
 
 
 }
