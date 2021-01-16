@@ -55,8 +55,7 @@ export class BridgeService {
     return this.http.post
     (
       `${environment.apiUrl}/authorizeRemoteOrder`,
-      {response: deviceResponse, code: String(code)},
-      this.authService.httpOptions
+      {response: deviceResponse, code: String(code)}
     )
 
   }

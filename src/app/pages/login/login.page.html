@@ -8,6 +8,8 @@
 </ion-header>
 
 
+  
+
 
 <ion-content>
 
@@ -24,7 +26,7 @@
 
     <ion-row>
       <ion-col>
-        <ion-button type ="submit" color="danger" expand = "block" (click)="login(email.value, pass.value)"> Sign In </ion-button>
+        <ion-button type ="submit" color="tertiary" expand = "block" shape ="round" (click)="login(email.value, pass.value)"> Sign In </ion-button>
         <div class = under-text>
           <a [routerLink]="['/forgot-password']" class = "small-text">Forgot Password?</a>
         </div>

@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BluetoothLE, DeviceInfo} from '@ionic-native/bluetooth-le/ngx';
 import { Platform } from '@ionic/angular';
-import { BehaviorSubject, Observable, Observer, of, Subject, throwError } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, Observer, of, Subject, throwError } from 'rxjs';
+import { catchError, concatMap, exhaustMap, filter, map, mergeMap, switchMap, take } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
 import { BluetoothAbstract, STATUS } from './bluetooth-abstract';
 
@@ -25,13 +25,21 @@ export class BluetoothNativeService implements BluetoothAbstract, OnDestroy{
 constructor(
   public plt: Platform) 
   {
-  console.log("INITIATED BLENATIVE");
+    this._initService();
+ }
+
+ 
+
+
+ _initService(){
+  
   this.bluetoothle = new BluetoothLE();
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
   this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
 
   this.response$ = new Subject<any>();
+
   this.plt.ready().then((readySource) => {
     console.log('Platform ready from', readySource);
     
@@ -47,18 +55,133 @@ constructor(
         this.bluetoothle.requestLocation().then(status => console.log(status));
       }
     });
-    this.bluetoothle.initialize({
-      "request": true, // request = true / false (default) - Should user be prompted to enable Bluetooth
-      "statusReceiver": true, // Should change in Bluetooth status notifications be sent.
-      "restoreKey" : "bluetoothleplugin" // A unique string to identify your app. Bluetooth Central background mode is required to use this, but background mode doesn't seem to require specifying the restoreKey.
+    
+    this._initialize();
 
-    }).subscribe(ble => {
-      console.log('ble', ble.status) // logs 'enabled'
-      this.bluetoothle.enable();
-      this.bluetoothle.getAdapterInfo().then(info => console.log(info));
-    });
+
    });
+   console.log("INITIATED BLENATIVE");
  }
+
+ _reinitService(){
+  delete this.bluetoothle;
+  this.bluetoothle = new BluetoothLE();
+  this.devicesFound = new Array();
+  this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
+  this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
+
+  this.response$ = new Subject<any>();
+
+  this.plt.ready().then((readySource) => {
+    console.log('Platform ready from', readySource);
+    
+    this.bluetoothle.hasPermission().then((response) => {
+      if(response.hasPermission == false){
+
+        this.bluetoothle.requestPermission().then(status => console.log(status));
+      }
+    });
+    this.bluetoothle.isLocationEnabled().then((isLocationEnabled) => {
+      console.log(isLocationEnabled);
+      if(!isLocationEnabled){
+        this.bluetoothle.requestLocation().then(status => console.log(status));
+      }
+    });
+    
+    this._initialize();
+
+    console.log("REINITIATED BLENATIVE");
+   });
+
+ }
+
+
+ _initialize(){
+ 
+
+  this.bluetoothle.initialize({
+    "request": true, // request = true / false (default) - Should user be prompted to enable Bluetooth
+    "statusReceiver": true, // Should change in Bluetooth status notifications be sent.
+    "restoreKey" : "bluetoothleplugin" // A unique string to identify your app. Bluetooth Central background mode is required to use this, but background mode doesn't seem to require specifying the restoreKey.
+
+  }).subscribe(ble => {
+    console.log('ble', ble.status) // logs 'enabled'
+    this.bluetoothle.enable();
+    this.bluetoothle.getAdapterInfo().then(info => console.log(info));
+  });
+
+ }
+
+
+  // _initialize() {
+  //   console. log("Waiting for platfrom readiness...");
+  //   return from(this.plt.ready())
+  //     .pipe(concatMap(readySource => {
+  //       console.log('Platform ready from', readySource);
+  //       console. log("Checking bluetooth permission...");
+  //       return from(this.bluetoothle.hasPermission())
+  //     }))
+  //     .pipe(concatMap(response => {
+  //       if (response.hasPermission == false) {
+  //         console. log("Requesting permission...");
+  //         return this.bluetoothle.requestPermission()
+  //       }
+  //       else {
+  //         console. log("Permission was granted.");
+  //         return of(null);
+  //       }
+  //     }))
+  //     .pipe(concatMap(status => {
+  //       console.log(status);
+  //       if (status.requestPermission) {
+  //         console. log("Permission granted. Checking location....");
+  //         return this.bluetoothle.isLocationEnabled();
+  //       }
+  //       else{
+
+  //         return of(null);
+  //       }
+  //     }))
+  //     .pipe(concatMap((isLocationEnabled) => {
+  //       console.log(isLocationEnabled);
+  //       if (!isLocationEnabled) {
+  //         console. log("Location not enabled. Requesting location permissions.");
+  //         return this.bluetoothle.requestLocation()
+  //       }
+  //       else{
+  //         return of(null)
+  //       }
+  //     }))
+  //     .pipe(concatMap((requestLocation) => {
+  //       console.log(requestLocation);
+  //       if (!requestLocation.requestLocation) {
+  //         return this.bluetoothle.initialize({
+  //           // request = true / false (default) - Should user be prompted to enable Bluetooth
+  //           "request": true,
+  //           // Should change in Bluetooth status notifications be sent.
+  //           "statusReceiver": true,
+  //           // A unique string to identify your app. Bluetooth Central background mode is required to use this,
+  //           // but background mode doesn't seem to require specifying the restoreKey.
+  //           "restoreKey": "bluetoothleplugin"
+  //         })
+  //       }
+  //     }))
+  //     .pipe(concatMap(ble => {
+  //       console.log('ble', ble.status) // logs 'enabled'
+  //       this.bluetoothle.enable();
+  //       return this.bluetoothle.getAdapterInfo()
+  //     }))
+  //     .pipe(concatMap(info => {
+  //       info => console.log(info);
+  //       return of(info);
+  //     }))
+  // }
+
+
+
+
+
+
 ngOnDestroy(){
   this.devicesFound = new Array();
   this.devicesFound$ = new BehaviorSubject<Array<any>>(this.devicesFound);
@@ -98,55 +221,100 @@ getDevicesFound(): Observable<Array<any>>{
   debugButton(){}
 
  
+  restart(){
+    this.bluetoothle.disable();
+    this._initService();
+    
+    //this.bluetoothle.enable();
+  }
+
   // INTERFACE BLUETOOTHABSTRACT =====================================================================================
-  startScanning(): Observable<{address: string,name: string, status: STATUS}>{
-   
-    this.bluetoothle.isScanning().then((status) => {
-      console.log("Is scanning =", status.isScanning);
+  startScanning() {
+    
+    return from(this.bluetoothle.isScanning())
+      .pipe(concatMap((status) => {
+        console.log("Is scanning =", status.isScanning);
+        if (!status.isScanning) {
+          //wait 2 secs and stop scanning
+          this._superviseScan();
+          this.devicesFound = [];
+          // Add currently connected device
+          if (this.devicesFound.find(device => device.address == this.connectionInfo$.value.address) || this.connectionInfo$.value.address == null) {
+            // if dupcilate do nothing
+          }
+          else {
+            // add to found devices array
+            this.devicesFound.push(this.connectionInfo$.value);
+          }
+          return this._startScan()
 
-    if(!status.isScanning){
-    this._superviseScan();
-    this.devicesFound = [];
-    // Add currently connected device
-    if(this.devicesFound.find(device => device.address == this.connectionInfo$.value.address) || this.connectionInfo$.value.address == null){
-      // do nothing
-    }
-    else{
-      this.devicesFound.push(this.connectionInfo$.value);
-    }
-   
-    console.log("Devices found:", this.devicesFound);
+        }
 
-    this.bluetoothle.startScan({
-      //"services": [this.PRIMARY_SERVICE_UID], // bugs when connecting to different devices or services
-      "allowDuplicates": true,  
-      "scanMode": this.bluetoothle.SCAN_MODE_LOW_LATENCY,
-      "matchMode": this.bluetoothle.MATCH_MODE_AGGRESSIVE,
-      "matchNum": this.bluetoothle.MATCH_NUM_MAX_ADVERTISEMENT,
-      "callbackType": this.bluetoothle.CALLBACK_TYPE_ALL_MATCHES,
-    }).subscribe((deviceInfo) => {
-        
-      // Avoid duplicates during 2 secs scan
-      if(deviceInfo.status == "scanResult"){
-        if(this.devicesFound.find(x => x.address == deviceInfo.address && x.name == deviceInfo.name)){}
-        else{
-          this.devicesFound.push(deviceInfo);
-        };
-      }
-      this.devicesFound$.next(this.devicesFound);
-    });
-   }
-  });
-
-    return this.connectionInfo$.asObservable();
+      })).pipe(filter(value => value != null))
 
   }
 
+  
+  _connect(dvc_address: string)
+  {
+    console.log("connecting... ")
+  if(this.connectionInfo$.value.status == STATUS.DISCONNECTED){
+    this.connectionInfo$.next({address: null, name: null, status: STATUS.CONNECTING});
+     return this.bluetoothle.connect({ address: dvc_address, autoConnect: false })
+     .pipe(exhaustMap((deviceInfo) => {
+
+        // If connection is successfull discover connected device's services
+        if (deviceInfo.status == "connected") {
+          return from(this.bluetoothle.discover({
+            "address": deviceInfo.address,
+            "clearCache": true
+          })
+          ).pipe(exhaustMap(device => {
+        
+
+            // Set connected device's MTU
+            return this.bluetoothle.mtu({ address: device.address, mtu: 242 })
+          }))
+            .pipe(exhaustMap(device => {
+              console.log("MTU SET ", JSON.stringify(device));
+
+              // Watch responses from the device
+              this._watchResponsesFrom(peripheral.characteristic.response.substring(2), peripheral.characteristic.status.substring(2))
+                .subscribe(val => this.response$.next(val));
+              this.connectionInfo$.next({address: deviceInfo.address, name: deviceInfo.name, status: STATUS.CONNECTED});
+              return of({ address: device.address, name: device.name, status: STATUS.CONNECTED })
+            }))
+        }
+        // If connectom os closed somehow
+        else{
+          this.connectionInfo$.next({address: null, name: null, status: STATUS.DISCONNECTED});
+          console.error("Device " + JSON.stringify(this.connectionInfo$.value) + " connection failed.");
+          return of({address: null, name: null, status: STATUS.DISCONNECTED});
+        };
+
+      }))
+    }
+    else if( this.connectionInfo$.value.status == STATUS.CONNECTED ){
+      console.error("Device " + JSON.stringify(this.connectionInfo$.value) + " already connected. Disconnecting...");
+      return this.disconnect();
+    }
+    else if( this.connectionInfo$.value.status == STATUS.CONNECTING ){
+
+
+      console.error("Device " + JSON.stringify(this.connectionInfo$.value) + " is during connection. Wait.");
+      return this.disconnect();
+    }
+     
+  }
+
+
+  // OLD
   connect(dvc_address: string)
   {
     if(this.connectionInfo$.value.status == STATUS.DISCONNECTED){
       this.connectionInfo$.next({address: null, name: null, status: STATUS.CONNECTING});
       console.log("Connecting initiated");
+    
       this.bluetoothle.connect(
         {
           address: dvc_address,
@@ -223,6 +391,52 @@ getDevicesFound(): Observable<Array<any>>{
   //   return of(null);
   // }
 
+
+  _disconnect(): Observable<{ address: string, name: string, status: STATUS }> {
+    console.log("Disconnecting...");
+
+    // If address is null there is nothing that can be done
+    if(this.connectionInfo$.value.address == null){
+      this.connectionInfo$.next({ address: null, name: null, status: STATUS.DISCONNECTED });
+      return of({ address: null, name: null, status: STATUS.DISCONNECTED });
+    }
+
+    return from(this.bluetoothle.disconnect(
+      {
+        address: this.connectionInfo$.value.address
+      }
+    ))
+      .pipe(mergeMap(deviceInfo => {
+        return from(this.bluetoothle.close(
+          {
+            address: this.connectionInfo$.value.address
+          }
+        ))
+      }))
+      .pipe(mergeMap((deviceInfo) => {
+        this.connectionInfo$.next({ address: null, name: null, status: STATUS.DISCONNECTED });
+        console.log("Connection closed");
+        return of({ address: null, name: null, status: STATUS.DISCONNECTED });
+      }
+      )
+      )
+      .pipe(catchError(err => {
+        this.connectionInfo$.next({ address: null, name: null, status: STATUS.DISCONNECTED });
+        return from(this.bluetoothle.isConnected({ address: this.connectionInfo$.value.address }))
+        .pipe(concatMap(deviceInfo => {
+          if (!deviceInfo.isConnected) {
+            
+          }
+          console.error(JSON.stringify(err));
+          return throwError(err);
+        }))
+      
+      
+      }))
+    }
+
+
+
   
   disconnect(): Observable<{address: string,name: string, status: STATUS}>{
     console.log("Disconnecting...");
@@ -256,6 +470,29 @@ getDevicesFound(): Observable<Array<any>>{
 
 
     return this.connectionInfo$.asObservable();
+  }
+
+  _startScan(){
+    return this.bluetoothle.startScan({
+      //"services": [this.PRIMARY_SERVICE_UID], // bugs when connecting to different devices or services
+      "allowDuplicates": true,  
+      "scanMode": this.bluetoothle.SCAN_MODE_LOW_LATENCY,
+      "matchMode": this.bluetoothle.MATCH_MODE_AGGRESSIVE,
+      "matchNum": this.bluetoothle.MATCH_NUM_MAX_ADVERTISEMENT,
+      "callbackType": this.bluetoothle.CALLBACK_TYPE_ALL_MATCHES,
+    }).pipe(mergeMap((deviceInfo) => {
+    
+      // Avoid duplicates during 2 secs scan
+      if(deviceInfo.status == "scanResult"){
+        if(this.devicesFound.find(x => x.address == deviceInfo.address && x.name == deviceInfo.name)){}
+        else{
+          
+          this.devicesFound.push(deviceInfo);
+        };
+      }
+      this.devicesFound$.next(this.devicesFound);
+      return of(this.devicesFound);
+    }));
   }
 
   //helper functions

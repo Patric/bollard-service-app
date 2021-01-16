@@ -23,11 +23,7 @@ export class AuthService {
   
 
   private url = environment.apiUrl;
-  httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json'}),
-    withCredentials: true
-  };
-
+ 
   //users: Array<any>;
 
 
@@ -61,15 +57,14 @@ export class AuthService {
     return this.http.post
     (
       `${this.url}/authenticate`,
-      {email: email$, pass: pass$},
-      this.httpOptions
+      {email: email$, pass: pass$}
       // map emits a new transformed observable, pipe used to combine functions
       // store user details and jwt token in local storage to keep user logged in between page refreshes
     ).pipe(map((user: any) => {
    
       /// DELETE
      // localStorage.setItem('currentUser', JSON.stringify(user));
-      
+      this.cookieService.deleteAll();
       const expDate = new Date();
       expDate.setMinutes(expDate.getMinutes() + this.cookieExpMin);
       this.cookieService.set(
@@ -89,7 +84,7 @@ export class AuthService {
 
   isLoggedIn(){
     if(this.getCookies(['token'])){
-      console.log("IS LOGGED IN");
+     
      return true;
     }
     else{
@@ -98,7 +93,11 @@ export class AuthService {
 
   }
 
-  
+  browserLogout(){
+    this.cookieService.deleteAll();
+    this.currentUserSubject.next(null);
+    this.navCtrl.navigateRoot('/');
+  }
 
 
   logout(){
@@ -106,8 +105,7 @@ export class AuthService {
     //send request to logout
     //localStorage.removeItem('currentUser');
     this.http.get(
-      `${this.url}/logout`,
-      this.httpOptions
+      `${this.url}/logout`
       ).subscribe(response => console.log(response));
     this.cookieService.deleteAll();
     this.currentUserSubject.next(null);

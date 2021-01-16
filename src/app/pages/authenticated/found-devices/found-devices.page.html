@@ -1,0 +1,29 @@
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>FoundDevices</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+      
+    <ion-item lines="full" shape ="round" *ngFor="let element of (devicesFound$.value)">
+        <ion-label class="ion-text-wrap"> {{element.address}} </ion-label><ion-badge color = "primary">{{element.name}}</ion-badge>
+        <div *ngIf="element.address != connectionInfo.address && connectionInfo.status != 'CONNECTING'">
+        <ion-button color="medium" (click) = "connect(element.address)">Connect</ion-button>
+      </div>
+
+
+      <div *ngIf="element.address == connectionInfo.address && connectionInfo.status != 'CONNECTING'">
+        <ion-button color="medium" (click) = "disconnect()">Disconnect</ion-button>
+      </div>
+      <div *ngIf="connectionInfo.status == 'CONNECTING'">
+        <ion-button color="warning">Connecting...</ion-button>
+      </div>
+    </ion-item>
+</ion-list>
+</ion-content>

@@ -8,9 +8,51 @@
         <ion-title>Profile</ion-title>
     
       </ion-toolbar>
+
     </ion-header>
 
+  
+            <div *ngIf = "userDetails != null && userDetails != undefined">
+                
+                <img class = "avatar" src="assets\avatars\avatar.png" alt="avatar">
+                <div class="avatar">
+                    <h2>{{userDetails.username}}</h2>
+                </div>
+                <div class = "userDetails">
+                    <ion-list  lines = "inset"> 
+                    <ion-item>
+                        <ion-label slot="start"> ID</ion-label>
+                        <ion-text>{{userDetails.id}}</ion-text>
+                    </ion-item>
 
-    Some profile info
+                    <ion-item >
+                        <ion-label slot="start" >Name </ion-label>
+                       <ion-text>{{userDetails.name}}</ion-text> 
+                    </ion-item>
+
+                    <ion-item >
+                        <ion-label slot="start" >Surname </ion-label>
+                        <ion-text>{{userDetails.surname}}</ion-text> 
+                    </ion-item>
+                    <ion-item> 
+                        <ion-label slot="start" >Team ID: </ion-label>
+                        <ion-text> {{userDetails.teamID}}</ion-text> 
+                    </ion-item>
+                   
+                    <ion-item>
+                        <ion-label slot="start" >Role </ion-label>
+                        <ion-text>  {{userDetails.role}}</ion-text> 
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label slot="start" >Phone </ion-label>
+                        <ion-text> {{userDetails.phoneNumber}} </ion-text> 
+                    </ion-item>
+                  </ion-list>
+                </div>
+            </div>
+   
 </ion-content>
 
+
+    

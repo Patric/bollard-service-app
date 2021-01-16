@@ -7,6 +7,7 @@ import { AuthService } from '../../../_services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { MenuController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -15,7 +16,10 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ProfilePage implements OnInit, OnDestroy, AfterViewInit {
 
+ 
 
+  private userDetails;
+  private photoUrl;
 
   constructor
   ( 
@@ -24,20 +28,27 @@ export class ProfilePage implements OnInit, OnDestroy, AfterViewInit {
     private authService: AuthService,
     private ngZone: NgZone,
     private menu: MenuController,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private userService: UserService
   ) {
 
   }
   ngAfterViewInit(): void {
-    //do smth
+    
   }
   ngOnDestroy(): void {
   }
 
   ngOnInit() {
-    
+    this.userService.getUserData().subscribe(userDetails => {
+      this.ngZone.run(() => { 
+        this.userDetails = userDetails;
+        console.log("userDetails: ", userDetails);
+      })
+    })
   }
 
-  
+ 
+
 
 }

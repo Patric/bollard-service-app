@@ -36,7 +36,7 @@ const routes: Routes = [
   },
 
 ];
-
+//dsad
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
@@ -47,8 +47,8 @@ export class AppRoutingModule {
  // navigate to profile if logged in
  constructor(private authService: AuthService, private router: Router) {
   if(this.authService.isLoggedIn){
-    console.log("App routing redirect triggered");
-    this.router.navigate(['/authenticated']);
+    // console.log("App routing redirect triggered");
+    // this.router.navigate(['/authenticated']);
   }
 }
 

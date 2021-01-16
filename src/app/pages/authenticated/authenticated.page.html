@@ -1,4 +1,5 @@
-<route-redirect from="/authenticated" to="authenticated/profile"></route-redirect>
+<div  [class.dark-theme]="dark">
+<ion-split-pane contentId="main-content">
 <ion-menu side="start" contentId="main-content">
   <ion-header class = "ion-no-border">
     <ion-toolbar translucent>
@@ -42,6 +43,20 @@
         </ion-menu-toggle>
 
 
+        <ion-list-header>
+          Settings
+        </ion-list-header>
+
+
+          <ion-item>
+            <ion-icon slot="start" name="moon"> </ion-icon>
+          <ion-label>Dark-mode</ion-label>
+     
+          <ion-toggle (click)="toggleDark()"></ion-toggle>
+          </ion-item>
+
+
+
 
     </ion-list>
   </ion-content>
@@ -49,11 +64,11 @@
 
 <div class="ion-page" id="main-content">
      <ion-content>
-      <router-outlet></router-outlet>
+      <router-outlet ></router-outlet>
      </ion-content>
  
 
 
   </div>
 
-
+</ion-split-pane>

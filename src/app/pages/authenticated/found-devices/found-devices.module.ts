@@ -4,18 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { AuthenticatedPageRoutingModule } from './authenticated-routing.module';
+import { FoundDevicesPageRoutingModule } from './found-devices-routing.module';
 
-import { AuthenticatedPage } from './authenticated.page';
-
+import { FoundDevicesPage } from './found-devices.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AuthenticatedPageRoutingModule
+    FoundDevicesPageRoutingModule
   ],
-  declarations: [AuthenticatedPage]
+  declarations: [FoundDevicesPage]
 })
-export class AuthenticatedPageModule {}
+export class FoundDevicesPageModule {}

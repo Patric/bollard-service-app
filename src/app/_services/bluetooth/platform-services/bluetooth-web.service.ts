@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, ReplaySubject, Subject } from 'rxjs';
-import { last, map, mergeMap, take } from 'rxjs/operators';
+import { filter, last, map, mergeMap, take } from 'rxjs/operators';
 import { peripheral } from '../config/bluetooth.config.json'
 import {BluetoothAbstract, STATUS} from './bluetooth-abstract';
 // only used for compiler to see navigator - delete later
@@ -15,7 +15,7 @@ export class BluetoothWebService implements BluetoothAbstract{
   private device: BluetoothDevice;
   constructor(
     ) {
-      this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: null});
+      this.connectionInfo$ = new BehaviorSubject<{address: string,name: string, status: STATUS}>({address: null, name: null, status: STATUS.DISCONNECTED});
       this.response$ = new Subject<any>();
       this._characteristics = new Map<number, {
         characteristic: BluetoothRemoteGATTCharacteristic,
@@ -35,7 +35,16 @@ export class BluetoothWebService implements BluetoothAbstract{
   private PRIMARY_SERVICE_UID = Number(peripheral.service.UUID);
   private response$: Subject<any>;
 
-  startScanning(): Observable<{address: string,name: string, status: STATUS}>{
+
+  /**
+   * @description
+   * Just disconnects``
+   */
+  restart(){
+    this.disconnect();
+  }
+
+  startScanning(){
     this._connectToService(this.PRIMARY_SERVICE_UID).then(_ => {
       this._watchResponsesFrom(Number(peripheral.characteristic.response), Number(peripheral.characteristic.status))
       .subscribe(val => {
@@ -43,7 +52,7 @@ export class BluetoothWebService implements BluetoothAbstract{
       });
     }
     );
-    return this.connectionInfo$.asObservable();
+    return of(null).pipe(filter(value => value != null));
     }
 
   connect(dvc_address?: string) {

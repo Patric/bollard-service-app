@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, Injector, NgZone, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertController, MenuController, NavController } from '@ionic/angular';
+import { AppComponent } from 'src/app/app.component';
 import { AuthService } from 'src/app/_services/auth.service';
 import { environment } from 'src/environments/environment';
 
@@ -26,7 +27,7 @@ export class AuthenticatedPage implements OnInit {
     {
       title: 'Operations',
       url: ['/authenticated', 'operations'],
-      icon: 'settings'
+      icon: 'cog'
     },
     {
       title: 'Guide',
@@ -35,8 +36,11 @@ export class AuthenticatedPage implements OnInit {
     }
   ];
 
+  dark = true;
+
   private currentRoute;
   private componentTitle = "Starter"
+  
   constructor
   ( 
     private http: HttpClient,
@@ -46,10 +50,15 @@ export class AuthenticatedPage implements OnInit {
     private menu: MenuController,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private injector: Injector
+    
   ) {
 
-
+   
+  }
+  toggleDark(){
+    this.injector.get(AppComponent).setDark();
   }
   ngOnDestroy(): void {
     
@@ -62,8 +71,7 @@ export class AuthenticatedPage implements OnInit {
   logEvent(){
     this.http.get
     (
-      `${environment.apiUrl}/someInfo`,
-      this.authService.httpOptions
+      `${environment.apiUrl}/someInfo`
       // map emits a new transformed observable, pipe used to combine functions
       // store user details and jwt token in local storage to keep user logged in between page refreshes
     ).subscribe((res: any) =>{ } );

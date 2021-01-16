@@ -1,0 +1,36 @@
+.info ion-grid{
+    padding-top: 50%;
+  }
+  .info ion-row {
+    height: 30%;
+    margin: 3%;
+    justify-content: center;
+
+  }
+  .info ion-title{
+    text-align: center;
+  }
+
+  .battery{
+    text-align: center;
+    justify-content: center;
+    font-size: 1.7em;
+  }
+
+
+  .code{
+    text-align: center;
+    justify-content: center;
+    font-size: 1.7em;
+  }
+
+  .scan-result-actionsheet .action-sheet-group {
+    background: #ff0000;
+    height: 30%;
+    margin: 3%;
+  }
+
+ion-content {
+    background: rgba(0, 0, 0, 0.063) /* Green background with 30% opacity */
+
+}

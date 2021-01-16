@@ -64,16 +64,20 @@ export interface  BluetoothAbstract{
 
     /**
    * @description
-   * Starts scanning for available devices. 
+   * Starts scanning for available devices. May return devicesFound array depending on platfrom.
    */
-    startScanning(): Observable<any>;
+    startScanning(): any | Observable<any>;
 
 
     /**
    * @description
    * @param dvc_address - MAC Address of the device that should be connected
+   * 
+   * 
+   * @returns ```Observable<any>``` of connection STATUS.
+   * 
    */
-    connect(dvc_address?: string);
+    connect(dvc_address?: string): any | Observable<{address: string,name: string, status: STATUS}>;
 
 
     /**
@@ -135,6 +139,14 @@ export interface  BluetoothAbstract{
    * Disconnects from currently connected device``
    */
     disconnect(): Observable<{address: string,name: string, status: STATUS}>;
+
+
+    /**
+   * @description
+   * Resets Bluetooth adapter.``
+   */
+    restart();
+
 
     debugButton();
    

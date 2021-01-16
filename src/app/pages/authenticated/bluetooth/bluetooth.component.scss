@@ -1,25 +1,58 @@
- .info ion-grid{
-    padding-top: 50%;
-  }
-  .info ion-row {
-    height: 30%;
-    margin: 3%;
-    justify-content: center;
+//  .info ion-grid{
+//     padding-top: 50%;
+//   }
+//   .info ion-row {
+//     height: 30%;
+//     margin: 3%;
+//     justify-content: center;
 
-  }
-  .info ion-title{
-    text-align: center;
-  }
+//   }
+//   .info ion-title{
+//     text-align: center;
+//   }
 
-  .battery{
-    text-align: center;
-    justify-content: center;
-    font-size: 1.7em;
-  }
+//   .battery{
+//     text-align: center;
+//     justify-content: center;
+//     font-size: 1.7em;
+//   }
 
 
-  .code{
-    text-align: center;
-    justify-content: center;
-    font-size: 1.7em;
-  }
+//   .code{
+//     text-align: center;
+//     justify-content: center;
+//     font-size: 1.7em;
+//   }
+
+//   .scan-result-actionsheet .action-sheet-group {
+//     background: #ff0000;
+//     height: 30%;
+//     margin: 3%;
+//   }
+
+//   .my-custom-class .modal-wrapper {
+//     background: rgba(34, 34, 34, 0.165);
+//   }
+
+.connectionInfo{
+  position: sticky;
+}
+
+.h6{
+  font-size:large;
+}
+.button-des p{
+  font-size:large;
+}
+// invert(100%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%)
+ion-icon.disconnect {
+  filter: invert(100%);
+  opacity: 60%;
+}
+
+div.ble-options{
+  position: fixed;
+  top: 88%;
+  z-index: 10000;
+  left: 83%;
+}
