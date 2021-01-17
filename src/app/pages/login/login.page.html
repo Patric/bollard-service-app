@@ -26,11 +26,17 @@
 
     <ion-row>
       <ion-col>
-        <ion-button type ="submit" color="tertiary" expand = "block" shape ="round" (click)="login(email.value, pass.value)"> Sign In </ion-button>
+        <ion-button type ="submit" color="primary" expand = "block" shape ="round" (click)="login(email.value, pass.value)"> Sign In </ion-button>
+        <div *ngIf="error" error class = "under-text-error">
+          {{error}}
+          </div>
+         
+
         <div class = under-text>
           <a [routerLink]="['/forgot-password']" class = "small-text">Forgot Password?</a>
         </div>
-       
+
+    
       </ion-col>
     </ion-row>
 

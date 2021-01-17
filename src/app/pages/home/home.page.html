@@ -1,10 +1,4 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Home
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+
 <!-- 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
@@ -14,21 +8,23 @@
   </ion-header>
 </ion-content> -->
 
-
-
-
 <ion-content class = "auth-form">
+<div class= "center-items">
 <ion-grid>
+<ion-row align-self-center>
+  <div class ="app-title">
+  <ion-title >Bollard Service Application</ion-title>
+</div>
+</ion-row>
   <ion-row class="ion-align-items-center">
     <ion-col align-self-center>
-        <ion-button [routerLink]="['/registration']" expand = "block" shape ="round" color ="light">Register</ion-button>
-
-        <span class="divider line one-line">or</span>
-
-        <span class="already"> Already a user?</span>
-
-        <ion-button [routerLink]="['/login']"  expand = "block" shape ="round" color ="tertiary">Sign in</ion-button>
+        <!-- <ion-button [routerLink]="['/registration']" expand = "block" shape ="round" color ="light">Register</ion-button> -->
+        <!-- <span class="divider line one-line"><ion-title class ="app-title">Bollard Service Application</ion-title></span> -->
+     
+      
+        <ion-button [routerLink]="['/login']"  expand = "block" shape ="round" color ="primary">Sign in</ion-button>
     </ion-col>
   </ion-row>
 </ion-grid>
+</div>
 </ion-content>

@@ -1,8 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, NgZone } from '@angular/core';
 import { User } from '../../_models/user';
 import { AuthService } from '../../_services/auth.service';
 import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NavController } from '@ionic/angular';
 
 
 @Component({
@@ -12,14 +13,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class LoginPage implements OnInit {
 
-  private user: Observable<User>;
 
 
+  private error;
   constructor
   (
     private route: ActivatedRoute,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private ctrlNav: NavController,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit() {
@@ -29,31 +32,21 @@ export class LoginPage implements OnInit {
 
   login($email: string, $pass: string)
   { 
-    //this.loginService.fakeBackendTest();
-
-    //this.loginService.validate($email, $pass); ------------------------------<--
-    //returns user
-    this.authService.authenticate($email, $pass).subscribe((user) => 
+    this.authService.authenticate($email, $pass).subscribe((response) => 
     {
-      console.log(user.token);
-      this.user = user;
-      if(user.token){
-        this.router.navigate([`/authenticated`]);
+  
+      if(response.token){
+        this.ctrlNav.navigateRoot([`/authenticated`]);
       }
-      
+      else{
+        this.ngZone.run(()=>{
+          this.error = response.error;
+
+        })
+     
+      }
     }
     );
-    
-    // console.log(`User: ${email} \n password: ${password} ${this.user}`);
-    
-    // if(this.user.email != undefined)
-    // {
-    //   console.log(`Fetched credentials from user ${this.user.email}`);
-    // }
-    // else
-    // {
-    //   console.log(this.loginService.validate(email, password).subscribe(user => this.user = user));
-    // }
 
   }
 

@@ -1,4 +1,4 @@
-<div  [class.dark-theme]="dark">
+
 <ion-split-pane contentId="main-content">
 <ion-menu side="start" contentId="main-content">
   <ion-header class = "ion-no-border">
@@ -6,7 +6,7 @@
       <ion-title>Menu</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-content>
+  <ion-content scroll-y="false"> 
     <ion-list lines = "none">
 
       <ion-list-header>
@@ -42,18 +42,6 @@
             </ion-item>
         </ion-menu-toggle>
 
-
-        <ion-list-header>
-          Settings
-        </ion-list-header>
-
-
-          <ion-item>
-            <ion-icon slot="start" name="moon"> </ion-icon>
-          <ion-label>Dark-mode</ion-label>
-     
-          <ion-toggle (click)="toggleDark()"></ion-toggle>
-          </ion-item>
 
 
 

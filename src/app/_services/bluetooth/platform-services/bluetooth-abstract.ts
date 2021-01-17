@@ -148,7 +148,7 @@ export interface  BluetoothAbstract{
     restart();
 
 
-    debugButton();
+ 
    
 }
 

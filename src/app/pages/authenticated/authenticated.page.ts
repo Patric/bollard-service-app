@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Injector, NgZone, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertController, MenuController, NavController } from '@ionic/angular';
-import { AppComponent } from 'src/app/app.component';
 import { AuthService } from 'src/app/_services/auth.service';
 import { environment } from 'src/environments/environment';
 
@@ -36,10 +35,9 @@ export class AuthenticatedPage implements OnInit {
     }
   ];
 
-  dark = true;
 
-  private currentRoute;
-  private componentTitle = "Starter"
+
+
   
   constructor
   ( 
@@ -57,9 +55,7 @@ export class AuthenticatedPage implements OnInit {
 
    
   }
-  toggleDark(){
-    this.injector.get(AppComponent).setDark();
-  }
+
   ngOnDestroy(): void {
     
   }

@@ -1,10 +1,10 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { AfterViewInit, Component, defineInjectable, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient} from '@angular/common/http';
+import { AfterViewInit, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
+
 import { AuthService } from '../../../_services/auth.service';
 
-import { environment } from '../../../../environments/environment';
+
 import { MenuController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
@@ -23,12 +23,7 @@ export class ProfilePage implements OnInit, OnDestroy, AfterViewInit {
 
   constructor
   ( 
-    private http: HttpClient,
-    private router: Router,
-    private authService: AuthService,
     private ngZone: NgZone,
-    private menu: MenuController,
-    private activatedRoute: ActivatedRoute,
     private userService: UserService
   ) {
 

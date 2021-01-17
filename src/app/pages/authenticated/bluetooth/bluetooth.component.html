@@ -1,196 +1,255 @@
 <!-- <ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav> -->
 
 
-<ion-content>
-  <ion-grid class ="ion-align-items-center">
+  <ion-grid class="ion-align-items-center">
 
     <ion-row>
-      <ion-col >
+      <ion-col>
         <div class="ion-padding">
-          <ion-button expand = "full" color ="primary" shape ="round" (click) = "scanDevices()"><ion-icon name ="bluetooth"></ion-icon>Scan for bollards</ion-button>
+          <ion-button expand="full" color="primary" shape="round" (click)="scanDevices()">
+            <ion-icon name="bluetooth" slot = "end"></ion-icon>Scan for bollards
+          </ion-button>
+
+          <ion-button expand="full" color="danger" shape="round" 
+          *ngIf="(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? false: true"
+           (click)="disconnect()">
+            <ion-icon class = "disconnect-button" name="custom-unlink" slot="end"></ion-icon>Disconnect
+          </ion-button>
+
+
+
         </div>
       </ion-col>
-    
+
     </ion-row>
 
-    <ion-row class = "connection-info">
-    <ion-col>
-      <ion-card>
-        <ion-card-header>
+    <ion-row class="connection-info">
+      <ion-col>
+        <ion-card>
+
+          <ion-card-header class="ion-activatable ripple-parent" (click)="toggleConnectionDetails()" button>
+          <ion-ripple-effect type="bounded"></ion-ripple-effect>
+
+            <ion-card-title>Connection details</ion-card-title>
+            <div *ngIf="connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED'">
+              <ion-card-subtitle>{{connectionInfo$.value.status}}</ion-card-subtitle>
+            </div>
+            <div *ngIf="connectionInfo$.value != undefined && connectionInfo$.value.status == 'CONNECTED'">
+              <ion-card-subtitle>CONNECTED TO {{connectionInfo$.value.name}}</ion-card-subtitle>
+            </div>
+
+          </ion-card-header>
+
+
    
-          <ion-card-title>Connection details</ion-card-title>
+            <ion-card-content *ngIf="connectionInfo$.value != undefined && connectionInfo$.value.status == 'CONNECTED' && showConnectionDetails" > 
+              
+              <ion-list lines="none">
+                <div *ngIf="connectionInfo$.value.status != null">
+                  <p>Connection status: {{connectionInfo$.value.status}}</p>
+                </div>
+                <div  *ngIf="connectionInfo$.value.name != null">
+                  <p>Name: {{connectionInfo$.value.name}}</p>
+                </div>
+                <div *ngIf="connectionInfo$.value.address != null">
+                  <p>MacAddress: {{connectionInfo$.value.address}}</p>
+                </div>
+              </ion-list>
+            </ion-card-content>
      
 
-         <div *ngIf="connectionInfo$.value != undefined && connectionInfo$.value.status == 'CONNECTED'">
-            <ion-card-subtitle>CONNECTED to {{connectionInfo$.value.name}}</ion-card-subtitle>
-        <ion-list lines="none">
-          <ion-list-item *ngIf= "connectionInfo$.value.status != null"> 
-           <p>Status: {{connectionInfo$.value.status}}</p> 
-          </ion-list-item>
-          <ion-list-item *ngIf= "connectionInfo$.value.name != null">
-            <p>Name: {{connectionInfo$.value.name}}</p> 
-          </ion-list-item>
-          <ion-list-item *ngIf= "connectionInfo$.value.address != null"> 
-            <p>MacAddress: {{connectionInfo$.value.address}}</p> 
-          </ion-list-item>
-        </ion-list>
-        </div>
-        <div *ngIf="connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED'">
-          <ion-card-subtitle>{{connectionInfo$.value.status}}</ion-card-subtitle>
-        </div>
-     
-        </ion-card-header>
-      </ion-card>
+        </ion-card>
 
-    </ion-col>
+      </ion-col>
     </ion-row>
 
     <!-- <ion-row *ngIf="connectionInfo != undefined && connectionInfo.status == 'CONNECTED'"> -->
       <ion-row>
+        <ion-col>
+          <ion-card>
+            <ion-card-header (click)="toggleMessages()" button>
+              <ion-ripple-effect type="bounded"></ion-ripple-effect>
+
+              <ion-item class="ion-activatable ripple-parent">
+                <ion-icon name="menu" slot="start"></ion-icon>
+
+                    <!-- <ion-label (click) = "codeDetailExpand()" [class] ="(true) ? 'ion-text-wrap' : none"> -->
+           
+                      <ion-card-title>Messages</ion-card-title>
+
+                   
+          
+  
+              </ion-item>
+
+            
+
+            </ion-card-header>
+  
+          
+            <ion-card-content *ngIf="showMessages">
+
+              
+             <div *ngIf="messages[0] == null">
+              <ion-title>
+                <p>No messages</p>
+             </ion-title>
+             </div> 
+
+      
+
+
+             <!-- <ion-content class ="chat"> -->
+             <div class="container-chat">
+              <div *ngFor="let message of messages;" class="message-left">
+           
+                 
+                <img class="message-avatar" src="assets\avatars\avatar.png" alt="avatar">
+                <div class="message-source">
+                  <p>{{message.source}} </p>
+                  <div class="incoming-datetime">
+                    <p>
+                      {{message.timestamp}}
+                    </p>
+                  </div>
+                  <div class="message-content">
+                    <span class="triangle"></span>
+                    <p class="line-breaker "> <ion-label color="primary">{{message.text}}</ion-label></p>
+                  </div>
+
+
+                </div>
+            
+              </div>
+            </div>
+
+            
+            <div *ngIf="messages[0] != null">
+                <ion-item class = "clear-chat" (click) = "clearChat()" button>
+                  <ion-icon name="trash" slot="start"></ion-icon>
+                  <p>Clear chat</p>
+                </ion-item>
+             </div> 
+
+
+          <!-- </ion-content> -->
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+
+
+
+
+
+
+    <ion-row>
       <ion-col>
         <ion-card>
-          <ion-card-header (click)="togglePredefinedCodes()" button>
-    
-           <ion-item>
-                <ion-icon name="menu" slot="start"></ion-icon>
+          <ion-card-header (click)="toggleOrderCodes()" button>
+
+            <ion-ripple-effect type="bounded"></ion-ripple-effect>
+            <ion-item class="ion-activatable ripple-parent">
+              <ion-icon name="menu" slot="start"></ion-icon>
               <ion-card-title>Order codes</ion-card-title>
             </ion-item>
           </ion-card-header>
-      
-          <ion-card-content *ngIf="predefinedCodes">
+
+          <ion-card-content *ngIf="showOrderCodes">
             <ion-list lines="full" *ngFor="let orderCode of orderCodes">
-      
+
               <ion-item-sliding>
                 <ion-item>
-      
+
                   <ion-icon [name]="orderCode.icon" slot="start"></ion-icon>
-      
-      
+
+
                   <!-- <ion-label (click) = "codeDetailExpand()" [class] ="(true) ? 'ion-text-wrap' : none"> -->
-                    <ion-label [class] ="(true) ? 'ion-text-wrap' : none">
+                  <ion-label [class]="(true) ? 'ion-text-wrap' : none">
                     <h5>{{orderCode.name}}</h5>
-                    <p class="btn-des">{{orderCode.description}}</p> 
-      
+
+
+                   
+                    <p class="btn-des">{{orderCode.description}} ({{orderCode.value}})</p>
+
                   </ion-label>
-      
-      
+
+
                 </ion-item>
-      
-                <ion-item-options  side="start">
-                  <ion-item-option *ngIf= "(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? false: true"  (click)="sendMessage(orderCode.value)"  >EXECUTE</ion-item-option>
-                  <ion-item-option disabled = "true" color ="medium" *ngIf= "(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? true: false " >EXECUTE</ion-item-option>
+
+                <ion-item-options side="start">
+                  <ion-item-option
+                    *ngIf="(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? false: true"
+                    (click)="sendMessage(orderCode.value)">EXECUTE</ion-item-option>
+                  <ion-item-option disabled="true" color="medium"
+                    *ngIf="(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? true: false ">
+                    EXECUTE</ion-item-option>
                 </ion-item-options>
-      
+
               </ion-item-sliding>
-      
+
             </ion-list>
-        
+
             <ion-item-sliding>
               <ion-item>
                 <ion-icon name="create" slot="start"></ion-icon>
-    
-    
+
+
                 <ion-label>
                   <h5>CUSTOM CODE</h5>
-                  <ion-input inputmode="text" class = "code" #code placeholder = "Type your custom code" type="text" required></ion-input>
+                  <ion-input inputmode="text" class="code" #code placeholder="Type your custom code" type="text"
+                    required></ion-input>
                 </ion-label>
-    
+
 
               </ion-item>
               <ion-item-options side="start">
-                <ion-item-option *ngIf= "(!isEmpty(code.value) && (connectionInfo$.value != undefined && connectionInfo$.value.status == 'CONNECTED')) ? true: false"  (click)="sendMessage(code.value)">EXECUTE</ion-item-option>
-                <ion-item-option disabled = "true" color ="medium" *ngIf= "(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? true: false " >EXECUTE</ion-item-option>
+                <ion-item-option
+                  *ngIf="(!isEmpty(code.value) && (connectionInfo$.value != undefined && connectionInfo$.value.status == 'CONNECTED')) ? true: false"
+                  (click)="sendMessage(code.value)">EXECUTE</ion-item-option>
+                <ion-item-option disabled="true" color="medium"
+                  *ngIf="(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? true: false ">EXECUTE</ion-item-option>
               </ion-item-options>
-    
+
             </ion-item-sliding>
 
           </ion-card-content>
         </ion-card>
-      
+
       </ion-col>
-      </ion-row>
-      
-      </ion-grid>
-
-
-      <div class = "ble-options">
-        <ion-fab>
-          <ion-fab-button>
-            <ion-icon name="bluetooth"></ion-icon>
-          </ion-fab-button>
-          <ion-fab-list side="top">
-            <ion-fab-button (click) = "scanDevices()"> <ion-icon  name="search"></ion-icon></ion-fab-button>
-          </ion-fab-list>
-          <ion-fab-list side="start">
-            <ion-fab-button [disabled] = "(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? true: false" (click)="disconnect()">
-              <ion-icon class ="disconnect" src="assets\icon\unlink.svg"></ion-icon>
-            </ion-fab-button>
-          </ion-fab-list>
-        
-        </ion-fab>
-      </div>
-     
-      
-
-
-
-      </ion-content>
+    </ion-row>
 
 
 
 
-      <ion-grid>
-        <ion-row class="ion-align-items-center">
-          <ion-button expand = "round" color ="primary" (click) = "scanDevices()">Check status</ion-button>
-        </ion-row>
-        <ion-row>
-          
-          <ion-list>
-              <ion-item lines="full" color="success" *ngFor="let element of response">
-                  <ion-badge color = "primary">{{element.id}}</ion-badge><ion-label class="ion-text-wrap"> {{element.email}}  </ion-label>
-              </ion-item>
-              
-             
-          </ion-list>
-        </ion-row>
-        <ion-input inputmode="text" class = "code" #code placeholder = "code" type="text" ></ion-input>
-        <ion-row>
-         
-          <div>
-          <div *ngIf="connectionInfo != undefined">
-              <ion-card>
-                <ion-card-header>Connection information</ion-card-header>
-                <ion-card-content>
-                <p>Status: {{connectionInfo.status}}</p> 
-                <p>Device name: {{connectionInfo.name}}</p> 
-    
-               
-    
-                </ion-card-content>
-                <div *ngIf="deviceResponse != undefined">
-                <ion-card-header>Messages</ion-card-header>
-                <ion-card-content> {{deviceResponse}} </ion-card-content>
-    
-                </div>
-              </ion-card>      
-          </div>
-        </div>
-        </ion-row>
-    
-      <ion-row>
-        <ion-button [disabled] = "(connectionInfo != undefined &&  connectionInfo.status != 'CONNECTED') ? true : false"color="medium" (click) = "disconnect()">Disconnect</ion-button>
-        <ion-button [disabled] = "isEmpty(code.value) || (connectionInfo != undefined &&  connectionInfo.status != 'CONNECTED') ? true : false" color="medium" (click) = "sendMessage(code.value)">Send order</ion-button>
-      </ion-row>
-      </ion-grid>
-    
-    
-      <ion-fab-button (click) = "restart()">
-        <ion-icon size =" large" name="refresh-circle"></ion-icon>
+
+  </ion-grid>
+
+
+  <div class="ble-options">
+    <ion-fab>
+      <ion-fab-button>
+        <ion-icon name="bluetooth"></ion-icon>
       </ion-fab-button>
-    
-      <ion-fab-button (click) = "presentToast()">
-        <ion-icon size =" large" name="add"></ion-icon>
-      </ion-fab-button>
-    
-      
-    
+      <ion-fab-list side="top">
+        <ion-fab-button (click)="scanDevices()">
+          <ion-icon name="search"></ion-icon>
+        </ion-fab-button>
+      </ion-fab-list>
+      <ion-fab-list side="start">
+        <ion-fab-button
+          [disabled]="(connectionInfo$.value != undefined && connectionInfo$.value.status != 'CONNECTED') ? true: false"
+          (click)="disconnect()">
+          <ion-icon class="disconnect" name="custom-unlink"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-button (click)="restart()">
+          <ion-icon name="refresh-circle"></ion-icon>
+        </ion-fab-button>
+      </ion-fab-list>
+
+    </ion-fab>
+  </div>
+
+
+  
+

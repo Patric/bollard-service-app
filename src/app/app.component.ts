@@ -15,7 +15,6 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private ngZone: NgZone
   ) {
     this.initializeApp();
   }
@@ -27,12 +26,5 @@ export class AppComponent {
     });
   }
 
-  setDark(){
-    this.ngZone.run(()=>{
-      this.dark = !this.dark;
-    })
-
-    console.log('Dark flag set to ', this.dark);
-  }
 
 }

@@ -220,7 +220,8 @@ export class BackendInterceptor implements HttpInterceptor {
 
       // If user cannot be found
       if (!user) {
-        return error("Email or password is incorrect");
+        console.error("Email or password is incorrect");
+        return errorHTTP(401, "Email or password is incorrect");
       }
       // TO DO
       // Hash user id
@@ -329,6 +330,10 @@ export class BackendInterceptor implements HttpInterceptor {
 
     function ok(body?: any) {
       return of(new HttpResponse({ status: 200, body: body }))
+    }
+
+    function errorHTTP(statusCode: number, body?: any) {
+      return of(new HttpResponse({ status: statusCode, body: {error: body} }))
     }
 
     function error(message: string) {

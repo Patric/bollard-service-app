@@ -55,10 +55,13 @@ void foo(int a)
 
 void setup() 
 {
+
+
+   delay(1000 * 2);
  
 
   Serial.begin(9600);
-  while(!Serial);
+  //while(!Serial);
   //pinMode(LED_BUTTON, OUTPUT);
 
   if(!BLE.begin()){
@@ -189,6 +192,15 @@ void handleJSONOrder(String order){
      else if(codeBuffer == "200"){
        execute_200();
      }
+     else if(codeBuffer == "101"){
+       execute_101();
+     }
+     else if(codeBuffer == "102"){
+       execute_102();
+     }
+      else if(codeBuffer == "202"){
+       execute_202();
+     }
      else{
        unknown();
      }
@@ -228,6 +240,51 @@ void execute_200(){
       orderChar.writeValue("");
   Serial.println("Task 200 executed");
 }
+
+
+void execute_101(){
+  wait4response = false;
+      response = null;
+      response["status"] = "executed";  
+      response["message"] = "Bollard locked";
+      responseChar.writeValue(JSON.stringify(response));
+      statusChar.writeValue("Written");
+      delay(1000 * 0.5);
+      statusChar.writeValue("Waiting");
+      // empty order char
+      orderChar.writeValue("");
+  Serial.println("Task 101 executed");
+}
+
+
+void execute_102(){
+  wait4response = false;
+      response = null;
+      response["status"] = "executed";  
+      response["message"] = "Bollard unlocked";
+      responseChar.writeValue(JSON.stringify(response));
+      statusChar.writeValue("Written");
+      delay(1000 * 0.5);
+      statusChar.writeValue("Waiting");
+      // empty order char
+      orderChar.writeValue("");
+  Serial.println("Task 102 executed");
+}
+
+void execute_202(){
+  wait4response = false;
+      response = null;
+      response["status"] = "executed";  
+      response["message"] = "Bollard's data, last 10 MAC IDs and users or battery level";
+      responseChar.writeValue(JSON.stringify(response));
+      statusChar.writeValue("Written");
+      delay(1000 * 0.5);
+      statusChar.writeValue("Waiting");
+      // empty order char
+      orderChar.writeValue("");
+  Serial.println("Task 102 executed");
+}
+
 
 void execute_150(){
   wait4response = false;

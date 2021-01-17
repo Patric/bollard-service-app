@@ -1,10 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Injector, Input, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../_services/auth.service';
-
 import { environment } from '../../../../environments/environment';
-
 import { BluetoothService } from '../../../_services/bluetooth/bluetooth.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import {BridgeService} from '../../../_services/bridge.service'
@@ -23,22 +20,34 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   private response: Observable<Array<any>>;
   
-  //isNaN: Function = Number.isNaN;
-  // Bonding with html
+  //Bluetooth variables
   private connectionInfo$: BehaviorSubject<any>;
   private deviceResponse;
   //@Input() code: String;//bou
   private devicesFound$: BehaviorSubject<any>;
+
+
+  // Scanning modal variable
   private connectTo;
 
+  // Order codes variables
   private orderCodes;
 
+  private messages: Array<{incoming: boolean, source: String, text: String, timestamp: String}>;
+
+  // Toastes
+  private connectionToast;
+  private restartBluetoothToastVar;
+  private messageToast: HTMLIonToastElement;
+
+  // Toggles varbiables
+  private showOrderCodes: boolean;
+  private showConnectionDetails: boolean;
+  private showMessages: boolean;
 
 
-
-  private predefinedCodes: boolean;
-  private connecionToast;
-
+  // Messages variables
+  
 
   constructor
 
@@ -53,7 +62,8 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     private loadingController: LoadingController,
     private modalController: ModalController
   ) {
-    
+
+    // Initial state
       this.connectionInfo$ = new BehaviorSubject({address: null, name: "null", status: "DISCONNECTED"});
       this.watchConnectonInfo();
       this.devicesFound$ = new BehaviorSubject<any>(null);
@@ -61,11 +71,18 @@ export class BluetoothComponent implements OnInit, OnDestroy {
         this.connectionStatusToast();
       })
 
+      this.messages = new Array<{incoming: boolean, source: String, text: String, timestamp: String}>();
+   
+      // Toggles initital state
+      this.showConnectionDetails = true;
+      this.showMessages = false;
+    
+
       this.orderCodes = [
         {
           value: "202",
-          name: "DOWNLOAD BOLLARD'S DATA",
-          description:"Downloads details from the device.",
+          name: "FETCH BOLLARD'S DATA",
+          description:"Fetches details from the device like 10 last connected users.",
           icon: 'arrow-down'
         },
         {
@@ -79,15 +96,32 @@ export class BluetoothComponent implements OnInit, OnDestroy {
           name: "UNLOCK BOLLARD",
           description:"Unlocks bollard.",
           icon: 'lock-open-outline'
-        }
+        },
+        {
+          value: "301",
+          name: "FETCH BATTERY LEVEL",
+          description:"Fetches current battery level from the device.",
+          icon: 'battery-dead'
+        },
     
     
     
       ];
-
-
-
   }
+  ngOnDestroy(): void {
+    //add clearing func
+    if(this.connectionInfo$.value.status == "CONNECTED"){
+      this.disconnect();
+    }
+   
+  }
+
+  async ngOnInit() {
+    await this.bluetoothService.ready();
+  }
+ 
+  // BLUETOOTH
+
   watchConnectonInfo(){
     this.bluetoothService.ble.getConnectionInfo().subscribe( (connectionInfo) => {
       this.ngZone.run( () => {
@@ -105,18 +139,9 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     )
   }
 
-  ngOnDestroy(): void {
-    //add clearing func
-    if(this.connectionInfo$.value.status == "CONNECTED"){
-      this.disconnect();
-    }
-   
-  }
 
 
-  async ngOnInit() {
-    await this.bluetoothService.ready();
-  }
+ 
 
   scanDevices() {
     // Start scanning and updating devices found
@@ -150,120 +175,20 @@ export class BluetoothComponent implements OnInit, OnDestroy {
       })
   }
 
-  togglePredefinedCodes(){
-    this.predefinedCodes = !this.predefinedCodes;
-  }
-
   
-  async presentScanResults() {
-    this.bluetoothService.ble.startScanning().subscribe((devicesFound) => {
-     this.devicesFound$.next(devicesFound);
+
  
-
- }, 
- (err) => console.error(err));
-        
-  const loading = await this.loadingController.create({
-    spinner: 'circles',
-    duration: 1000*2,
-    message: 'Scanning...',
-    translucent: true,
-    cssClass: 'custom-class custom-loading',
-    backdropDismiss: true
-  });
-  await loading.present();
-
-  const { role, data } = await loading.onDidDismiss();
-  console.log('Loading dismissed with role:', role);
-
-
-
-    let buttons = Array();
-
-    for(let deviceFound of this.devicesFound$.value){
-      if(deviceFound.name == null){
-        deviceFound.name = "unnamed";
-      }
-      
-      if((deviceFound.address != null && this.connectionInfo$.value.address!= null) && deviceFound.address == this.connectionInfo$.value.address){
-        buttons.push({
-          text: deviceFound.name + " (Connected)"+ ` [${deviceFound.address}]`,
-          icon: 'checkmark-circle-outline',
-          handler: () => {
-            console.log("Disconnecting from", deviceFound.name);
-          }
-          })
-
-      }
-      else{
-        buttons.push({
-          text: deviceFound.name+ ` [${deviceFound.address}]`,
-          icon: 'close-circle-outline',
-          handler: () => {
-            console.log("Connectng to ", deviceFound.name);
-          }
-          })
-      }
-
-   
-    }
-
-    buttons.push({
-      text: 'Refresh',
-      icon: 'refresh',
-      role: 'destructive',
-      handler: () => {
-        console.log('Refreshing');
-      }
-    });
-
-
-    buttons.push({
-      text: 'Cancel',
-      icon: 'close',
-      role: 'cancel',
-      handler: () => {
-        console.log('Cancel clicked');
-      }
-    });
-
-
-    console.log("FOR LOOP HERE");
-    for(let i =0; i < 40; i++){
-
-      buttons.push({
-        text: "Bollard_#00 "+String(i),
-        icon: 'close-circle-outline',
-        handler: () => {
-          console.log('Cancel clicked');
-        }
-      });
-    }
-    
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Found devices',
-      cssClass: 'scan-result-actionsheet',
-      buttons: buttons
-    });
-    await actionSheet.present();
-  }
-
 
   async restart(){ 
-    const toast = await this.toastController.create({
-      message: 'Restarting Bluetooth...',
-      duration: 2000
-    });
-    toast.present();
-
     this.ngZone.run( () => {
-    this.bluetoothService.ble.restart();
-  })
+      this.bluetoothService.ble.restart();
+    })
+
+    this.restartBluetoothToast();
   
   }
 
 
- 
   disconnect(){
     this.bluetoothService.ble.disconnect()//.subscribe( (connectionInfo) => {
       // this.ngZone.run( () => {
@@ -277,39 +202,32 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   }
 
-  logEvent(){
-    this.http.get
-    (
-      `${environment.apiUrl}/someInfo`,
-      // map emits a new transformed observable, pipe used to combine functions
-      // store user details and jwt token in local storage to keep user logged in between page refreshes
-    ).subscribe((res: any) =>{
-      // if(res.status == "401"){
-      //   this.router.navigateByUrl(this.router.getCurrentNavigation.toString());
-      // }
-
-      console.log(res);
-      this.response = res.users;
-      
-    } );
-  
-  }
 
   sendMessage(code: String){
+
+    this.ngZone.run( () => {
+      this.sentMessageToast(code);
+      this.appendChat(false, "Me", code);
+    });
   
     console.log("Sending code: ", JSON.stringify(code));
       this.bridgeService.authoriseOrder(Number(code)).subscribe(res =>{
         console.log("Authorizing order status: ", res);
         res = JSON.stringify(JSON.parse(res), null, 2);
         res = res.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        this.ngZone.run( () => {this.deviceResponse = res;});
+        this.ngZone.run( () => {
+          this.appendChat(true, this.connectionInfo$.value.name, res);
+          this.newMessageToast();
+    
+        });
       })
 
   }
 
  
   startScan(){
-
+ 
+      this.scanningToast();
        this.bluetoothService.ble.startScanning().subscribe((devicesFound) => {
          this.ngZone.run( () => {
         this.devicesFound$.next(devicesFound);
@@ -329,17 +247,38 @@ export class BluetoothComponent implements OnInit, OnDestroy {
       this.bluetoothService.ble.connect(dvc_address);
   }
 
-  isEmpty(input): Boolean{
-    if(String(input).length > 0){
-      return false;
-    }
-    return true;
+ 
+
+   // CHAT
+   appendChat(incoming: boolean, source: String, text: String){
+    this.ngZone.run( () => {
+      this.messages.push({incoming: incoming, source: source, text: text, timestamp: String(new Date().toLocaleString() ) });
+  
+    });
+    
   }
 
- 
+  clearChat(){
+    delete this.messages;
+    this.messages = new Array<{incoming: boolean, source: String, text: String, timestamp: String}>();
+  }
+
+ // TOGGLES
+ toggleOrderCodes(){
+  this.showOrderCodes = !this.showOrderCodes;
+}
+toggleConnectionDetails(){
+
+  this.showConnectionDetails = !this.showConnectionDetails;
+}
+
+toggleMessages(){
+  this.showMessages = !this.showMessages;
+}
+  // TOASTES
   async connectionStatusToast() {
-    if(this.connecionToast){
-      await this.connecionToast.dismiss();
+    if(this.connectionToast){
+      await this.connectionToast.dismiss();
     }
     
     let message = "Connection status";
@@ -360,7 +299,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   
    let duration =  this.connectionInfo$.value.status == "CONNECTING" ? null: 3*1000;
 
-    this.connecionToast = await this.toastController.create({
+    this.connectionToast = await this.toastController.create({
       header: header,
       message: message,
       position: 'bottom',
@@ -373,15 +312,123 @@ export class BluetoothComponent implements OnInit, OnDestroy {
           text: 'Close',
           role: 'cancel',
           handler: () => {
-            this.connecionToast.dismiss();
+            this.connectionToast.dismiss();
           }
         }
       ],
       duration
     });
-    this.connecionToast.present();
+    this.connectionToast.present();
+  }
+
+  async restartBluetoothToast(){
+
+    this.restartBluetoothToastVar = await this.toastController.create({
+      header: "Restarting bluetooth...",
+      message: "This operation may take a while.",
+      position: 'bottom',
+      buttons: [
+        {
+          side: 'start',
+          icon: 'bluetooth',
+          role: 'cancel'
+        }, {
+          text: 'Close',
+          role: 'cancel',
+          handler: () => {
+            this.restartBluetoothToastVar.dismiss();
+          }
+        }
+      ],
+      duration: 6*1000
+    });
+    this.restartBluetoothToastVar.present();
+  }
+
+  async newMessageToast(){
+
+    this.messageToast = await this.toastController.create({
+      header: `You've received new message from ${this.connectionInfo$.value.name} `,
+      //message: "Toggle messages to see it",
+      position: 'bottom',
+      buttons: [
+        {
+          side: 'start',
+          icon: 'bluetooth',
+          role: 'cancel'
+        }, {
+          text: 'Close',
+          role: 'cancel',
+          handler: () => {
+            this.messageToast.dismiss();
+          }
+        }
+      ],
+      duration: 2*1000
+    });
+    this.messageToast.present();
   }
 
 
+  async scanningToast(){
 
+    this.connectionToast = await this.toastController.create({
+      header: `Scanning has started `,
+      message: "Try scanning again if no devices have been found",
+      position: 'bottom',
+      buttons: [
+        {
+          side: 'start',
+          icon: 'bluetooth',
+          role: 'cancel'
+        }, {
+          text: 'Close',
+          role: 'cancel',
+          handler: () => {
+            this.connectionToast.dismiss();
+          }
+        }
+      ],
+      duration: 2*1000
+    });
+    this.connectionToast.present();
+  }
+
+  async sentMessageToast(code?: String){
+
+    let message = (code != undefined && code != null ) ? `CODE ${code}` : null;
+
+    this.messageToast = await this.toastController.create({
+      header: `Message sent to ${this.connectionInfo$.value.name} `,
+      message: message,
+      position: 'bottom',
+      buttons: [
+        {
+          side: 'start',
+          icon: 'bluetooth',
+          role: 'cancel'
+        }, {
+          text: 'Close',
+          role: 'cancel',
+          handler: () => {
+            this.messageToast.dismiss();
+          }
+        }
+      ],
+      duration: 3*1000
+    });
+    this.messageToast.present();
+  }
+
+  // HELPER
+  isEmpty(input): Boolean{
+    if(String(input).length > 0){
+      return false;
+    }
+    return true;
+  }
+
+  doRefresh(){
+
+  }
 }
