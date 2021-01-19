@@ -1,6 +1,6 @@
 {
   "appId": "io.ionic.starter",
-  "appName": "ionic-form-ui",
+  "appName": "bollard-service-app",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "windowsAndroidStudioPath": "D:\\Android Studio\\bin\\studio64.exe",
@@ -23,7 +23,7 @@
   },
   "server": {
     "cleartext": true,
-    "url": "http://192.168.0.108:8100",
-    "originalUrl": "https://192.168.0.108:8100"
+    "url": "https://192.168.0.106:8100",
+    "originalUrl": "https://192.168.0.106:8100"
   }
 }

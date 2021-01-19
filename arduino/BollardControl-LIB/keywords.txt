@@ -1,0 +1,20 @@
+#######################################
+# Syntax Coloring Map For BollardControl
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+BollardController	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+initBluetooth	KEYWORD2
+waitForconnection   KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

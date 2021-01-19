@@ -95,7 +95,11 @@ ion-content .chat{
 
 }
 
- 
+ion-img.bollard-icon{
+ filter:invert(50%);
+ opacity: 100%;
+}
+
 ion-content .scroll-content {
   background-color: #f5f5f5;
 }
@@ -118,6 +122,14 @@ ion-content .scroll-content {
       height: 45px;
       box-shadow: 0 0 2px rgba(0, 0, 0, 0.36);
   }
+  .message-avatar-bollard {
+    position: absolute;
+    border-radius: 45px;
+    width: 45px;
+    height: 45px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.36);
+    filter:invert(50%);
+}
   .message-source {
       width: 100%;
       padding-left: 60px;

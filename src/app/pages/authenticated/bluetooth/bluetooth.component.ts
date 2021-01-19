@@ -81,9 +81,15 @@ export class BluetoothComponent implements OnInit, OnDestroy {
       this.orderCodes = [
         {
           value: "202",
-          name: "FETCH BOLLARD'S DATA",
-          description:"Fetches details from the device like 10 last connected users.",
+          name: "FETCH 5 LAST CONNECTED USERS",
+          description:"Fetches 5 last connected users in format | MacAddress | UserID |. Registered after disconnection.",
           icon: 'arrow-down'
+        },
+        {
+          value: "205",
+          name: "FETCH 5 LAST USER EXECUTIONS",
+          description:"Fetches 5 last users that tried to execute codes in format | MacAddress | UserID | Code/Info |. Does not contain the current fetching order. ",
+          icon: 'download-outline'
         },
         {
           value: "101",
@@ -98,7 +104,13 @@ export class BluetoothComponent implements OnInit, OnDestroy {
           icon: 'lock-open-outline'
         },
         {
-          value: "301",
+          value: "130",
+          name: "SET INTERNAL LOCK STATE",
+          description:"Manually sets internal lock state to inversed one.",
+          icon: 'hand-right-outline'
+        },
+        {
+          value: "200",
           name: "FETCH BATTERY LEVEL",
           description:"Fetches current battery level from the device.",
           icon: 'battery-dead'
@@ -207,11 +219,11 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
     this.ngZone.run( () => {
       this.sentMessageToast(code);
-      this.appendChat(false, "Me", code);
+      this.appendChat(false, "Service App", code);
     });
   
     console.log("Sending code: ", JSON.stringify(code));
-      this.bridgeService.authoriseOrder(Number(code)).subscribe(res =>{
+      this.bridgeService.authoriseOrder(code).subscribe(res =>{
         console.log("Authorizing order status: ", res);
         res = JSON.stringify(JSON.parse(res), null, 2);
         res = res.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

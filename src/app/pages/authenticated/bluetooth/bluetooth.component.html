@@ -104,7 +104,8 @@
               <div *ngFor="let message of messages;" class="message-left">
            
                  
-                <img class="message-avatar" src="assets\avatars\avatar.png" alt="avatar">
+                <img *ngIf = "!message.incoming" class="message-avatar" src="assets\avatars\avatar.png" alt="avatar">
+                <img *ngIf = "message.incoming" class="message-avatar-bollard" src="assets\img\icons\custom-noun_bollard.svg" alt="avatar">
                 <div class="message-source">
                   <p>{{message.source}} </p>
                   <div class="incoming-datetime">

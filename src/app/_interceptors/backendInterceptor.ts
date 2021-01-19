@@ -229,7 +229,7 @@ export class BackendInterceptor implements HttpInterceptor {
       usersData.users[userID].token = generatedToken;
       console.log(usersData.users[userID]);
       return ok({
-        //  id: user.id,//hashed user id
+        id: user.id,
         token: generatedToken
       });
     }
@@ -281,6 +281,8 @@ export class BackendInterceptor implements HttpInterceptor {
       let jsonbody = JSON.parse(body.response);
       let jsoncode = body.code;
 
+
+
       console.log("Authorizing solution: ", sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
       return from(sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
         .pipe(switchMap(value => {
@@ -295,7 +297,9 @@ export class BackendInterceptor implements HttpInterceptor {
 
     // repleace crypto api with something else
     function sign(challenge: string, code: string, key: Uint8Array, salt: String) {
-      console.log(code)
+ 
+      console.log("Payload to hash: ", challenge + salt + code + String(getUser().id));
+
       if (code == "150") {
         return new Promise((resolve, reject) => {
           resolve("SIGNATURE_FROM_CODE_150");
@@ -315,8 +319,8 @@ export class BackendInterceptor implements HttpInterceptor {
         console.log("Generating key...");
         return window.crypto.subtle.sign(
           "HMAC",
-          key,
-          encoder.encode(challenge + salt + code)
+          key, 
+          encoder.encode(challenge + salt + code + String(getUser().id)) //getUser().id from incoming JWT
         ).then(signature => {
           var b = new Uint8Array(signature);
           var str = Array.prototype.map.call(b, x => ('00' + x.toString(16)).slice(-2)).join("");

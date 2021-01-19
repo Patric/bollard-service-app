@@ -2,6 +2,7 @@
 #include <Arduino_JSON.h>
 #include <sha256.h>
 #include <rBase64.h>
+//#include <BollardControl.h>
 
 uint8_t hmacKey[]={
   0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c,0x0c
@@ -15,7 +16,7 @@ JSONVar response;
 
 String codeBuffer;
 String signatureBuffer;
-
+String userIdBuffer;
 
 int deviceId = 1;
 
@@ -31,12 +32,26 @@ String stringifyHash(uint8_t* hash) {
 }
 
 
+
+
+
 BLEService controlService("1101");
 
 BLEStringCharacteristic batteryLevelChar("2101", BLERead | BLEIndicate | BLEWrite, 20);
 BLEStringCharacteristic statusChar("3100", BLERead | BLEIndicate , 128);
 BLEStringCharacteristic orderChar("3101", BLENotify | BLEWrite, 256);
 BLEStringCharacteristic responseChar("3102", BLERead | BLEIndicate, 256);
+
+
+// struct list{
+//   list* next;
+//   list* prev;
+//   int id;
+//   struct values{
+//     String uid;
+//     String macAdress;
+//   };
+// };
 
 
 bool wait4response;
@@ -61,7 +76,9 @@ void setup()
  
 
   Serial.begin(9600);
-  //while(!Serial);
+  while(!Serial);
+
+
   //pinMode(LED_BUTTON, OUTPUT);
 
   if(!BLE.begin()){
@@ -99,7 +116,7 @@ void loop()
 
   int id = 0;
   if(central){
-    
+    //BollardControl.init();
   
     Serial.print("Connected to central: ");
     Serial.println(central.address());
@@ -152,11 +169,11 @@ void handleJSONOrder(String order){
 
     String signature = (const char*)order_json["s"];
     String code = (const char*)order_json["c"];
-
+    
    
     
     // challenge required
-    if(signature == "null")
+    if(signature == null)
     {
       wait4response = true;
       // cache code
@@ -166,7 +183,10 @@ void handleJSONOrder(String order){
      // generate challenge
       String challenge = generateChallenge();
  
-      
+      /// save user ID
+      userIdBuffer = (const char*)order_json["uid"];
+      Serial.print("User ID in buffer: ");
+      Serial.println(userIdBuffer);
       // solve challenge and cache signature
       signatureBuffer = getSignature(challenge);
       Serial.print("Signature: ");
@@ -366,7 +386,9 @@ String generateChallenge(){
 
 String getSignature(String challenge){
   Sha256.initHmac(hmacKey, sizeof(hmacKey));
-  Sha256.print(challenge + salt + codeBuffer);
+  Serial.print("Generating signature from: ");
+  Serial.println(challenge + salt + codeBuffer + userIdBuffer);
+  Sha256.print(challenge + salt + codeBuffer + userIdBuffer);
 
   Serial.print("Correct signature is: ");
   String result = stringifyHash(Sha256.resultHmac());

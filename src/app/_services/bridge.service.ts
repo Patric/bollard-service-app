@@ -19,7 +19,7 @@ export class BridgeService {
     ) { }
 
  
-  authoriseOrder(code: number): Observable<any>{
+  authoriseOrder(code: String): Observable<any>{
    
     // get challenge and initiate authentication
     return this.getChallenge(code)
@@ -47,7 +47,7 @@ export class BridgeService {
 
 
   getChallenge(code){
-    let message = JSON.stringify({s: "null", c: String(code)});
+    let message = JSON.stringify({s: null, c: code, uid: String(this.authService.currentUserValue.id) });
     return this.bluetoothService.ble.order(message);
   }
 
@@ -55,7 +55,7 @@ export class BridgeService {
     return this.http.post
     (
       `${environment.apiUrl}/authorizeRemoteOrder`,
-      {response: deviceResponse, code: String(code)}
+      {response: deviceResponse, code: code}
     )
 
   }

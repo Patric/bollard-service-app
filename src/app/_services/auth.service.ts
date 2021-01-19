@@ -39,7 +39,7 @@ export class AuthService {
   ) 
   { 
     //update with cookie observable
-    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['token'])));
+    this.currentUserSubject = new BehaviorSubject<User>(JSON.parse(this.getCookies(['token', 'id'])));
     this.currentUser = this.currentUserSubject.asObservable();
     this.cookieExpMin = 15;
     //console.log("Value: ", this.currentUserValue);
@@ -70,6 +70,16 @@ export class AuthService {
       this.cookieService.set(
         'token', // name 
         (decodeURIComponent(user.token)), // value
+        expDate, // cookie expiration in addition to session expiration 
+        null, // path
+        null, //domain
+        null, // secure
+      );
+
+      expDate.setMinutes(expDate.getMinutes() + this.cookieExpMin);
+      this.cookieService.set(
+        'id', // name 
+        (decodeURIComponent(user.id)), // value
         expDate, // cookie expiration in addition to session expiration 
         null, // path
         null, //domain

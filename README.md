@@ -1,4 +1,4 @@
-# ionic-form-ui
+# bollard-service-app
 
 Część webowa rozwijana w Visual Studio Code z dodatkiem Angular Snippets (Version 9)
 Aktualnie sprawdzone na Android. W przypadku iOS prawdopodobnie będzie trzeba dokonać małych poprawek jeśli chodzi o plugin bluetooth. Na windows plugin bluetooth nie działa.
