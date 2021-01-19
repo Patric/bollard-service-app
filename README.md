@@ -1,4 +1,4 @@
-# bollard-service-app
+# Bollard Service Application
 
 Część webowa rozwijana w Visual Studio Code z dodatkiem Angular Snippets (Version 9)
 Aplikacja testowana na s
