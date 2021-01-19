@@ -3,6 +3,57 @@
 
 // BLUETOOTH CONNECTION
 
+  void BollardControllerClass::initBluetoothCustom(const char* deviceName, int deviceId, String salt,
+    const char* controlServiceUID, const char*  statusCharUID, const char*  orderCharUID, const char*  responseCharUID,
+     bool lockedInitially){
+       this->deviceName = deviceName;
+       this->deviceId = deviceId;
+        this->salt = salt;
+        this->locked = lockedInitially;
+
+
+       while (!Serial);
+
+  if (!BLE.begin())
+  {
+    Serial.println("Starting BLE failed");
+    while (1)
+      ;
+  }
+
+  this->controlService = new BLEService(controlServiceUID);
+  this->statusChar = new BLEStringCharacteristic(statusCharUID, BLERead | BLEIndicate, 128);
+  this->orderChar = new BLEStringCharacteristic(orderCharUID, BLENotify | BLEWrite, 256);
+  this->responseChar = new BLEStringCharacteristic(responseCharUID, BLERead | BLEIndicate, 256);
+
+  // initiate bluetooth
+
+  BLE.setLocalName(deviceName);
+  Serial.print("Device name set to ");
+  Serial.println(deviceName);
+
+  BLE.setAdvertisedService(*this->controlService);
+  Serial.println("Advertised service set.");
+
+  controlService->addCharacteristic(*this->statusChar);
+  controlService->addCharacteristic(*this->orderChar);
+  controlService->addCharacteristic(*this->responseChar);
+  BLE.addService(*this->controlService);
+  Serial.println("Service added.");
+
+  BLE.advertise();
+  Serial.println("Bluetooth device active.");
+  this->statusChar->writeValue("Waiting");
+  this->initArray(this->lastConnected, arrSize);
+  this->initArray(this->lastExecuted, arrSize);
+
+
+  this->central = BLEDevice();
+  randomSeed(analogRead(0));
+
+     }
+
+
 void BollardControllerClass::initBluetooth()
 {
   while (!Serial);
@@ -72,7 +123,7 @@ boolean BollardControllerClass::waitForConnection()
   {
     Serial.print("Connected to central: ");
     Serial.println(central.address());
-
+   
     // Save central MAC ADDRESS
 
     while (central.connected())
@@ -101,7 +152,7 @@ boolean BollardControllerClass::waitForConnection()
 
 
     this->pushArray(this->lastConnected,
-    String(" | " + central.address() + "|" + String(userIdBuffer)), 
+    String("|" + central.address() + "|" + String(userIdBuffer)), 
     arrSize);
   }
 }
@@ -128,7 +179,7 @@ String BollardControllerClass::handleJSONOrder(String JSONOrder)
   {
     response = this->handleAuthenticatedOrder(codeBuffer);
     this->pushArray(this->lastExecuted,
-    String(" | " + central.address() + "|" + String(userIdBuffer)+ "|" + codeBuffer), 
+    String("|" + central.address() + "|" + String(userIdBuffer)+ "|" + codeBuffer), 
     6);
   }
   // FOR NATIVE FLOW TESTS WITHOUT HTTPS, WITHOUT HASHING
@@ -136,7 +187,7 @@ String BollardControllerClass::handleJSONOrder(String JSONOrder)
   {
     response = this->order150();
      this->pushArray(this->lastExecuted,
-    String(" | "+ central.address() + "|" + central.deviceName() + "|" + String(userIdBuffer)+ "|" + codeBuffer), 
+    String("|"+ central.address() + "|" + String(userIdBuffer)+ "|" + codeBuffer), 
     6);
   }
   // for incorrect signature
@@ -144,7 +195,7 @@ String BollardControllerClass::handleJSONOrder(String JSONOrder)
   {
     response = this->unauthorized();
      this->pushArray(this->lastExecuted,
-    String(" | " + central.address() + "|" + String(userIdBuffer)+ "|" + "unauthorized"), 
+    String("|" + central.address() + "|" + String(userIdBuffer)+ "|" + "unauthorized"), 
     6);
   }
 
@@ -226,12 +277,13 @@ boolean BollardControllerClass::verifySignature(String userSignature)
 
 String BollardControllerClass::SHA256HMAC(String challenge, String salt, String code, String userID)
 {
-  Sha256.initHmac(hmacKey, sizeof(hmacKey));
-  Serial.print("Generating SHA256HMAC signature from: ");
+  Serial.println("Generating SHA256HMAC signature from: ");
   Serial.println(challenge + salt + code + userID);
-  Sha256.print(challenge + salt + code + userID);
+  Sha256.initHmac(hmacKey, sizeof(hmacKey));
 
-  Serial.print("Correct signature is: ");
+  Sha256.print(challenge + salt + code + userID);
+    
+  Serial.println("Correct signature is: ");
   String result = this->stringifyHash(Sha256.resultHmac());
   Serial.println(result);
 
@@ -298,13 +350,11 @@ void BollardControllerClass::pushArray(String array[], String value, int length)
     if(array[i] == ""){
       array[i] = value;
       pushed = true;
-      Serial.print("Array: ");
-      Serial.println(array[i]);
       break;
     }
   }
   if(!pushed){
-    for(int i = 0 ; i < length - 1; i++)
+    for(int i = length - 2 ; i > 0; i--)
     {
       Serial.println(array[i]);
       array[i + 1] = array[i];
@@ -317,13 +367,13 @@ void BollardControllerClass::pushArray(String array[], String value, int length)
     Serial.println(array[i]);
     
   }
-  
+
 }
 
 String BollardControllerClass::strArrayToString(String array[], int length){
   String merged = "";
   for(int i = 0; i< length; i++){
-    merged += array[i];
+    merged += array[i] + ",";
   }
   return merged;
 }
@@ -369,6 +419,10 @@ JSONVar BollardControllerClass::order200()
   Serial.print("Executing order 200... Battery Level % is now: ");
   Serial.println(batteryLevel);
   response["status"] = "executed";
+  response["MacAddress"] = BLE.address();
+  response["DeviceID"] = this->deviceId;
+  response["Name"] = this->deviceName;
+  response["RSSI"] = BLE.rssi();
   response["batteryLevel"] = String(batteryLevel);
   Serial.println("Order 200 executed");
   return response;

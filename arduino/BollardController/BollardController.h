@@ -14,7 +14,12 @@ class BollardControllerClass
 {
   public:
     // INITIALISATION AND CONNECTION MANAGING
-    void initBluetooth(void);
+    void initBluetooth();
+
+    void initBluetoothCustom(const char* deviceName, int deviceId, String salt,
+    const char*  controlServiceUID, const char*  statusCharUID, const char*  orderCharUID,const char*  responseCharUID,
+     bool lockedInitially);
+
     boolean waitForConnection();
 
   private:
@@ -55,7 +60,7 @@ class BollardControllerClass
       uint8_t hmacKey[20] = {
         0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c};
     String salt = "9U01j34NVW06kzb1uVyMIoqCi";
-
+    uint8_t* hmacKey2[20] ;
 
  
     // CACHING METHODS
@@ -77,7 +82,7 @@ class BollardControllerClass
     JSONVar handleAuthenticatedOrder(String code);
 
   
-    // Battery level
+    // Device Information
     JSONVar order200();
 
     // Lock bollard

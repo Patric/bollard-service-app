@@ -12,6 +12,7 @@ BollardController	KEYWORD1
 #######################################
 
 initBluetooth	KEYWORD2
+initBluetoothCustom	KEYWORD2
 waitForconnection   KEYWORD2
 
 #######################################

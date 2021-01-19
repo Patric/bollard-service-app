@@ -54,6 +54,7 @@ export class AuthService {
 
   authenticate(email$: string, pass$: string)
   {
+    
     return this.http.post
     (
       `${this.url}/authenticate`,
@@ -62,6 +63,7 @@ export class AuthService {
       // store user details and jwt token in local storage to keep user logged in between page refreshes
     ).pipe(map((user: any) => {
    
+      console.log("Received id and token", user);
       /// DELETE
      // localStorage.setItem('currentUser', JSON.stringify(user));
       this.cookieService.deleteAll();

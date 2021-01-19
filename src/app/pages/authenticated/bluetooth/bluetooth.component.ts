@@ -80,6 +80,12 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
       this.orderCodes = [
         {
+          value: "200",
+          name: "FETCH DEVICE INFO",
+          description:"Fetches device's MacAddress, ID, name, current rssi and battery level from the device.",
+          icon: 'information-circle-outline'
+        },
+        {
           value: "202",
           name: "FETCH 5 LAST CONNECTED USERS",
           description:"Fetches 5 last connected users in format | MacAddress | UserID |. Registered after disconnection.",
@@ -105,16 +111,11 @@ export class BluetoothComponent implements OnInit, OnDestroy {
         },
         {
           value: "130",
-          name: "SET INTERNAL LOCK STATE",
-          description:"Manually sets internal lock state to inversed one.",
+          name: "INVERT INTERNAL LOCK STATE",
+          description:"Manually sets internal lock state to the inversed one.",
           icon: 'hand-right-outline'
         },
-        {
-          value: "200",
-          name: "FETCH BATTERY LEVEL",
-          description:"Fetches current battery level from the device.",
-          icon: 'battery-dead'
-        },
+        
     
     
     
@@ -153,8 +154,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
 
 
- 
-
   scanDevices() {
     // Start scanning and updating devices found
     this.startScan();
@@ -188,8 +187,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   }
 
   
-
- 
 
   async restart(){ 
     this.ngZone.run( () => {
@@ -264,6 +261,8 @@ export class BluetoothComponent implements OnInit, OnDestroy {
    // CHAT
    appendChat(incoming: boolean, source: String, text: String){
     this.ngZone.run( () => {
+      text = text.split("{").join("").split("}").join("").split("|").join(" | ").split("\"").join("").split(", |").join("\n");
+
       this.messages.push({incoming: incoming, source: source, text: text, timestamp: String(new Date().toLocaleString() ) });
   
     });

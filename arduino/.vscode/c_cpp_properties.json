@@ -5,9 +5,11 @@
             "includePath": [
                 "C:\\Users\\patry\\AppData\\Local\\Arduino15\\packages\\arduino\\tools\\**",
                 "D:\\AruinoREPO\\arduino-1.8.13-windows\\arduino-1.8.13\\libraries\\**",
-                "C:\\Users\\patry\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.9\\**",
+                "C:\\Users\\patry\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.11\\**",
                 "C:\\Users\\patry\\Documents\\Arduino\\libraries\\**",
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:\\Users\\patry\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.9\\**",
+                "..//BollardController"
             ],
             "defines": [
                 "_DEBUG",
@@ -17,6 +19,7 @@
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe",
             "intelliSenseMode": "msvc-x64",
             "forcedInclude": [
+                "C:\\Users\\patry\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.11\\cores\\arduino\\Arduino.h",
                 "C:\\Users\\patry\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\samd\\1.8.9\\cores\\arduino\\Arduino.h"
             ]
         }
