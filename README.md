@@ -11,10 +11,9 @@ Zainstalowane pakiety npm:
 + +-- ionic@5.4.16
 + `-- native-run@1.2.2
 
-+  Informacje o konfiguracji środowiska w przypadku Ionic:
-+ Ionic:
-+ 
-   Ionic CLI                     : 5.4.16 (C:\Users\patry\AppData\Roaming\npm\node_modules\ionic)
+Informacje o konfiguracji środowiska w przypadku Ionic:
+
+   Ionic CLI                     : 5.4.16
    Ionic Framework               : @ionic/angular 5.3.1
    @angular-devkit/build-angular : 0.901.12
    @angular-devkit/schematics    : 9.1.12
@@ -39,8 +38,8 @@ Utility:
 
 System:
 
-   Android SDK Tools : 26.1.1 (D:\AndroidSDK)
-   NodeJS            : v12.18.2 (D:\nodejs\node.exe)
+   Android SDK Tools : 26.1.1 
+   NodeJS            : v12.18.2 
    npm               : 6.14.5
    OS                : Windows 10
 
