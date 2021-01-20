@@ -1,12 +1,6 @@
-import { HttpClient} from '@angular/common/http';
-import { AfterViewInit, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
-import { AuthService } from '../../../_services/auth.service';
+import {  Component, NgZone, OnInit } from '@angular/core';
 
-
-import { MenuController } from '@ionic/angular';
-import { ActivatedRoute } from '@angular/router';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -14,7 +8,7 @@ import { UserService } from 'src/app/_services/user.service';
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
 })
-export class ProfilePage implements OnInit, OnDestroy, AfterViewInit {
+export class ProfilePage implements OnInit {
 
  
 
@@ -27,11 +21,6 @@ export class ProfilePage implements OnInit, OnDestroy, AfterViewInit {
     private userService: UserService
   ) {
 
-  }
-  ngAfterViewInit(): void {
-    
-  }
-  ngOnDestroy(): void {
   }
 
   ngOnInit() {

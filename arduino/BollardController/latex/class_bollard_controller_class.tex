@@ -1,0 +1,387 @@
+\hypertarget{class_bollard_controller_class}{}\section{Bollard\+Controller\+Class Class Reference}
+\label{class_bollard_controller_class}\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+
+
+{\ttfamily \#include $<$Bollard\+Controller.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_a09862f010e4d0e0ffbd107e2041079d1}{init\+Bluetooth}} ()
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_aea92c19b0ccb06e2ddc3adadbe698ebf}{init\+Bluetooth\+Custom}} (const char $\ast$\mbox{\hyperlink{class_bollard_controller_class_a957641f4012a1089512b61792d661fb6}{device\+Name}}, int \mbox{\hyperlink{class_bollard_controller_class_a2ee4843a75dc2efa26044c0b80c669e2}{device\+Id}}, String \mbox{\hyperlink{class_bollard_controller_class_a00641ae780ce3476dbd3ed2c2c4f097a}{salt}}, const char $\ast$control\+Service\+U\+ID, const char $\ast$status\+Char\+U\+ID, const char $\ast$order\+Char\+U\+ID, const char $\ast$response\+Char\+U\+ID, bool locked\+Initially)
+\item 
+boolean \mbox{\hyperlink{class_bollard_controller_class_a6bc962c69934d16bab48b2407ef6f94a}{wait\+For\+Connection}} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_a980b5b76c8c3776b54f3906c4cc623d9}{send\+Response}} (String response)
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_a20ba08d7a3efdadd4a70b7fcd03644d3}{push\+Array}} (String array\mbox{[}$\,$\mbox{]}, String value, int length)
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_a1e15c0f5b739be3830dc0700842e117e}{init\+Array}} (String array\mbox{[}$\,$\mbox{]}, int length)
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a81e1b88bbc03b8b8d228b07e58e25672}{str\+Array\+To\+String}} (String array\mbox{[}$\,$\mbox{]}, int length)
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_a129eac34669458631c2c235c9c01a2fb}{cache\+Code\+And\+User\+ID}} (String code, String user\+ID)
+\item 
+void \mbox{\hyperlink{class_bollard_controller_class_a12b211bbbaf0ef839aba053b48bb990e}{cache\+Challenge}} (String challenge)
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_ad4b7da78d49f5bf2922b30912283adf5}{S\+H\+A256\+H\+M\+AC}} (String challenge, String \mbox{\hyperlink{class_bollard_controller_class_a00641ae780ce3476dbd3ed2c2c4f097a}{salt}}, String code, String user\+ID)
+\item 
+boolean \mbox{\hyperlink{class_bollard_controller_class_ab543ba0b273413dfa896902e6a9855ee}{verify\+Signature}} (String user\+Signature)
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a909392fb23d4fd17ca8f59dd4bbcbec1}{stringify\+Hash}} (uint8\+\_\+t $\ast$hash)
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a7463ffa0ae3c7f4a34ee18d06d158be4}{generate\+Challenge}} ()
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a1873a12a6d76aac6d952a08029f3eccd}{handle\+J\+S\+O\+N\+Order}} (String order)
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_ab9fd9904294e6b21de58a49b901a5aee}{initialise\+J\+S\+O\+N\+Order}} (J\+S\+O\+N\+Var J\+S\+O\+N\+Order)
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_add52fb47bb3e0e0724f9e815be177ba1}{handle\+Authenticated\+Order}} (String code)
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_ac3d5d0d205c14f92ce259c72f3f6181e}{order200}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_ac4862bcb5d565875e5330865c9a2af7f}{order101}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_ad411677305ddacf05e5d26470dfa1253}{order102}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_a2d88e7925b96e33a9feb1d694af472ff}{order130}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_ac00390cae67911839fea54cca8fc271b}{order202}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_a691390c11d2573946b99240d088c647e}{order205}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_a44b4123649f5bffc436e544c85b0af15}{unauthorized}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_a5d086d123a1f4130e9d48fb03105796d}{unknown}} ()
+\item 
+J\+S\+O\+N\+Var \mbox{\hyperlink{class_bollard_controller_class_a837c32c83b06ee43688222a30c6c2986}{order150}} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+B\+L\+E\+Service $\ast$ \mbox{\hyperlink{class_bollard_controller_class_aa33c6977997f53ec8665ac97978e8658}{control\+Service}}
+\item 
+B\+L\+E\+String\+Characteristic $\ast$ \mbox{\hyperlink{class_bollard_controller_class_a3c635fd63b84f3653154dc9e7ce96680}{status\+Char}}
+\item 
+B\+L\+E\+String\+Characteristic $\ast$ \mbox{\hyperlink{class_bollard_controller_class_a2bddc09b3a29a30f38c2ce820a750a0f}{order\+Char}}
+\item 
+B\+L\+E\+String\+Characteristic $\ast$ \mbox{\hyperlink{class_bollard_controller_class_aa83ef5e8c78a02cab745be0e8e5245fd}{response\+Char}}
+\item 
+B\+L\+E\+Device \mbox{\hyperlink{class_bollard_controller_class_a20bc21b9a4101f873d334f2509896c86}{central}}
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a3a87ae7d8b4193850cba8f81e6d00fad}{code\+Buffer}}
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a96ffd2a4993d585c4e792b9fc4a08d11}{challenge\+Buffer}}
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_af336aee4d67527cf9ddb398ef77caec6}{user\+Id\+Buffer}}
+\item 
+bool \mbox{\hyperlink{class_bollard_controller_class_a8381678e8f8a4cbf15c72fb6e03d534d}{wait4response}}
+\item 
+bool \mbox{\hyperlink{class_bollard_controller_class_ac4ce4bd9274bd1199af144139af0cce5}{locked}} = false
+\item 
+int \mbox{\hyperlink{class_bollard_controller_class_a2ee4843a75dc2efa26044c0b80c669e2}{device\+Id}} = 1
+\item 
+const char $\ast$ \mbox{\hyperlink{class_bollard_controller_class_a957641f4012a1089512b61792d661fb6}{device\+Name}} = \char`\"{}Bollard\+\_\+\#001\char`\"{}
+\item 
+int \mbox{\hyperlink{class_bollard_controller_class_afafc24c575b1cc0519f196097a1999dc}{arr\+Size}} = 6
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_aaa6b8839cf845f53212c5cc80c068737}{last\+Connected}} \mbox{[}6\mbox{]}
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a9d2d94e426e1591c07b7dc0e068133ac}{last\+Executed}} \mbox{[}6\mbox{]}
+\item 
+uint8\+\_\+t \mbox{\hyperlink{class_bollard_controller_class_af0aff575e5183c82913f1f0d3370a770}{hmac\+Key}} \mbox{[}20\mbox{]}
+\item 
+String \mbox{\hyperlink{class_bollard_controller_class_a00641ae780ce3476dbd3ed2c2c4f097a}{salt}} = \char`\"{}9\+U01j34\+N\+V\+W06kzb1u\+Vy\+M\+Ioq\+Ci\char`\"{}
+\item 
+uint8\+\_\+t $\ast$ \mbox{\hyperlink{class_bollard_controller_class_acc115b72127ce9817cafddc86e70000a}{hmac\+Key2}} \mbox{[}20\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class with basic examples of Bollard control and service. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_bollard_controller_class_a12b211bbbaf0ef839aba053b48bb990e}\label{class_bollard_controller_class_a12b211bbbaf0ef839aba053b48bb990e}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!cache\+Challenge@{cache\+Challenge}}
+\index{cache\+Challenge@{cache\+Challenge}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{cache\+Challenge()}{cacheChallenge()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::cache\+Challenge (\begin{DoxyParamCaption}\item[{String}]{challenge }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Caches challenge to generate signature and compare with the signature received from the user \mbox{\Hypertarget{class_bollard_controller_class_a129eac34669458631c2c235c9c01a2fb}\label{class_bollard_controller_class_a129eac34669458631c2c235c9c01a2fb}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!cache\+Code\+And\+User\+ID@{cache\+Code\+And\+User\+ID}}
+\index{cache\+Code\+And\+User\+ID@{cache\+Code\+And\+User\+ID}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{cache\+Code\+And\+User\+I\+D()}{cacheCodeAndUserID()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::cache\+Code\+And\+User\+ID (\begin{DoxyParamCaption}\item[{String}]{code,  }\item[{String}]{user\+ID }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Caches code to execute after authentication and user\+ID to generate signature and compare with the signature received from the user \mbox{\Hypertarget{class_bollard_controller_class_a7463ffa0ae3c7f4a34ee18d06d158be4}\label{class_bollard_controller_class_a7463ffa0ae3c7f4a34ee18d06d158be4}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!generate\+Challenge@{generate\+Challenge}}
+\index{generate\+Challenge@{generate\+Challenge}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{generate\+Challenge()}{generateChallenge()}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::generate\+Challenge (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Generates 80 bytes logn challenge \mbox{\Hypertarget{class_bollard_controller_class_add52fb47bb3e0e0724f9e815be177ba1}\label{class_bollard_controller_class_add52fb47bb3e0e0724f9e815be177ba1}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!handle\+Authenticated\+Order@{handle\+Authenticated\+Order}}
+\index{handle\+Authenticated\+Order@{handle\+Authenticated\+Order}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{handle\+Authenticated\+Order()}{handleAuthenticatedOrder()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::handle\+Authenticated\+Order (\begin{DoxyParamCaption}\item[{String}]{code }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Used when order is authenticated. Can return unknown if code number is unknown. \mbox{\Hypertarget{class_bollard_controller_class_a1873a12a6d76aac6d952a08029f3eccd}\label{class_bollard_controller_class_a1873a12a6d76aac6d952a08029f3eccd}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!handle\+J\+S\+O\+N\+Order@{handle\+J\+S\+O\+N\+Order}}
+\index{handle\+J\+S\+O\+N\+Order@{handle\+J\+S\+O\+N\+Order}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{handle\+J\+S\+O\+N\+Order()}{handleJSONOrder()}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::handle\+J\+S\+O\+N\+Order (\begin{DoxyParamCaption}\item[{String}]{order }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Triggered when order characteristic is written. Handles Order in 3 ways\+: initiates authentication, executes code or responds with unauthorized or unknown error. \mbox{\Hypertarget{class_bollard_controller_class_a1e15c0f5b739be3830dc0700842e117e}\label{class_bollard_controller_class_a1e15c0f5b739be3830dc0700842e117e}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!init\+Array@{init\+Array}}
+\index{init\+Array@{init\+Array}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{init\+Array()}{initArray()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::init\+Array (\begin{DoxyParamCaption}\item[{String}]{array\mbox{[}$\,$\mbox{]},  }\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Initiates array with \char`\"{}\char`\"{} values. \mbox{\Hypertarget{class_bollard_controller_class_a09862f010e4d0e0ffbd107e2041079d1}\label{class_bollard_controller_class_a09862f010e4d0e0ffbd107e2041079d1}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!init\+Bluetooth@{init\+Bluetooth}}
+\index{init\+Bluetooth@{init\+Bluetooth}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{init\+Bluetooth()}{initBluetooth()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::init\+Bluetooth (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Initiates bluetooth with defalt pvalues \mbox{\Hypertarget{class_bollard_controller_class_aea92c19b0ccb06e2ddc3adadbe698ebf}\label{class_bollard_controller_class_aea92c19b0ccb06e2ddc3adadbe698ebf}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!init\+Bluetooth\+Custom@{init\+Bluetooth\+Custom}}
+\index{init\+Bluetooth\+Custom@{init\+Bluetooth\+Custom}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{init\+Bluetooth\+Custom()}{initBluetoothCustom()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::init\+Bluetooth\+Custom (\begin{DoxyParamCaption}\item[{const char $\ast$}]{device\+Name,  }\item[{int}]{device\+Id,  }\item[{String}]{salt,  }\item[{const char $\ast$}]{control\+Service\+U\+ID,  }\item[{const char $\ast$}]{status\+Char\+U\+ID,  }\item[{const char $\ast$}]{order\+Char\+U\+ID,  }\item[{const char $\ast$}]{response\+Char\+U\+ID,  }\item[{bool}]{locked\+Initially }\end{DoxyParamCaption})}
+
+Initiates bluetooth with custom values 
+\begin{DoxyParams}{Parameters}
+{\em control\+Service\+U\+ID} & Bluetooth services U\+ID\textquotesingle{}s. \\
+\hline
+{\em locked\+Initially} & Locked status when initiating device. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_bollard_controller_class_ab9fd9904294e6b21de58a49b901a5aee}\label{class_bollard_controller_class_ab9fd9904294e6b21de58a49b901a5aee}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!initialise\+J\+S\+O\+N\+Order@{initialise\+J\+S\+O\+N\+Order}}
+\index{initialise\+J\+S\+O\+N\+Order@{initialise\+J\+S\+O\+N\+Order}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{initialise\+J\+S\+O\+N\+Order()}{initialiseJSONOrder()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::initialise\+J\+S\+O\+N\+Order (\begin{DoxyParamCaption}\item[{J\+S\+O\+N\+Var}]{J\+S\+O\+N\+Order }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Initialisises authentication. Caches generated challenge, received user\+ID and order code. \mbox{\Hypertarget{class_bollard_controller_class_ac4862bcb5d565875e5330865c9a2af7f}\label{class_bollard_controller_class_ac4862bcb5d565875e5330865c9a2af7f}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order101@{order101}}
+\index{order101@{order101}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order101()}{order101()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order101 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns response with status and bollard locked state. Changes state to locked. \mbox{\Hypertarget{class_bollard_controller_class_ad411677305ddacf05e5d26470dfa1253}\label{class_bollard_controller_class_ad411677305ddacf05e5d26470dfa1253}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order102@{order102}}
+\index{order102@{order102}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order102()}{order102()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order102 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns response with status and bollard locked state. Changes state to unlocked. \mbox{\Hypertarget{class_bollard_controller_class_a2d88e7925b96e33a9feb1d694af472ff}\label{class_bollard_controller_class_a2d88e7925b96e33a9feb1d694af472ff}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order130@{order130}}
+\index{order130@{order130}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order130()}{order130()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order130 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns response with status and bollard locked state. Manually changes the locked state regardless current state. \mbox{\Hypertarget{class_bollard_controller_class_a837c32c83b06ee43688222a30c6c2986}\label{class_bollard_controller_class_a837c32c83b06ee43688222a30c6c2986}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order150@{order150}}
+\index{order150@{order150}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order150()}{order150()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order150 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_ac3d5d0d205c14f92ce259c72f3f6181e}\label{class_bollard_controller_class_ac3d5d0d205c14f92ce259c72f3f6181e}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order200@{order200}}
+\index{order200@{order200}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order200()}{order200()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order200 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns response with status, Mac\+Address, Device\+ID, Name, R\+S\+SI and battery level \mbox{\Hypertarget{class_bollard_controller_class_ac00390cae67911839fea54cca8fc271b}\label{class_bollard_controller_class_ac00390cae67911839fea54cca8fc271b}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order202@{order202}}
+\index{order202@{order202}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order202()}{order202()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order202 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns response with status, last 5 connected users. Counts when users disconnects. \mbox{\Hypertarget{class_bollard_controller_class_a691390c11d2573946b99240d088c647e}\label{class_bollard_controller_class_a691390c11d2573946b99240d088c647e}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order205@{order205}}
+\index{order205@{order205}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order205()}{order205()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::order205 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns response with status, 5 users that executed orders on the device along with their id and code or information. \mbox{\Hypertarget{class_bollard_controller_class_a20ba08d7a3efdadd4a70b7fcd03644d3}\label{class_bollard_controller_class_a20ba08d7a3efdadd4a70b7fcd03644d3}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!push\+Array@{push\+Array}}
+\index{push\+Array@{push\+Array}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{push\+Array()}{pushArray()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::push\+Array (\begin{DoxyParamCaption}\item[{String}]{array\mbox{[}$\,$\mbox{]},  }\item[{String}]{value,  }\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Pushes array of given length with given value. \mbox{\Hypertarget{class_bollard_controller_class_a980b5b76c8c3776b54f3906c4cc623d9}\label{class_bollard_controller_class_a980b5b76c8c3776b54f3906c4cc623d9}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!send\+Response@{send\+Response}}
+\index{send\+Response@{send\+Response}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{send\+Response()}{sendResponse()}}
+{\footnotesize\ttfamily void Bollard\+Controller\+Class\+::send\+Response (\begin{DoxyParamCaption}\item[{String}]{response }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Writes String response to characteristic \mbox{\Hypertarget{class_bollard_controller_class_ad4b7da78d49f5bf2922b30912283adf5}\label{class_bollard_controller_class_ad4b7da78d49f5bf2922b30912283adf5}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!S\+H\+A256\+H\+M\+AC@{S\+H\+A256\+H\+M\+AC}}
+\index{S\+H\+A256\+H\+M\+AC@{S\+H\+A256\+H\+M\+AC}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{S\+H\+A256\+H\+M\+A\+C()}{SHA256HMAC()}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::\+S\+H\+A256\+H\+M\+AC (\begin{DoxyParamCaption}\item[{String}]{challenge,  }\item[{String}]{salt,  }\item[{String}]{code,  }\item[{String}]{user\+ID }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Hash function H\+M\+AC using S\+H\+A256. Generates valid signature from given arguments. \mbox{\Hypertarget{class_bollard_controller_class_a81e1b88bbc03b8b8d228b07e58e25672}\label{class_bollard_controller_class_a81e1b88bbc03b8b8d228b07e58e25672}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!str\+Array\+To\+String@{str\+Array\+To\+String}}
+\index{str\+Array\+To\+String@{str\+Array\+To\+String}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{str\+Array\+To\+String()}{strArrayToString()}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::str\+Array\+To\+String (\begin{DoxyParamCaption}\item[{String}]{array\mbox{[}$\,$\mbox{]},  }\item[{int}]{length }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Converts array to string using commas. \mbox{\Hypertarget{class_bollard_controller_class_a909392fb23d4fd17ca8f59dd4bbcbec1}\label{class_bollard_controller_class_a909392fb23d4fd17ca8f59dd4bbcbec1}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!stringify\+Hash@{stringify\+Hash}}
+\index{stringify\+Hash@{stringify\+Hash}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{stringify\+Hash()}{stringifyHash()}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::stringify\+Hash (\begin{DoxyParamCaption}\item[{uint8\+\_\+t $\ast$}]{hash }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Converts S\+H\+A256\+H\+N\+AC output to String. \mbox{\Hypertarget{class_bollard_controller_class_a44b4123649f5bffc436e544c85b0af15}\label{class_bollard_controller_class_a44b4123649f5bffc436e544c85b0af15}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!unauthorized@{unauthorized}}
+\index{unauthorized@{unauthorized}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{unauthorized()}{unauthorized()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::unauthorized (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns status unexectued and unauthorized message. \mbox{\Hypertarget{class_bollard_controller_class_a5d086d123a1f4130e9d48fb03105796d}\label{class_bollard_controller_class_a5d086d123a1f4130e9d48fb03105796d}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!unknown@{unknown}}
+\index{unknown@{unknown}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{unknown()}{unknown()}}
+{\footnotesize\ttfamily J\+S\+O\+N\+Var Bollard\+Controller\+Class\+::unknown (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Returns status unexectued and unknownd message. \mbox{\Hypertarget{class_bollard_controller_class_ab543ba0b273413dfa896902e6a9855ee}\label{class_bollard_controller_class_ab543ba0b273413dfa896902e6a9855ee}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!verify\+Signature@{verify\+Signature}}
+\index{verify\+Signature@{verify\+Signature}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{verify\+Signature()}{verifySignature()}}
+{\footnotesize\ttfamily boolean Bollard\+Controller\+Class\+::verify\+Signature (\begin{DoxyParamCaption}\item[{String}]{user\+Signature }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+Verifes given signature with S\+H\+A256\+H\+M\+AC using cached arguments from buffers. \mbox{\Hypertarget{class_bollard_controller_class_a6bc962c69934d16bab48b2407ef6f94a}\label{class_bollard_controller_class_a6bc962c69934d16bab48b2407ef6f94a}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!wait\+For\+Connection@{wait\+For\+Connection}}
+\index{wait\+For\+Connection@{wait\+For\+Connection}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{wait\+For\+Connection()}{waitForConnection()}}
+{\footnotesize\ttfamily boolean Bollard\+Controller\+Class\+::wait\+For\+Connection (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Main loop when connected to a device. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{class_bollard_controller_class_afafc24c575b1cc0519f196097a1999dc}\label{class_bollard_controller_class_afafc24c575b1cc0519f196097a1999dc}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!arr\+Size@{arr\+Size}}
+\index{arr\+Size@{arr\+Size}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{arr\+Size}{arrSize}}
+{\footnotesize\ttfamily int Bollard\+Controller\+Class\+::arr\+Size = 6\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a20bc21b9a4101f873d334f2509896c86}\label{class_bollard_controller_class_a20bc21b9a4101f873d334f2509896c86}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!central@{central}}
+\index{central@{central}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{central}{central}}
+{\footnotesize\ttfamily B\+L\+E\+Device Bollard\+Controller\+Class\+::central\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a96ffd2a4993d585c4e792b9fc4a08d11}\label{class_bollard_controller_class_a96ffd2a4993d585c4e792b9fc4a08d11}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!challenge\+Buffer@{challenge\+Buffer}}
+\index{challenge\+Buffer@{challenge\+Buffer}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{challenge\+Buffer}{challengeBuffer}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::challenge\+Buffer\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a3a87ae7d8b4193850cba8f81e6d00fad}\label{class_bollard_controller_class_a3a87ae7d8b4193850cba8f81e6d00fad}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!code\+Buffer@{code\+Buffer}}
+\index{code\+Buffer@{code\+Buffer}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{code\+Buffer}{codeBuffer}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::code\+Buffer\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_aa33c6977997f53ec8665ac97978e8658}\label{class_bollard_controller_class_aa33c6977997f53ec8665ac97978e8658}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!control\+Service@{control\+Service}}
+\index{control\+Service@{control\+Service}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{control\+Service}{controlService}}
+{\footnotesize\ttfamily B\+L\+E\+Service$\ast$ Bollard\+Controller\+Class\+::control\+Service\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a2ee4843a75dc2efa26044c0b80c669e2}\label{class_bollard_controller_class_a2ee4843a75dc2efa26044c0b80c669e2}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!device\+Id@{device\+Id}}
+\index{device\+Id@{device\+Id}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{device\+Id}{deviceId}}
+{\footnotesize\ttfamily int Bollard\+Controller\+Class\+::device\+Id = 1\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a957641f4012a1089512b61792d661fb6}\label{class_bollard_controller_class_a957641f4012a1089512b61792d661fb6}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!device\+Name@{device\+Name}}
+\index{device\+Name@{device\+Name}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{device\+Name}{deviceName}}
+{\footnotesize\ttfamily const char$\ast$ Bollard\+Controller\+Class\+::device\+Name = \char`\"{}Bollard\+\_\+\#001\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_af0aff575e5183c82913f1f0d3370a770}\label{class_bollard_controller_class_af0aff575e5183c82913f1f0d3370a770}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!hmac\+Key@{hmac\+Key}}
+\index{hmac\+Key@{hmac\+Key}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{hmac\+Key}{hmacKey}}
+{\footnotesize\ttfamily uint8\+\_\+t Bollard\+Controller\+Class\+::hmac\+Key\mbox{[}20\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= \{
+        0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 
+      0x0c, 0x0c, 0x0c, 0x0c\}
+\end{DoxyCode}
+H\+M\+AC key used by S\+H\+A256\+H\+M\+AC function \mbox{\Hypertarget{class_bollard_controller_class_acc115b72127ce9817cafddc86e70000a}\label{class_bollard_controller_class_acc115b72127ce9817cafddc86e70000a}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!hmac\+Key2@{hmac\+Key2}}
+\index{hmac\+Key2@{hmac\+Key2}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{hmac\+Key2}{hmacKey2}}
+{\footnotesize\ttfamily uint8\+\_\+t$\ast$ Bollard\+Controller\+Class\+::hmac\+Key2\mbox{[}20\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_aaa6b8839cf845f53212c5cc80c068737}\label{class_bollard_controller_class_aaa6b8839cf845f53212c5cc80c068737}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!last\+Connected@{last\+Connected}}
+\index{last\+Connected@{last\+Connected}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{last\+Connected}{lastConnected}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::last\+Connected\mbox{[}6\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a9d2d94e426e1591c07b7dc0e068133ac}\label{class_bollard_controller_class_a9d2d94e426e1591c07b7dc0e068133ac}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!last\+Executed@{last\+Executed}}
+\index{last\+Executed@{last\+Executed}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{last\+Executed}{lastExecuted}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::last\+Executed\mbox{[}6\mbox{]}\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_ac4ce4bd9274bd1199af144139af0cce5}\label{class_bollard_controller_class_ac4ce4bd9274bd1199af144139af0cce5}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!locked@{locked}}
+\index{locked@{locked}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{locked}{locked}}
+{\footnotesize\ttfamily bool Bollard\+Controller\+Class\+::locked = false\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a2bddc09b3a29a30f38c2ce820a750a0f}\label{class_bollard_controller_class_a2bddc09b3a29a30f38c2ce820a750a0f}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!order\+Char@{order\+Char}}
+\index{order\+Char@{order\+Char}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{order\+Char}{orderChar}}
+{\footnotesize\ttfamily B\+L\+E\+String\+Characteristic$\ast$ Bollard\+Controller\+Class\+::order\+Char\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_aa83ef5e8c78a02cab745be0e8e5245fd}\label{class_bollard_controller_class_aa83ef5e8c78a02cab745be0e8e5245fd}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!response\+Char@{response\+Char}}
+\index{response\+Char@{response\+Char}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{response\+Char}{responseChar}}
+{\footnotesize\ttfamily B\+L\+E\+String\+Characteristic$\ast$ Bollard\+Controller\+Class\+::response\+Char\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a00641ae780ce3476dbd3ed2c2c4f097a}\label{class_bollard_controller_class_a00641ae780ce3476dbd3ed2c2c4f097a}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!salt@{salt}}
+\index{salt@{salt}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{salt}{salt}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::salt = \char`\"{}9\+U01j34\+N\+V\+W06kzb1u\+Vy\+M\+Ioq\+Ci\char`\"{}\hspace{0.3cm}{\ttfamily [private]}}
+
+Salt added to S\+H\+A256\+H\+M\+AC input. \mbox{\Hypertarget{class_bollard_controller_class_a3c635fd63b84f3653154dc9e7ce96680}\label{class_bollard_controller_class_a3c635fd63b84f3653154dc9e7ce96680}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!status\+Char@{status\+Char}}
+\index{status\+Char@{status\+Char}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{status\+Char}{statusChar}}
+{\footnotesize\ttfamily B\+L\+E\+String\+Characteristic$\ast$ Bollard\+Controller\+Class\+::status\+Char\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_af336aee4d67527cf9ddb398ef77caec6}\label{class_bollard_controller_class_af336aee4d67527cf9ddb398ef77caec6}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!user\+Id\+Buffer@{user\+Id\+Buffer}}
+\index{user\+Id\+Buffer@{user\+Id\+Buffer}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{user\+Id\+Buffer}{userIdBuffer}}
+{\footnotesize\ttfamily String Bollard\+Controller\+Class\+::user\+Id\+Buffer\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{class_bollard_controller_class_a8381678e8f8a4cbf15c72fb6e03d534d}\label{class_bollard_controller_class_a8381678e8f8a4cbf15c72fb6e03d534d}} 
+\index{Bollard\+Controller\+Class@{Bollard\+Controller\+Class}!wait4response@{wait4response}}
+\index{wait4response@{wait4response}!Bollard\+Controller\+Class@{Bollard\+Controller\+Class}}
+\subsubsection{\texorpdfstring{wait4response}{wait4response}}
+{\footnotesize\ttfamily bool Bollard\+Controller\+Class\+::wait4response\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{_bollard_controller_8h}{Bollard\+Controller.\+h}}\item 
+\mbox{\hyperlink{_bollard_controller_8cpp}{Bollard\+Controller.\+cpp}}\end{DoxyCompactItemize}
