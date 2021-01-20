@@ -143,7 +143,7 @@ boolean BollardControllerClass::waitForConnection()
   }
 
 
-  //digitalWrite(LED_BUTTON, LOW);
+
   if (central.address() != "00:00:00:00:00:00")
   {
 

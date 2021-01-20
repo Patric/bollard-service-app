@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './operations.page.html',
   styleUrls: ['./operations.page.scss'],
 })
-export class OperationsPage implements OnInit {
+export class OperationsPage{
 
 
 
@@ -13,7 +13,6 @@ export class OperationsPage implements OnInit {
 
   }
 
-  ngOnInit() {
-  }
+
 
 }

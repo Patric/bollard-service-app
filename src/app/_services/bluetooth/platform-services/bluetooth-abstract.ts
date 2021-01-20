@@ -55,8 +55,6 @@ export enum STATUS{
 
     disconnect(): Promise<any>{...}
 
-    //TO DEL
-    debugButton()
   * 
   * ```
   */
@@ -139,7 +137,6 @@ export interface  BluetoothAbstract{
    * Disconnects from currently connected device``
    */
     disconnect(): Observable<{address: string,name: string, status: STATUS}>;
-
 
     /**
    * @description

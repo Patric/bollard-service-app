@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Injector, NgZone, OnInit } from '@angular/core';
+
+import { Component} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AlertController, MenuController, NavController } from '@ionic/angular';
+import { AlertController, MenuController } from '@ionic/angular';
 import { AuthService } from 'src/app/_services/auth.service';
-import { environment } from 'src/environments/environment';
+
 
 
 
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './authenticated.page.html',
   styleUrls: ['./authenticated.page.scss'],
 })
-export class AuthenticatedPage implements OnInit {
+export class AuthenticatedPage{
 
  
   accountPages = [
@@ -41,38 +41,15 @@ export class AuthenticatedPage implements OnInit {
   
   constructor
   ( 
-    private http: HttpClient,
     private router: Router,
     private authService: AuthService,
-    private ngZone: NgZone,
     private menu: MenuController,
     private activatedRoute: ActivatedRoute,
-    private navCtrl: NavController,
-    private alertCtrl: AlertController,
-    private injector: Injector
-    
+    private alertCtrl: AlertController
   ) {
 
    
   }
-
-  ngOnDestroy(): void {
-    
-  }
-
-  ngOnInit() {
-
-  }
-
-  logEvent(){
-    this.http.get
-    (
-      `${environment.apiUrl}/someInfo`
-      // map emits a new transformed observable, pipe used to combine functions
-      // store user details and jwt token in local storage to keep user logged in between page refreshes
-    ).subscribe((res: any) =>{ } );
-  }
-
 
   openMenu(){
 

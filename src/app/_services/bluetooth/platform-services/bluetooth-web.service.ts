@@ -141,7 +141,7 @@ export class BluetoothWebService implements BluetoothAbstract {
 
 
   // Cannot read two at the same time. When reading is stopped. stopReadingValue$ shall be called
-  _readValue$(characteristicUID: number) {
+  _readValue$(characteristicUID: number): BehaviorSubject<any> {
     this._characteristics.get(characteristicUID).listener = (e: any) => {
       const value = e.target.value;
       let result = "";
@@ -160,7 +160,7 @@ export class BluetoothWebService implements BluetoothAbstract {
   }
 
 
-  _readValue(characteristicUID: number) {
+  _readValue(characteristicUID: number): Promise<string> {
 
     return this._characteristics.get(characteristicUID).characteristic.readValue().then(value => {
 
@@ -172,7 +172,7 @@ export class BluetoothWebService implements BluetoothAbstract {
   }
 
 
-  _writeValue(characteristicUID: number, value: string) {
+  _writeValue(characteristicUID: number, value: string): Promise<void> {
     return this._characteristics.get(characteristicUID).characteristic
       .writeValue(this._string2ArrayBuffer(value))
       .then(_ => {
@@ -183,7 +183,7 @@ export class BluetoothWebService implements BluetoothAbstract {
   }
 
 
-  _watchResponsesFrom(characteristicUID: number, statusCharacteristicUID: number) {
+  _watchResponsesFrom(characteristicUID: number, statusCharacteristicUID: number): Observable<any> {
     const subject$ = new Subject<any>();
     this._readValue$(statusCharacteristicUID).subscribe(val => {
       if (val == "Written") {
