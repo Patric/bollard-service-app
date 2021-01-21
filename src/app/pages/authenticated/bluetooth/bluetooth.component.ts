@@ -75,7 +75,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
    
       // Toggles initital state
       this.showConnectionDetails = true;
-      this.showMessages = false;
+      this.showMessages = true;
     
 
       this.orderCodes = [
@@ -112,7 +112,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
         {
           value: "130",
           name: "INVERT INTERNAL LOCK STATE",
-          description:"Manually sets internal lock state to the inversed one.",
+          description:"Forcefully changes internal lock state to the inversed one.",
           icon: 'hand-right-outline'
         },
         
@@ -227,6 +227,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
         this.ngZone.run( () => {
           this.appendChat(true, this.connectionInfo$.value.name, res);
           this.newMessageToast();
+          this.showMessages = true;
     
         });
       })
