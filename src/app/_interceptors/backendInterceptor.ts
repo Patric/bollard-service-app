@@ -309,7 +309,7 @@ export class BackendInterceptor implements HttpInterceptor {
       let jsoncode = body.code;
 
 
-      console.log("[BACKEND MOCK] Generated signature: ", sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
+   
       return from(sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
         .pipe(switchMap(value => {
           return ok({ s: value });
@@ -342,7 +342,6 @@ export class BackendInterceptor implements HttpInterceptor {
         false, // export = false
         ["sign"] // what this key can do
       ).then(key => {
-        console.log("Generating key...");
         return window.crypto.subtle.sign(
           "HMAC",
           key, 
@@ -350,6 +349,7 @@ export class BackendInterceptor implements HttpInterceptor {
         ).then(signature => {
           var b = new Uint8Array(signature);
           var str = Array.prototype.map.call(b, x => ('00' + x.toString(16)).slice(-2)).join("");
+          console.log("[BACKEND MOCK] Generated signature: ", str);
           return str;
         });
       });

@@ -165,6 +165,7 @@ String BollardControllerClass::handleJSONOrder(String JSONOrder)
 
   String signature = (const char *)order_json["s"];
 
+
   JSONVar response;
 
   Serial.print("Received message: ");
@@ -208,7 +209,9 @@ JSONVar BollardControllerClass::initialiseJSONOrder(JSONVar JSONOrder)
   Serial.println("Signature was not provided. Following order initialisation path...");
   String code = (const char *)JSONOrder["c"];
   String uid = (const char *)JSONOrder["uid"];
+  JSONVar response;
 
+  if(uid != null){
   wait4response = true;
   // cache code
   this->cacheCodeAndUserID(code, uid);
@@ -218,11 +221,16 @@ JSONVar BollardControllerClass::initialiseJSONOrder(JSONVar JSONOrder)
   String challenge = generateChallenge();
   this->cacheChallenge(challenge);
 
-  JSONVar response;
+  
   response["id"] = deviceId;
   response["ch"] = challenge;
 
+  return response;  
+  }
+  response["status"] = "unexecuted";
+  response["message"] = "user id required";
   return response;
+  
 }
 
 JSONVar BollardControllerClass::handleAuthenticatedOrder(String code)

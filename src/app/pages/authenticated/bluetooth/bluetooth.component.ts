@@ -180,6 +180,7 @@ export class BluetoothComponent implements OnInit, OnDestroy {
         res = JSON.stringify(JSON.parse(res), null, 2);
         res = res.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         this.ngZone.run( () => {
+          console.log("[BluetoothComponent] Message received: ", res);
           this.appendChat(true, this.connectionInfo$.value.name, res);
           this.newMessageToast();
           this.showMessages = true;
