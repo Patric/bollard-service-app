@@ -83,8 +83,9 @@ https://github.com/randdusing/cordova-plugin-bluetoothle
 
 #  Aby zbudować aplikację natywną:
 
-Aby wyświetlać logi w Visual Studio Code: (aplikacja nie działa po odłączeniu od komputera):
-`ionic capacitor run android --livereload --external
+`ionic capacitor run android --livereload --external - wersja natywna nie działa na ssl. Należy testować z kodem 150
+
+`ionic capacitor run android --livereload --external --ssl - wersja na przeglądarki w pełni sprawna
 
 
 # Testowanie aplikacji.
