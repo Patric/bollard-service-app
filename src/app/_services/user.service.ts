@@ -16,6 +16,10 @@ export class UserService {
    }
 
    getUserData() {
-    return this.http.get(`${environment.apiUrl}/this.getUserData`);
+    return this.http.get(`${environment.apiUrl}/getUserData`);
+   }
+
+   getUserOrderCodes(){
+     return this.http.get(`${environment.apiUrl}/getOrderCodes`);
    }
 }

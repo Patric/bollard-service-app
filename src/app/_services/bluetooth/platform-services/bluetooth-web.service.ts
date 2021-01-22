@@ -62,7 +62,7 @@ export class BluetoothWebService implements BluetoothAbstract {
   order(body: string): Observable<any> {
     setTimeout(() => {
       this._writeValue(Number(peripheral.characteristic.order), body).then(_ => {
-        console.log("Order sent.")
+        console.log("[Blutooth Web Service] Order sent.")
       }
       );
     }, 500);
@@ -126,7 +126,7 @@ export class BluetoothWebService implements BluetoothAbstract {
         this._cacheCharacteristic(service, Number(peripheral.characteristic.response));
         return this._cacheCharacteristic(service, Number(peripheral.characteristic.status));
       })
-      .then(_ => console.log("Connected to", service))
+      .then(_ => console.log("[BluetoothWebService] Connected to", service))
       .catch(error => { console.error(error); });
   }
 

@@ -60,7 +60,7 @@ const usersData = {
 
 
 
-
+// For further development - upload from Client app to server
 const devicesData = [
   {
     // Actual device
@@ -149,6 +149,44 @@ const devicesData = [
 
 ]
 
+const orderCodes = [
+  {
+    value: "200",
+    name: "FETCH DEVICE INFO",
+    description:"Fetches device's MacAddress, ID, name, current rssi and battery level from the device.",
+    icon: 'information-circle-outline'
+  },
+  {
+    value: "202",
+    name: "FETCH 5 LAST CONNECTED USERS",
+    description:"Fetches 5 last connected users in format | MacAddress | UserID |. Registered after disconnection.",
+    icon: 'arrow-down'
+  },
+  {
+    value: "205",
+    name: "FETCH 5 LAST USER EXECUTIONS",
+    description:"Fetches 5 last users that tried to execute codes in format | MacAddress | UserID | Code/Info |. Does not contain the current fetching order. ",
+    icon: 'download-outline'
+  },
+  {
+    value: "101",
+    name: "LOCK BOLLARD",
+    description:"Locks bollard.",
+    icon: 'lock-closed-outline'
+  },
+  {
+    value: "102",
+    name: "UNLOCK BOLLARD",
+    description:"Unlocks bollard.",
+    icon: 'lock-open-outline'
+  },
+  {
+    value: "130",
+    name: "INVERT INTERNAL LOCK STATE",
+    description:"Forcefully changes internal lock state to the inversed one.",
+    icon: 'hand-right-outline'
+  },
+];
 
 
 
@@ -162,7 +200,6 @@ export class BackendInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
     const { url, method, headers, body } = request;
-    //console.log("Method intercept called");
     //we return an observable of null since we want to decide in handleRoute what we want to do instead of returning anything in the first place
 
     return of(null)
@@ -171,13 +208,6 @@ export class BackendInterceptor implements HttpInterceptor {
       .pipe(delay(500))
       .pipe(dematerialize());
 
-
-    // console.log("Method intercept called");
-    // if(request.method === "GET" && request.url === "http://localhost:8100/users")
-    // {
-    //     return of(new HttpResponse({ status: 200, body: usersData }))
-    // }
-    // next.handle(request);
 
 
     function handleRoute() {
@@ -188,20 +218,12 @@ export class BackendInterceptor implements HttpInterceptor {
           return authenticate();
         case url.endsWith('logout') && method === 'GET':
           return logout();
-        case url.endsWith('someInfo') && method === 'GET':
-          return testFunc();
         case url.includes('getUserData') && method === 'GET':
           return getUserData();
-        // case url.endsWith('getSyncChallenge') && method === 'POST':
-        //   return generateChallenge();
-        // case url.endsWith('synchronize') && method === 'POST':
-        //   return synchronize();
-        // case url.endsWith('changeDeviceState') && method === 'POST':
-        //   return changeDeviceState();
-        // case url.endsWith('confirmAction') && method === 'POST':
-        //   return confirmAction();
         case url.endsWith('authorizeRemoteOrder') && method === 'POST':
           return authorizeRemoteOrder();
+        case url.endsWith('getOrderCodes') && method === 'GET':
+          return getOrderCodes();
         default:
           return next.handle(request)
       }
@@ -211,9 +233,8 @@ export class BackendInterceptor implements HttpInterceptor {
     //routeFunctions ====================================================================================
 
     function authenticate() {
-      //console.log(headers, body);
+
       const { email, pass } = body;
-      // console.log("found: ", usersData.users.find(x => x.email === email && x.pass === pass ));
       const user = usersData.users.find(x => x.email === email && x.pass === pass);
       const userID = usersData.users.findIndex(x => x.email === email && x.pass === pass);
 
@@ -223,8 +244,6 @@ export class BackendInterceptor implements HttpInterceptor {
         console.error("Email or password is incorrect");
         return errorHTTP(401, "Email or password is incorrect");
       }
-      // TO DO
-      // Hash user id
       const generatedToken = generateJWT(121, user.id);
       usersData.users[userID].token = generatedToken;
       console.log(usersData.users[userID]);
@@ -247,17 +266,25 @@ export class BackendInterceptor implements HttpInterceptor {
 
 
     function getUserData() {
-
       if (isLoggedIn()) {
         return ok(getUser().personalDetails)
       }
       else {
         return loginTimeOut();
       }
-
-
-      //return ok();
     }
+
+    function getOrderCodes() {
+      if (isLoggedIn()) {
+        // Real server can send only codes restricted to user's access level
+        return ok(orderCodes);
+      }
+      else {
+        return loginTimeOut();
+      }
+    }
+
+
 
     function testFunc() {
       if (isLoggedIn()) {
@@ -275,30 +302,29 @@ export class BackendInterceptor implements HttpInterceptor {
     // NEW CHALLENGE
     // {response: "{auth: challenge, id: number}", orderCode: "code"}
     function authorizeRemoteOrder() {
-      // if(isLoggedIn())
-      // {
-      console.log("Authorizing remote order: ", body.response);
+      if(isLoggedIn())
+      {
+      console.log("[BACKEND MOCK] Signing remote order: ", body.response);
       let jsonbody = JSON.parse(body.response);
       let jsoncode = body.code;
 
 
-
-      console.log("Authorizing solution: ", sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
+      console.log("[BACKEND MOCK] Generated signature: ", sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt));
       return from(sign(jsonbody.ch, jsoncode, devicesData.find(device => device.id == jsonbody.id).key, devicesData.find(device => device.id == jsonbody.id).salt))
         .pipe(switchMap(value => {
           return ok({ s: value });
         })
         );
-      // }
-      // else{
-      //   return unauthorised();
-      // }
+      }
+      else{
+        return unauthorised();
+      }
     }
 
-    // repleace crypto api with something else
+  
     function sign(challenge: string, code: string, key: Uint8Array, salt: String) {
  
-      console.log("Payload to hash: ", challenge + salt + code + String(getUser().id));
+      console.log("[BACKEND MOCK] Payload to hash: ", challenge + salt + code + String(getUser().id));
 
       if (code == "150") {
         return new Promise((resolve, reject) => {
@@ -362,11 +388,6 @@ export class BackendInterceptor implements HttpInterceptor {
 
     };
 
-    // use crypto API for JWT auth
-    function isAuthenticated(JWTtoken: String) {
-
-
-    }
 
     function generateJWT(length: number, userID: String) {
       var result = "";

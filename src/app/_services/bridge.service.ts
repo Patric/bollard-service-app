@@ -21,11 +21,13 @@ export class BridgeService {
  
   authoriseOrder(code: String): Observable<any>{
    
+ 
+
     // get challenge and initiate authentication
     return this.getChallenge(code)
     .pipe(switchMap(response => {
   
-    console.log("Received challenge: ", response)
+    console.log("[BridgeService] Received challenge: ", response)
 
 
     // pass challenge and get authorisation signature from server
@@ -47,11 +49,14 @@ export class BridgeService {
 
 
   getChallenge(code){
+    console.log("[BridgeService] Getting challenge from the device with code ", code, " for user ", String(this.authService.currentUserValue.id));
     let message = JSON.stringify({s: null, c: code, uid: String(this.authService.currentUserValue.id) });
     return this.bluetoothService.ble.order(message);
   }
 
   passChallenge(deviceResponse, code){
+    console.log("[BridgeService] Passing challenge: ", deviceResponse, " for code ", code);
+
     return this.http.post
     (
       `${environment.apiUrl}/authorizeRemoteOrder`,
@@ -61,6 +66,7 @@ export class BridgeService {
   }
 
   passSignature(httpResponse){
+    console.log("[BridgeService] Passing signature..." );
     return this.bluetoothService.ble.order(JSON.stringify(httpResponse))
   }
 
