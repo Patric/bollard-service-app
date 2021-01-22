@@ -15,13 +15,12 @@ void setup()
   Serial.begin(9600);
   while(!Serial);
   
-  BollardController.initBluetoothCustom(deviceName, deviceId,salt, controlServiceUID, statusCharUID, orderCharUID,  responseCharUID,lockedInitially);
+  BollardController.initBluetoothCustom(deviceName, deviceId,salt, controlServiceUID, 
+  statusCharUID, orderCharUID,  responseCharUID,lockedInitially);
 }
 void loop()
 {
-
   BollardController.waitForConnection();
-
 }
 
 

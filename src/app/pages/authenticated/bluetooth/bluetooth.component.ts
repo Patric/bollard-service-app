@@ -8,6 +8,7 @@ import {BridgeService} from '../../../_services/bridge.service'
 import { ActionSheetController, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { filter, switchMap, take } from 'rxjs/operators';
 import { FoundDevicesPage } from '../found-devices/found-devices.page';
+import { UserService } from 'src/app/_services/user.service';
 
 
 @Component({
@@ -52,15 +53,11 @@ export class BluetoothComponent implements OnInit, OnDestroy {
   constructor
 
   ( private bluetoothService: BluetoothService,
-    private http: HttpClient,
     private bridgeService: BridgeService,
-    private router: Router,
     private ngZone: NgZone,
-    private injector: Injector,
-    private actionSheetController: ActionSheetController,
     private toastController: ToastController,
-    private loadingController: LoadingController,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private userService: UserService
   ) {
 
     // Initial state
@@ -76,51 +73,18 @@ export class BluetoothComponent implements OnInit, OnDestroy {
       // Toggles initital state
       this.showConnectionDetails = true;
       this.showMessages = true;
-    
 
-      this.orderCodes = [
-        {
-          value: "200",
-          name: "FETCH DEVICE INFO",
-          description:"Fetches device's MacAddress, ID, name, current rssi and battery level from the device.",
-          icon: 'information-circle-outline'
-        },
-        {
-          value: "202",
-          name: "FETCH 5 LAST CONNECTED USERS",
-          description:"Fetches 5 last connected users in format | MacAddress | UserID |. Registered after disconnection.",
-          icon: 'arrow-down'
-        },
-        {
-          value: "205",
-          name: "FETCH 5 LAST USER EXECUTIONS",
-          description:"Fetches 5 last users that tried to execute codes in format | MacAddress | UserID | Code/Info |. Does not contain the current fetching order. ",
-          icon: 'download-outline'
-        },
-        {
-          value: "101",
-          name: "LOCK BOLLARD",
-          description:"Locks bollard.",
-          icon: 'lock-closed-outline'
-        },
-        {
-          value: "102",
-          name: "UNLOCK BOLLARD",
-          description:"Unlocks bollard.",
-          icon: 'lock-open-outline'
-        },
-        {
-          value: "130",
-          name: "INVERT INTERNAL LOCK STATE",
-          description:"Forcefully changes internal lock state to the inversed one.",
-          icon: 'hand-right-outline'
-        },
-        
-    
-    
-    
-      ];
   }
+
+
+  getUserCodes(){
+    this.userService.getUserOrderCodes().subscribe(orderCodes => 
+      this.ngZone.run(()=>{
+        this.orderCodes = orderCodes;
+      })
+      );
+  }
+
   ngOnDestroy(): void {
     //add clearing func
     if(this.connectionInfo$.value.status == "CONNECTED"){
@@ -128,13 +92,12 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     }
    
   }
-
   async ngOnInit() {
     await this.bluetoothService.ready();
+    this.getUserCodes();
   }
  
   // BLUETOOTH
-
   watchConnectonInfo(){
     this.bluetoothService.ble.getConnectionInfo().subscribe( (connectionInfo) => {
       this.ngZone.run( () => {
@@ -151,8 +114,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     }
     )
   }
-
-
 
   scanDevices() {
     // Start scanning and updating devices found
@@ -186,8 +147,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
       })
   }
 
-  
-
   async restart(){ 
     this.ngZone.run( () => {
       this.bluetoothService.ble.restart();
@@ -196,7 +155,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     this.restartBluetoothToast();
   
   }
-
 
   disconnect(){
     this.bluetoothService.ble.disconnect()//.subscribe( (connectionInfo) => {
@@ -211,17 +169,14 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   }
 
-
   sendMessage(code: String){
 
     this.ngZone.run( () => {
       this.sentMessageToast(code);
       this.appendChat(false, "Service App", code);
     });
-  
-    console.log("Sending code: ", JSON.stringify(code));
+
       this.bridgeService.authoriseOrder(code).subscribe(res =>{
-        console.log("Authorizing order status: ", res);
         res = JSON.stringify(JSON.parse(res), null, 2);
         res = res.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         this.ngZone.run( () => {
@@ -234,7 +189,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
 
   }
 
- 
   startScan(){
  
       this.scanningToast();
@@ -248,7 +202,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     (err) => console.error(err));
     
   }
-
   
   connect(dvc_address: string){
     // this.ngZone.run( () => {
@@ -256,8 +209,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     // });
       this.bluetoothService.ble.connect(dvc_address);
   }
-
- 
 
    // CHAT
    appendChat(incoming: boolean, source: String, text: String){
@@ -274,7 +225,6 @@ export class BluetoothComponent implements OnInit, OnDestroy {
     delete this.messages;
     this.messages = new Array<{incoming: boolean, source: String, text: String, timestamp: String}>();
   }
-
  // TOGGLES
  toggleOrderCodes(){
   this.showOrderCodes = !this.showOrderCodes;
@@ -381,7 +331,6 @@ toggleMessages(){
     this.messageToast.present();
   }
 
-
   async scanningToast(){
 
     this.connectionToast = await this.toastController.create({
@@ -441,6 +390,5 @@ toggleMessages(){
   }
 
   doRefresh(){
-
   }
 }
