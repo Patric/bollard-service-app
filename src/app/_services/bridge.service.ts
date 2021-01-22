@@ -1,12 +1,35 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { mergeMap, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
 import { BluetoothService } from './bluetooth/bluetooth.service';
 
-
+/**
+* @description
+* BridgeService provides integration between Bluetooth Device and HTTP server. It mainly alows sending and authorizing messages between the two parties.
+* @usage
+* ```
+* import { BridgeService } from 'bridge.service';
+* 
+* @Component({
+* selector: 'app-bluetooth',
+* templateUrl: './bluetooth.component.html',
+* styleUrls: ['./bluetooth.component.scss'],
+*  })
+*   export class BluetoothComponent{
+*   constructor(private bridgeService: BridgeService){...}
+*   exampleFunction(){
+*   this.bridgeService.order(code: String).subscibe(response => {
+*   
+*   console.log(response);
+*   })}
+}
+* 
+* 
+* ```
+*/
 @Injectable({
   providedIn: 'root'
 })
@@ -18,11 +41,15 @@ export class BridgeService {
     private authService: AuthService
     ) { }
 
- 
+ /**
+* @description
+* Authorizes order sent to the device.
+* 
+* @returns ```Observable<any>``` of response from the device.
+* ```
+*/
   authoriseOrder(code: String): Observable<any>{
-   
- 
-
+  
     // get challenge and initiate authentication
     return this.getChallenge(code)
     .pipe(switchMap(response => {
