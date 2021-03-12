@@ -2,8 +2,7 @@
 
 https://github.com/Patric/bollard-service-app/
 
-This repository cointains code of BEng graduate project of application for secure communication with an Internet of Things (IoT) device. As an example of such setup a service application for an intelligent parking bollard has been chosen. The application may be a part of more complex system that has not been included in the thesis. The assumptions made for the aforementioned issue concern lack of continues Internet connection of the bollard control device and to this problem a study on Internet of Things, web applications and cybersecurity is addressed.
-
+This repository cointains code of BEng graduate project of application for secure communication with an Internet of Things (IoT) device. 
 
 
 Web development frameworks and languages: Angular 9, Ionic 5, Typescript
