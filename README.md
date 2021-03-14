@@ -50,6 +50,8 @@ Test data:
 username: user_1 
 password: test
 
+GIFs: (Application GUI on the right side, Arduino Serial Port on the bottom, Application console on the left. Authentication steps are visible in application console)
+
 Logging in:
 
 ![log-in](https://user-images.githubusercontent.com/55952226/111076721-c1e41d00-84ed-11eb-8aaf-e04c6e06aa93.gif)
@@ -58,9 +60,23 @@ Connecting to a device:
 
 ![operations-page](https://user-images.githubusercontent.com/55952226/111076820-4e8edb00-84ee-11eb-843a-3933edd13361.gif)
 
-Sending orders
+Sending custom messages
+
+![custom-code](https://user-images.githubusercontent.com/55952226/111077356-ba724300-84f0-11eb-89c5-4a65ebb0867a.gif)
+
+
+Sending predefined orders
 
 ![orders](https://user-images.githubusercontent.com/55952226/111077143-ac6ff280-84ef-11eb-96df-63346514865f.gif)
+
+Android native version
+
+![ionic-native](https://user-images.githubusercontent.com/55952226/111077660-1db0a500-84f2-11eb-9c9c-20932422492e.gif)
+
+
+PC PWA version
+
+
 
 ![app_presentation](https://user-images.githubusercontent.com/55952226/111075999-b3483680-84ea-11eb-902a-d705c5d64d63.gif)
 
