@@ -1,4 +1,4 @@
-# bollard-service-app
+# bollard-service-app alpha
 
 https://github.com/Patric/bollard-service-app/
 
@@ -49,6 +49,12 @@ ionic cap run android --livereload --external
 Test data:
 username: user_1 
 password: test
+
+Logging in:
+
+![log-in](https://user-images.githubusercontent.com/55952226/111076721-c1e41d00-84ed-11eb-8aaf-e04c6e06aa93.gif)
+
+
 
 ![app_presentation](https://user-images.githubusercontent.com/55952226/111075999-b3483680-84ea-11eb-902a-d705c5d64d63.gif)
 
