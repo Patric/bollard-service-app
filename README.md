@@ -2,7 +2,7 @@
 
 https://github.com/Patric/bollard-service-app/
 
-This repository cointains code of BEng graduate project of Ionic application for secure communication with an Internet of Things (IoT) device. As an example a service application for IoT device has been chosen. Communication is established via Bluetooth 4.2 protocol between Arduino Nano 33 IoT and Ionic (Angular + TypeScript) using a PWA/Native facade and adapters that has been written exclusively for this problem. Connection is secured with third party mockbackend authentication using HMAC-SHA256 algorithm in one-channel communication device-userApp-backend.
+This repository cointains code of BEng graduate project of Ionic application for secure communication with an Internet of Things (IoT) device. As an example a service application for IoT device has been chosen. Communication is established via Bluetooth 4.2 protocol between Arduino Nano 33 IoT and Ionic (Angular + TypeScript) using a PWA/Native facade and adapters that has been written exclusively for this problem. Connection is secured with third party authentication (mock backed for now) using HMAC-SHA256 algorithm in one-channel communication offline-device-userApp-backend.
 
 
 Web development frameworks and languages: Angular 9, Ionic 5, Typescript
@@ -58,6 +58,9 @@ Connecting to a device:
 
 ![operations-page](https://user-images.githubusercontent.com/55952226/111076820-4e8edb00-84ee-11eb-843a-3933edd13361.gif)
 
+Sending orders
+
+![orders](https://user-images.githubusercontent.com/55952226/111077143-ac6ff280-84ef-11eb-96df-63346514865f.gif)
 
 ![app_presentation](https://user-images.githubusercontent.com/55952226/111075999-b3483680-84ea-11eb-902a-d705c5d64d63.gif)
 
