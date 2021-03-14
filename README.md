@@ -75,17 +75,16 @@ Sending predefined orders
 
 ***Android native***
 
-Android native version
 
 ![ionic-native](https://user-images.githubusercontent.com/55952226/111077660-1db0a500-84f2-11eb-9c9c-20932422492e.gif)
 
 
 ***PC PWA***
 
+![PWA_PC](https://user-images.githubusercontent.com/55952226/111077768-9fa0ce00-84f2-11eb-9e94-03957491fdeb.gif)
 
 
-![app_presentation](https://user-images.githubusercontent.com/55952226/111075999-b3483680-84ea-11eb-902a-d705c5d64d63.gif)
-
+***FULL VIDEO***
 
 https://user-images.githubusercontent.com/55952226/111075113-b2ada100-84e6-11eb-8e29-1c16269dedda.mp4
 
