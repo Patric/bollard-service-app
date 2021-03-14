@@ -34,11 +34,6 @@ cordova
 + cordova-plugin-whitelist 1.3.3 "Whitelist"
 
 After downloading all npm, angular and ionic packages and addons use
-![app_presentation](https://user-images.githubusercontent.com/55952226/111075999-b3483680-84ea-11eb-902a-d705c5d64d63.gif)
-
-
-https://user-images.githubusercontent.com/55952226/111075113-b2ada100-84e6-11eb-8e29-1c16269dedda.mp4
-
 
 to run application on Android browser (common wi-fi network for PC and smartphone may be needed) or Windows browser:
 ```
@@ -54,5 +49,10 @@ ionic cap run android --livereload --external
 Test data:
 username: user_1 
 password: test
+
+![app_presentation](https://user-images.githubusercontent.com/55952226/111075999-b3483680-84ea-11eb-902a-d705c5d64d63.gif)
+
+
+https://user-images.githubusercontent.com/55952226/111075113-b2ada100-84e6-11eb-8e29-1c16269dedda.mp4
 
 
