@@ -1,4 +1,4 @@
-# bollard-service-app alpha
+IoT Device Service Application (Alpha)
 
 https://github.com/Patric/bollard-service-app/
 
