@@ -36,9 +36,9 @@ cordova
 + cordova-plugin-statusbar 2.4.2 "StatusBar"
 + cordova-plugin-whitelist 1.3.3 "Whitelist"
 
-After downloading all npm, angular and ionic packages and addons use
+After downloading all npm, angular and ionic packages and addons use:
 
-to run application on Android browser (common wi-fi network for PC and smartphone may be needed) or Windows browser:
+to run application on Android browser (shared wi-fi network for PC and smartphone may be needed) or Windows browser:
 ```
 ionic cap run android --livereload --external --ssl
 ```
