@@ -5,10 +5,10 @@ https://github.com/Patric/bollard-service-app/
 Arduino library supporting this application with doxygen documentation:
 https://github.com/Patric/bollard-service-app/tree/master/arduino/BollardController
 
-This repository cointains code of BEng graduate project of Ionic application for secure communication with an Internet of Things (IoT) device. As an example a service application for IoT device has been chosen. Communication is established via Bluetooth 4.2 protocol between Arduino Nano 33 IoT and Ionic (Angular + TypeScript) using a PWA/Native facade and adapters that has been written exclusively for this problem. Connection is secured with third party authentication (mock backed for now) using HMAC-SHA256 algorithm in one-channel communication offline-device-userApp-backend.
+This repository cointains code of BEng graduate project of Ionic application for secure communication with an Internet of Things (IoT) device. As an example a service application for IoT device has been chosen. Communication is established via Bluetooth 4.2 protocol between Arduino Nano 33 IoT and Ionic (Angular + TypeScript) using a PWA/Native facade and adapters that has been written exclusively for this problem. Connection is secured with challenge-response authentication between offline Arduino (only bluetooth), user application (bridge) and Backed which authorizes every operation on the device (mock backed for now). For messages integrity and MITM attacks avoidance HMAC-SHA256 algorithm has been used. 
 
 
-Web development frameworks and languages: Angular 9, Ionic 5, Typescript
+Web development frameworks and languages: Angular 9, Ionic 5, Typescript and a few plugins and packages.
 
 Arduino: C++, sha256, arduino_json, ArduinoBLE
 
