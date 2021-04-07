@@ -42,7 +42,7 @@ to run application on Android browser (shared wi-fi network for PC and smartphon
 ```
 ionic cap run android --livereload --external --ssl
 ```
-to run application on native device use (common wi-fi network for PC and smartphone may be needed). Android Studio will be required.
+to run application on native device use (shared wi-fi network for PC and smartphone may be needed). Android Studio will be required.
 ```
 ionic cap run android --livereload --external
 ```
